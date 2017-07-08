@@ -1,6 +1,16 @@
 
-backEnd/.idea/.name
-backEnd/.idea/libraries/Maven__org_javassist_javassist_3_20_0_GA.xml
-backEnd/.idea/compiler.xml
-backEnd/.idea/copyright/profiles_settings.xml
-*.xml
+.idea/
+build/
+out/
+
+*.bat
+classes/
+libs/
+
+.classpath
+.project
+.settings/
+
+.DS_Store
+
+webapp/
