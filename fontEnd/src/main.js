@@ -11,12 +11,14 @@ Vue.use(Element)
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login') {
-    sessionStorage.removeItem('userToken')
+  if (to.meta.needAuth === false) {
+    next()
+    return
   }
-  let token = sessionStorage.getItem('userToken')
-  console.log(token)
-  if (!token && to.path !== '/login') {
+  let token = store.getters.token
+  if (token != null && to.path === '/login') {
+    next('/')
+  } else if (token == null && to.path !== '/login') {
     next({ path: '/login' })
   } else {
     next()

@@ -53,7 +53,7 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @RequestMapping(value = "/user",method = RequestMethod.GET)
+    @RequestMapping(value = "/user",method = RequestMethod.POST)
     public ResJsonTemplate testUser(){
         return new ResJsonTemplate<>("400","you are user");
     }
