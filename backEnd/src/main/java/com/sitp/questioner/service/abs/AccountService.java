@@ -1,4 +1,4 @@
-package com.sitp.questioner.service;
+package com.sitp.questioner.service.abs;
 
 import com.sitp.questioner.entity.Account;
 
