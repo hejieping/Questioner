@@ -14,3 +14,4 @@ libs/
 .DS_Store
 
 webapp/
+backEnd/src/main/resources/application.properties
