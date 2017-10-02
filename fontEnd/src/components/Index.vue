@@ -68,6 +68,7 @@
 <script>
   import TopHeader from './top-header/Top-Header.vue'
   import MainContent from './main-content/Content.vue'
+
   export default{
     components: {
       'top-header': TopHeader,

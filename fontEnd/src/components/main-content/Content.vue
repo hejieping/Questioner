@@ -9,6 +9,7 @@
   import List from './ContentItem.vue'
   import bus from '../../assets/eventBus'
   import fetch from '@/utils/fetch'
+  import $ from 'jquery'
 
   export default{
     data () {
