@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
-import Hello from '@/components/Hello'
+import Index from '@/components/Index'
 import All from '@/components/All'
 
 Vue.use(Router)
@@ -10,9 +10,9 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'hello',
-      component: Hello,
-      meta: {needAuth: true}
+      name: 'index',
+      component: Index,
+      meta: {needAuth: false}
     },
     {
       path: '/login',

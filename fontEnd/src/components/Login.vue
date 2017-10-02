@@ -1,8 +1,8 @@
 <template>
   <div id="loginContainer">
     <el-card class="box-card">
-      <div slot="header" class="clearfix title">
-        <span style="line-height: 36px;">遇见知识</span>
+      <div slot="header" class="clearfix login-title">
+        <span style="">遇见知识</span>
       </div>
       <div>
         <el-form ref="loginform" :model="loginform" :rules="loginrule">
@@ -14,13 +14,12 @@
             <el-input type="password" v-model="loginform.password" autoComplete="false"
                    icon="edit" placeholder="请输入密码"></el-input>
           </el-form-item>
-          <el-form-item>
-            <el-button  style="width: 100%" type="success" :loading="logining" @click.native.prevent="login" >登录</el-button>
+          <el-form-item class="login-button">
+            <el-button style="width: 100%" type="success" :loading="logining" @click.native.prevent="login" >登录</el-button>
           </el-form-item>
         </el-form>
       </div>
     </el-card>
-    <span v-show="hasLogin">sderer</span>
   </div>
 </template>
 <script>
@@ -33,7 +32,7 @@
           password: ''
         },
         loginrule: {
-          account: [
+          username: [
             { required: true, message: '请输入账号', trigger: 'blur' }
           ],
           password: [
@@ -67,16 +66,30 @@
     }
   }
 </script>
-<style scoped>
+<style>
   #loginContainer{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
     margin: 100px auto;
     width: 400px;
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;
   }
-  .title{
+  #loginContainer button span{
+    color: white;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .login-title{
+    text-align: center;
+  }
+  #loginContainer .login-title span{
     font-family: "Arial","Microsoft YaHei","黑体","宋体",sans-serif;
-    color: dodgerblue;
-    font-size: 2em;
+    color: dodgerblue ;
+    font-size: 2em ;
+    line-height: 36px;
   }
 </style>
