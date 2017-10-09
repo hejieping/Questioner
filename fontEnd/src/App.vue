@@ -6,7 +6,9 @@
     </transition>
   </div>
 </template>
-
+<style>
+  html,body{background: #f1efe2;}
+</style>
 <script>
 export default {
   name: 'app'
@@ -14,31 +16,30 @@ export default {
 </script>
 
 <style>
-   *{
-    /*css reset*/
-    margin:0;
-    padding:0;
-    list-style:none;
+  * {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    word-wrap: break-word;
     box-sizing:border-box;
     font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
     font-size: 13px;
     line-height: 1.7;
-    color:#666;
-    text-align: left;
   }
-  a{
-    cursor: pointer;
-    text-decoration:none;
+  h1{
+    font-family: 'Raleway',Arial,sans-serif;
+    font-weight: 700;
+    font-size: 45px;
+    margin-top: 15px;
+    color: #38935f;
   }
-  a:hover{
-    text-decoration: underline;
-    color:#259;
-  }
-  .left{
-    float:left;
-  }
-  .right{
-    float:right;
+  h3{
+    font-family: 'Raleway',Arial,sans-serif;
+    font-weight: 400;
+    font-size: 25px;
+    margin-top: 15px;
+    color: #918e84;
   }
 .fade-enter-active,
 .fade-leave-active {
