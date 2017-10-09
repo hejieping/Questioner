@@ -1,6 +1,10 @@
 <template>
   <el-menu theme="dark" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-    <el-menu-item index="0"><img width="61" height="30" src="./img/logo.png" /></el-menu-item>
+    <el-menu-item index="0">
+      <router-link to="/">
+        <img width="61" height="30" src="./img/logo.png" />
+      </router-link>
+    </el-menu-item>
     <el-menu-item index="1" >
       <el-input
         @keyup.enter.native="search" v-model="question" icon="search" :on-icon-click="search" placeholder="请输入搜索内容">
@@ -11,13 +15,19 @@
       <template slot="title"><span><img src="./img/user.jpg" class="thumbnail">
         个人中心</span>
       </template>
-      <el-menu-item index="3-1">个人资料</el-menu-item>
-      <el-menu-item index="3-2">问题中心</el-menu-item>
+      <el-menu-item @click="$router.push('/personInfo')" index="3-1">
+          个人资料
+       </el-menu-item>
+      <el-menu-item index="3-2">
+        <router-link to="/personInfo">
+          问题中心
+        </router-link>
+      </el-menu-item>
       <el-menu-item @click="logout" index="3-3">退出登录</el-menu-item>
     </el-submenu>
   </el-menu>
 </template>
-<style>
+<style scoped>
   ul.el-menu{
     padding-left: 40px;
   }

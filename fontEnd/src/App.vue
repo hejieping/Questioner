@@ -27,6 +27,13 @@ export default {
     font-size: 13px;
     line-height: 1.7;
   }
+  h1,h2,h3{text-align: center;}
+  ol, ul {
+    list-style: none;
+  }
+  a{
+    text-decoration: none;
+  }
   h1{
     font-family: 'Raleway',Arial,sans-serif;
     font-weight: 700;

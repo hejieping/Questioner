@@ -16,9 +16,9 @@ router.beforeEach((to, from, next) => {
     return
   }
   let token = store.getters.token
-  if (token != null && to.path === '/login') {
+  if (token !== null && to.path === '/login') {
     next('/')
-  } else if (token == null && to.path !== '/login') {
+  } else if (token === null && to.path !== '/login') {
     next({ path: '/login' })
   } else {
     next()
