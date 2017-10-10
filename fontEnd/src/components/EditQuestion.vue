@@ -17,13 +17,11 @@
         </el-form-item>
         <el-form-item label="问题描述">
           <div class="editor-container">
-            <UE :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
+            <UE :name="content" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
           </div>
         </el-form-item>
-        <el-form-item style="float: right">
-          <el-button  size="small" type="success"  @click="getUEContent()">发布问题</el-button>
-        </el-form-item>
       </el-form>
+      <el-button style="float: right"  size="small" type="success"  @click="getUEContent()">发布问题</el-button>
     </div>
   </div>
 </template>
@@ -79,6 +77,7 @@
           message: content,
           type: 'success'
         })
+        console.log(content)
       }
     }
   }

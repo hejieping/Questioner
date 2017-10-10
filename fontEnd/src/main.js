@@ -6,10 +6,6 @@ import router from './router'
 import Element from 'element-ui'
 import store from './store'
 import 'element-ui/lib/theme-default/index.css'
-import '../static/UE/ueditor.config'
-import '../static/UE/ueditor.all.min.js'
-import '../static/UE/lang/zh-cn/zh-cn'
-import '../static/UE/ueditor.parse.min'
 
 Vue.use(Element)
 

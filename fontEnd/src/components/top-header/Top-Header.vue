@@ -20,10 +20,8 @@
       <el-menu-item @click="$router.push('/personInfo')" index="3-1">
           个人资料
        </el-menu-item>
-      <el-menu-item index="3-2">
-        <router-link to="/personInfo">
+      <el-menu-item @click="$router.push('/showContent')" index="3-2">
           问题中心
-        </router-link>
       </el-menu-item>
       <el-menu-item @click="logout" index="3-3">退出登录</el-menu-item>
     </el-submenu>
