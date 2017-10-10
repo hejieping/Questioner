@@ -10,7 +10,9 @@
         @keyup.enter.native="search" v-model="question" icon="search" :on-icon-click="search" placeholder="请输入搜索内容">
       </el-input>
     </el-menu-item>
-    <el-menu-item index="2">去提问</el-menu-item>
+    <el-menu-item @click="$router.push('/editQuestion')" index="2">
+        去提问
+    </el-menu-item>
     <el-submenu id="personInfo" index="3">
       <template slot="title"><span><img src="./img/user.jpg" class="thumbnail">
         个人中心</span>
@@ -33,7 +35,7 @@
   }
   #personInfo{
     float: right;
-    margin-right: 10px;
+    margin-right: 65px;
   }
 </style>
 <script>
