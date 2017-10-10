@@ -4,11 +4,13 @@ import Login from '@/components/Login'
 import Index from '@/components/Index'
 import All from '@/components/All'
 import PersonInfo from '@/components/PersonInfo'
-import Content from '@/components/Content'
+import Content from '@/components/main-content/Content'
+import QuestionList from '@/components/main-content/QuestionList'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -16,10 +18,30 @@ export default new Router({
       component: Index,
       children: [
         {
-          name: 'index', path: '', component: Content, meta: {needAuth: false}
+          name: 'index',
+          path: '/',
+          component: Content,
+          children: [
+            {
+              name: 'allQuestion',
+              path: '/',
+              component: QuestionList,
+              meta: {needAuth: false}
+            }
+          ]
         },
         {
-          name: 'personInfo', path: 'personInfo', meta: {needAuth: false}
+          name: 'personInfo', path: '/personInfo', meta: {needAuth: false}
+        },
+        {
+          name: 'questionContent',
+          path: 'questions',
+          component: Content,
+          children: [
+            {
+              name: 'questions', path: '/questions/:questionType', component: QuestionList, meta: {needAuth: false}
+            }
+          ]
         }
       ]
     },

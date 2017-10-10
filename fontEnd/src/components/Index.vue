@@ -17,7 +17,7 @@
 </style>
 <script>
   import TopHeader from './top-header/Top-Header.vue'
-  import Content from './Content.vue'
+  import Content from './main-content/Content.vue'
   export default {
     data () {
       return {
