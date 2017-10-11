@@ -80,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                         "/**/*.css",
                         "/**/*.js").permitAll()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/question/**").permitAll()
                 .antMatchers("/ueditor/**").permitAll()
                 .antMatchers("/index","/register").permitAll()
                 .anyRequest().authenticated();

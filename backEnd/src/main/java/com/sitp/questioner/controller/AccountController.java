@@ -28,10 +28,9 @@ public class AccountController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResJsonTemplate register(@RequestBody Account addedUser)  {
         if (accountService.register(addedUser) != null) {
-
-            return new ResJsonTemplate<java.lang.String>("201", "注册成功");
+            return new ResJsonTemplate<>("201", "注册成功");
         } else {
-            return new ResJsonTemplate<java.lang.String>("400", "注册失败");
+            return new ResJsonTemplate<>("400", "注册失败");
         }
     }
 
