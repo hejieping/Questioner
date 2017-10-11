@@ -22,7 +22,7 @@ UE.Editor.prototype.getKfContent = function(callback){
         var imgType = item.getAttribute('src').match(/^[^;]+/)[0];
         if ( imgType === 'data:image/png') {
             base64Imgs.push(item);
-        }    
+        }
     });
 
     if (base64Imgs.length == 0){
@@ -58,7 +58,6 @@ UE.Editor.prototype.getKfContent = function(callback){
 
     function execCallback(){
         if (count >= base64Imgs.length) {
-            ue.sync();
             callback(me.getContent());
         }
     }

@@ -55,8 +55,8 @@
       })
     },
     methods: {
-      getUEContent () {
-        return this.editor.getContent()
+      getUEditor () {
+        return this.editor
       }
     },
     destroyed () {

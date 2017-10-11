@@ -101,7 +101,7 @@
         //启用自动保存
         //,enableAutoSave: true
         //自动保存间隔时间， 单位ms
-        //,saveInterval: 500
+        ,saveInterval: 50000
 
         //,fullscreen : false //是否开启初始化时即全屏，默认关闭
 

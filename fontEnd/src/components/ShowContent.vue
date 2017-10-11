@@ -50,6 +50,9 @@ int main(){
         </p>
       </li>
     </ol>
+    <p>
+      <img class="kfformula" src="http://localhost:8080/img/ueditor/20171011/1507718725897069084.jpg" data-latex="\approx \approx \approx \approx \approx "/>
+    </p>
   </div>
 </template>
 <style>

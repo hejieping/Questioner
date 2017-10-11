@@ -47,7 +47,7 @@
         defaultMsg: '',
         config: {
           initialFrameWidth: null,
-          initialFrameHeight: 150
+          initialFrameHeight: 250
         },
         questionTitle: '',
         questionType: '',
@@ -71,11 +71,14 @@
     },
     methods: {
       getUEContent () {
-        let content = this.$refs.ue.getUEContent()
-        this.$notify({
-          title: '获取成功，可在控制台查看！',
-          message: content,
-          type: 'success'
+        let editor = this.$refs.ue.getUEditor()
+        var _this = this
+        editor.getKfContent(function (content) {
+          _this.$notify({
+            title: '获取成功，可在控制台查看！',
+            message: content,
+            type: 'success'
+          })
         })
       }
     }
