@@ -1,9 +1,6 @@
 package com.sitp.questioner.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created by qi on 2017/10/11.
@@ -22,6 +19,10 @@ public class Question {
 
     @Column(name = "questionContentTxt", columnDefinition = "TEXT")
     private String questionContentTxt; // plain text of the question remove the format
+
+    @JoinColumn(name = "type_id")
+    @ManyToOne
+    private QuestionType questionType;
 
     public Long getId() {
         return id;
@@ -55,6 +56,14 @@ public class Question {
         this.questionContentTxt = questionContentTxt;
     }
 
+    public QuestionType getQuestionType() {
+        return questionType;
+    }
+
+    public void setQuestionType(QuestionType questionType) {
+        this.questionType = questionType;
+    }
+
     @Override
     public String toString() {
         return "Question{" +
@@ -62,6 +71,7 @@ public class Question {
                 ", questionTitle='" + questionTitle + '\'' +
                 ", questionContent='" + questionContent + '\'' +
                 ", questionContentTxt='" + questionContentTxt + '\'' +
+                ", questionType=" + questionType +
                 '}';
     }
 }

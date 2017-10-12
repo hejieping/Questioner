@@ -24,30 +24,15 @@ export default {
     word-wrap: break-word;
     box-sizing:border-box;
     font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
-    font-size: 13px;
     line-height: 1.7;
   }
-  h1,h2,h3{text-align: center;}
   ol, ul {
     list-style: none;
   }
   a{
     text-decoration: none;
   }
-  h1{
-    font-family: 'Raleway',Arial,sans-serif;
-    font-weight: 700;
-    font-size: 45px;
-    margin-top: 15px;
-    color: #38935f;
-  }
-  h3{
-    font-family: 'Raleway',Arial,sans-serif;
-    font-weight: 400;
-    font-size: 25px;
-    margin-top: 15px;
-    color: #918e84;
-  }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: all .2s ease;

@@ -1,48 +1,26 @@
 <template>
   <div id="canvas">
-    <div id="nav">
+    <div id="nav" v-loading.lock='loading'>
       <ul id="toggle">
         <li>
           <div class="active border">
             <router-link to="/">所有问题</router-link>
           </div>
         </li>
-        <li>
+        <li v-for="(value,key) in questionTypeMap">
           <div>
-            <a href="javascript:void(0)">About Us</a>
-            <span class="the-btn el-icon-plus"></span>
-          </div>
-          <ul style="">
-            <li>
-              <router-link to="/questions/c++">
-                C++
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/questions/java">
-                Java
-              </router-link>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <div style="word-wrap: break-word">
-            <a href="javascript:void(0)">PORTFOLIO</a>
+            <a href="javascript:void(0)">
+              {{ key }}
+            </a>
             <span class="the-btn el-icon-plus"></span>
           </div>
           <ul>
-            <li>
-              <a href="#">WEB DESIGN</a>
-            </li>
-            <li>
-              <a href="#">GRAPHIC DESIGN efr</a>
+            <li v-for="type in value">
+              <router-link :to="{ path : '/questions/' + type.id }">
+                {{ type.course }}
+              </router-link>
             </li>
           </ul>
-        </li>
-        <li>
-          <div>
-            <a href="#">CONTACT</a>
-          </div>
         </li>
       </ul>
     </div>
@@ -202,22 +180,45 @@
 </style>
 <script>
   import $ from 'jquery'
+  import { getQuestionType } from '@/api/question'
+  import { Message } from 'element-ui'
+  import { transformQuestionType2Map } from '@/utils/util'
 
   export default {
     data () {
       return {
-        message: 'Hello World'
+        message: 'Hello World',
+        questionTypeArray: [],
+        loading: true
+      }
+    },
+    computed: {
+      questionTypeMap () {
+        return transformQuestionType2Map(this.questionTypeArray)
       }
     },
     mounted: function () {
-      this.initEvent()
+      var _this = this
+      this.initToggleEvent()
+      this.openNav()
+      getQuestionType().then((response) => {
+        if (response.status === '200') {
+          _this.questionTypeArray = response.result
+          _this.loading = false
+          _this.$nextTick(function () {
+            _this.initEvent()
+          })
+        }
+      }).catch((e) => {
+        Message({
+          message: '获取问题类别信息失败',
+          type: 'error',
+          duration: 5 * 1000
+        })
+      })
     },
     methods: {
       initEvent () {
-        var _this = this
-        $('.toggle-nav').click(function () {
-          _this.toggleNavigation()
-        })
         // SLiding codes
         $('#toggle > li > div').click(function () {
           if ($(this).next().is(':visible') === false) {
@@ -235,9 +236,12 @@
           $('#toggle > li > div').removeClass('active')
           $(this).addClass('active')
         })
-        if ($('#container').hasClass('display-nav')) {
-          this.closeNav()
-        }
+      },
+      initToggleEvent () {
+        var _this = this
+        $('.toggle-nav').click(function () {
+          _this.toggleNavigation()
+        })
       },
       closeNav () {
         $('#container').removeClass('display-nav')

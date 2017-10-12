@@ -7,12 +7,17 @@
         </el-form-item>
         <el-form-item prop="questionType" label="问题类型">
           <el-select v-model="questionForm.questionType" filterable placeholder="请选择">
-            <el-option
-              v-for="item in questionTypeArray"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+            <el-option-group
+              v-for="group in groupQuestionType"
+              :key="group.label"
+              :label="group.label">
+              <el-option
+                v-for="item in group.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-option-group>
           </el-select>
         </el-form-item>
         <el-form-item label="问题描述">
@@ -40,13 +45,15 @@
 </style>
 <script>
   import UE from '../components/UE.vue'
-  import { raiseQuestion } from '@/api/question'
+  import { raiseQuestion, getQuestionType } from '@/api/question'
   import { Message } from 'element-ui'
+  import { transformQuestionType2Map } from '@/utils/util'
   export default {
     components: {UE},
     data () {
       return {
         defaultMsg: '',
+        questionTypeArray: [],
         config: {
           initialFrameWidth: null,
           initialFrameHeight: 250
@@ -55,22 +62,6 @@
           questionTitle: '',
           questionType: ''
         },
-        questionTypeArray: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
         rules: {
           questionTitle: [
             { required: true, message: '请输入问题标题', trigger: 'blur' }
@@ -81,6 +72,34 @@
         }
       }
     },
+    computed: {
+      groupQuestionType () {
+        const questionTypeMap = transformQuestionType2Map(this.questionTypeArray)
+        let options = []
+        for (var key in questionTypeMap) {
+          let option = []
+          let typeArray = questionTypeMap[key]
+          for (var i = 0; i < typeArray.length; i++) {
+            option.push({
+              label: typeArray[i]['course'],
+              value: '' + typeArray[i]['id']
+            })
+          }
+          options.push({
+            label: key,
+            options: option
+          })
+        }
+        return options
+      }
+    },
+    mounted: function () {
+      getQuestionType().then((response) => {
+        if (response.status === '200') {
+          this.questionTypeArray = response.result
+        }
+      })
+    },
     methods: {
       submitQuestion (formName) {
         this.$refs[formName].validate((valid) => {
@@ -88,7 +107,7 @@
             let editor = this.$refs.ue.getUEditor()
             var _this = this
             editor.getKfContent(function (content) {
-              raiseQuestion(_this.questionForm.questionTitle, content, editor.getContentTxt())
+              raiseQuestion(_this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
                 .then((response) => {
                   if (response.status === '201') {
                     Message({

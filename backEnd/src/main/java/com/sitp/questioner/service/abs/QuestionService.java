@@ -7,4 +7,6 @@ import com.sitp.questioner.entity.Question;
  */
 public interface QuestionService {
     boolean saveQuestion(Question question);
+
+    Question getQuestion(Long questionId);
 }

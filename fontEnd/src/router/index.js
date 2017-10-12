@@ -8,6 +8,7 @@ import Content from '@/components/main-content/Content'
 import QuestionList from '@/components/main-content/QuestionList'
 import EditQuestion from '@/components/EditQuestion'
 import ShowContent from '@/components/ShowContent'
+import PersonQuestion from '@/components/PersonQuestion'
 
 Vue.use(Router)
 
@@ -50,6 +51,9 @@ export default new Router({
         },
         {
           name: 'ShowContent', path: '/showContent', component: ShowContent, meta: {needAuth: false}
+        },
+        {
+          name: 'personalQuestion', path: '/personalQuestion/:questionId', component: PersonQuestion, meta: {needAuth: false}
         }
       ]
     },
