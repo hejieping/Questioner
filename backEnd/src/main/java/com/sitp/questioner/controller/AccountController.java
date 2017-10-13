@@ -5,10 +5,14 @@ import com.sitp.questioner.jwt.JwtAuthenticationRequest;
 import com.sitp.questioner.jwt.JwtAuthenticationResponse;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AuthService;
+import com.sitp.questioner.util.FIleSaveUtil;
 import com.sitp.questioner.util.ResJsonTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 /**
  * Created by jieping on 2017-07-08.
@@ -19,6 +23,10 @@ public class AccountController {
     AuthService authService;
     @Autowired
     AccountService accountService;
+
+    @Value("${deployment.url}")
+    private String deploymentURL ;
+
     @RequestMapping(value = "/index")
     @ResponseBody
     public ResJsonTemplate hello() {
@@ -44,6 +52,15 @@ public class AccountController {
         return new ResJsonTemplate<>("400", authenticationResponse);
     }
 
+
+    @RequestMapping(value = "/uploadAvatar", consumes = "multipart/form-data",method = RequestMethod.POST)
+    public ResJsonTemplate uploadAvatar(@RequestParam("avatar") MultipartFile avatarFile){
+        if(!avatarFile.isEmpty())
+        {
+            FIleSaveUtil.saveAvatar(avatarFile);
+        }
+        return new ResJsonTemplate<>("200","上传头像成功");
+    }
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/admin",method = RequestMethod.GET)
     public ResJsonTemplate testAdmin()
