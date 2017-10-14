@@ -1,7 +1,11 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,11 +20,17 @@ public class Account {
     private String username;
     @Column(nullable = false)
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    @Column(nullable = false)
+    private String avatarURL;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name="account_role",joinColumns = {
             @JoinColumn(name = "account_id",referencedColumnName = "id"),
     },inverseJoinColumns = {@JoinColumn(name = "role_id",referencedColumnName = "id")})
     private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Answer> answers = new ArrayList<>();
 
     public void setId(Long id) {
         this.id = id;
@@ -43,6 +53,14 @@ public class Account {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAvatarURL() {
+        return avatarURL;
+    }
+
+    public void setAvatarURL(String avatarURL) {
+        this.avatarURL = avatarURL;
     }
 
     public Set<Role> getRoles() {

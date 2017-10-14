@@ -1,6 +1,8 @@
 package com.sitp.questioner.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by qi on 2017/10/11.
@@ -23,6 +25,11 @@ public class Question {
     @JoinColumn(name = "type_id")
     @ManyToOne
     private QuestionType questionType;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Answer> answers = new ArrayList<>();
+
+
 
     public Long getId() {
         return id;
@@ -62,6 +69,14 @@ public class Question {
 
     public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 
     @Override

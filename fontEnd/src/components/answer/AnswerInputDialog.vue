@@ -7,12 +7,12 @@
     </div>
     <div style="margin-top: 20px">
       <div>
-        <ue :fullscreen="false" :config="config" ref="ue"></ue>
+        <UE  :config="config" ref="ue"></UE>
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click.prevent="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click.prevent="dialogVisible = false">确 定</el-button>
+      <el-button type="primary" @click.prevent="submitAnswer()">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -28,14 +28,15 @@
 <script>
   import UE from '@/components/UE.vue'
   export default {
-    components: {'ue': UE},
+    components: { UE },
     data () {
       return {
         dialogVisible: false,
         config: {
           initialFrameWidth: 900,
           initialFrameHeight: 250
-        }
+        },
+        editorReady: false
       }
     },
     props: {
@@ -55,11 +56,29 @@
           this.$emit('dialogOpen')
         }
         this.dialogVisible = true
+        let _this = this
+        this.$nextTick(function () {
+          let ueditor = _this.getEditor()
+          ueditor.addListener('ready', function () {
+            ueditor.setContent('') // 确保UE加载完成后，放入内容。
+            _this.editorReady = true
+          })
+        })
+        if (_this.editorReady) {
+          this.getEditor().setContent('')
+        }
       },
       close () {
         if (this.dialogVisible) {
           this.$emit('dialogClose')
         }
+        this.dialogVisible = false
+      },
+      getEditor () {
+        return this.$refs.ue.getUEditor()
+      },
+      submitAnswer () {
+        this.$emit('submitAnswer', this.getEditor().getContent())
         this.dialogVisible = false
       }
     }

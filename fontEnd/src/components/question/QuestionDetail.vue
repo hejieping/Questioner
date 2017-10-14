@@ -18,7 +18,7 @@
       </div>
       <div id="answers-panel" v-loading.lock="answerLoading">
         <div id="answer-summary">
-          共有 100 个回答
+          共有 {{ answerNum }} 个回答
           <span id="sort-panel">排序</span>
         </div>
 
@@ -73,7 +73,7 @@
 
       </div>
     </div>
-    <answer-dialog ref="dialog"></answer-dialog>
+    <answer-dialog @submitAnswer="submit" ref="dialog"></answer-dialog>
   </div>
 </template>
 <style scoped>
@@ -126,7 +126,7 @@
   }
 </style>
 <script>
-  import { getQuestion } from '@/api/question'
+  import { getQuestion, postAnswer, getAnswerNum } from '@/api/question'
   import { Message } from 'element-ui'
   import '../../../static/UE/ueditor.parse'
   import AnswerInputDialog from '@/components/answer/AnswerInputDialog'
@@ -140,13 +140,17 @@
           questionId: null
         },
         questionLoading: true,
-        answerLoading: false,
+        answerLoading: true,
+        answerNum: -1,
         limit: 0,
-        answers: []
+        answers: [],
+        userId: 1,
+        questionId: null
       }
     },
     mounted: function () {
       this.getQuestion()
+      this.getAnswer()
       window.addEventListener('scroll', this.scrollMethod)
     },
     methods: {
@@ -174,7 +178,7 @@
         getQuestion(questionId).then((response) => {
           _this.question.questionTitle = response.result.questionTitle
           _this.question.questionContent = response.result.questionContent
-          _this.question.questionId = response.result.questionId
+          _this.question.questionId = response.result.id
           _this.$nextTick(function () {
             window.uParse('#questionContent', {
               rootPath: '../../static/UE/'
@@ -184,6 +188,35 @@
         }).catch((e) => {
           Message({
             message: '获取问题失败！',
+            type: 'error',
+            duration: 5 * 1000
+          })
+        })
+      },
+      getAnswer () {
+        const questionId = this.$route.params.questionId
+        let _this = this
+        getAnswerNum(questionId).then((response) => {
+          _this.answerNum = response.result
+          _this.answerLoading = false
+        }).catch((e) => {
+          Message({
+            message: '请求数据出错，请稍后再试！',
+            type: 'error',
+            duration: 5 * 1000
+          })
+        })
+      },
+      submit: function (answer) {
+        postAnswer(answer, this.question.questionId, this.userId).then((response) => {
+          Message({
+            message: '感谢你的答案!',
+            type: 'success',
+            duration: 5 * 1000
+          })
+        }).catch((e) => {
+          Message({
+            message: '对不起，回答失败，请稍后再试！',
             type: 'error',
             duration: 5 * 1000
           })

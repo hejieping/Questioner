@@ -32,3 +32,28 @@ export function getQuestionType () {
     method: 'get'
   })
 }
+
+export function postAnswer (answerContent, questionId, userId) {
+  const data = {
+    answerContent: answerContent,
+    question: {
+      id: questionId
+    },
+    account: {
+      id: userId
+    }
+  }
+  return fetch({
+    url: '/answer',
+    method: 'post',
+    data
+  })
+}
+
+export function getAnswerNum (questionId) {
+  return fetch({
+    url: '/answer/getAnswerNum/' + questionId,
+    method: 'get'
+  })
+}
+

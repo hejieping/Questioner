@@ -60,6 +60,9 @@
     methods: {
       getUEditor () {
         return this.editor
+      },
+      clearContent () {
+        this.editor.setContent('')
       }
     },
     destroyed () {

@@ -102,6 +102,7 @@
     },
     methods: {
       submitQuestion (formName) {
+        console.log('sd')
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let editor = this.$refs.ue.getUEditor()

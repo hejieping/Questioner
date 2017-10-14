@@ -38,5 +38,4 @@ public class QuestionController {
         Page<Question> questionPageable = questionService.getAllQuestionByPage(10,0);
         return new ResJsonTemplate<>("200", questionPageable);
     }
-
 }
