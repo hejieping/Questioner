@@ -4,6 +4,7 @@ import com.sitp.questioner.entity.Question;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,6 +31,12 @@ public class QuestionController {
         if(question == null)
             return new ResJsonTemplate<>("404","不存在的问题！");
         return new ResJsonTemplate<>("200", question);
+    }
+
+    @RequestMapping(value = "/questionOverview", method = RequestMethod.GET)
+    public ResJsonTemplate getAllQuestionOverview(){
+        Page<Question> questionPageable = questionService.getAllQuestionByPage(10,0);
+        return new ResJsonTemplate<>("200", questionPageable);
     }
 
 }

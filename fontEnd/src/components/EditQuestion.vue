@@ -22,7 +22,7 @@
         </el-form-item>
         <el-form-item label="问题描述">
           <div class="editor-container">
-            <UE :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
+            <UE  :config="config" ref="ue"></UE>
           </div>
         </el-form-item>
       </el-form>

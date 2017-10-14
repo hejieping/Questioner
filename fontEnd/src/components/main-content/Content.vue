@@ -174,8 +174,9 @@
   }
   .question-container{
     margin: 0 auto;
-    overflow: auto;
+    overflow: hidden;
     padding-left: 20px;
+    width: 100%;
   }
 </style>
 <script>
@@ -246,10 +247,12 @@
       closeNav () {
         $('#container').removeClass('display-nav')
         $('#canvas').css('width', '100%')
+        $('#question-list').css('margin-right', '5%')
       },
       openNav () {
         $('#container').addClass('display-nav')
         $('#canvas').css('width', '70%')
+        $('#question-list').css('margin-right', '0')
       },
 
       toggleNavigation () {

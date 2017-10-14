@@ -9,6 +9,7 @@ import QuestionList from '@/components/main-content/QuestionList'
 import EditQuestion from '@/components/EditQuestion'
 import ShowContent from '@/components/ShowContent'
 import PersonQuestion from '@/components/PersonQuestion'
+import QuestionDetail from '@/components/question/QuestionDetail'
 
 Vue.use(Router)
 
@@ -54,6 +55,9 @@ export default new Router({
         },
         {
           name: 'personalQuestion', path: '/personalQuestion/:questionId', component: PersonQuestion, meta: {needAuth: false}
+        },
+        {
+          name: 'questionDetail', path: '/questionDetail/:questionId', component: QuestionDetail, meta: {needAuth: false}
         }
       ]
     },
