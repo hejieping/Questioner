@@ -1,7 +1,14 @@
 <template>
-  <el-dialog size="large" title="请写下您的回答" :visible.sync="dialogVisible">
-    <div>
-      <ue :fullscreen="false" :config="config" ref="ue"></ue>
+  <el-dialog size="large" :visible.sync="dialogVisible">
+    <div id="userinfo" style="position: fixed; top: 10px; margin-bottom: 20px">
+      <h3>感谢您的回答</h3>
+      <img class="useravatar" :src="userInfo.useravatar"/>
+      <span>{{ userInfo.username }}</span>
+    </div>
+    <div style="margin-top: 20px">
+      <div>
+        <ue :fullscreen="false" :config="config" ref="ue"></ue>
+      </div>
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click.prevent="dialogVisible = false">取 消</el-button>

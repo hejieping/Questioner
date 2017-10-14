@@ -32,12 +32,15 @@
       },
       name: {
         type: String
+      },
+      fullscreen: {
+        type: Boolean,
+        default: true
       }
     },
     mounted () {
-      const _this = this
       this.config.toolbars = [[
-        'fullscreen', 'source', '|', 'undo', 'redo', '|',
+        'source', '|', 'undo', 'redo', '|',
         'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
         'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
         'customstyle', 'paragraph', 'fontfamily', 'fontsize', '|',
@@ -49,10 +52,10 @@
         'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
         'print', 'preview', 'searchreplace', 'drafts', 'kityformula'
       ]]
+      if (this.fullscreen) {
+        this.config.toolbars[0].push('fullscreen')
+      }
       this.editor = window.UE.getEditor('editor', this.config)
-      this.editor.addListener('ready', function () {
-        _this.editor.setContent(_this.defaultMsg)
-      })
     },
     methods: {
       getUEditor () {
