@@ -39,14 +39,12 @@ export default {
   ]),
   methods: {
     logout () {
-      console.log('sd')
       this.$store.dispatch('logout')
         .then(() => {
           location.reload()
         })
     },
     testuser () {
-      console.log('sd')
       testUser().then(response => {
         console.log(response)
       }).catch(error => {

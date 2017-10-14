@@ -6,6 +6,7 @@ import router from './router'
 import Element from 'element-ui'
 import store from './store'
 import 'element-ui/lib/theme-default/index.css'
+
 Vue.use(Element)
 
 Vue.config.productionTip = false
@@ -16,9 +17,9 @@ router.beforeEach((to, from, next) => {
     return
   }
   let token = store.getters.token
-  if (token != null && to.path === '/login') {
+  if (token !== null && to.path === '/login') {
     next('/')
-  } else if (token == null && to.path !== '/login') {
+  } else if (token === null && to.path !== '/login') {
     next({ path: '/login' })
   } else {
     next()

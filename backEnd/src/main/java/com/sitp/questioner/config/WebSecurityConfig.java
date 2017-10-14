@@ -72,17 +72,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET,"/","/*.html",
+                        "/video/**",
+                        "/file/**",
+                        "/img/**",
                         "/favicon.ico",
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js").permitAll()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/questionType/**").permitAll()
+                .antMatchers("/question/**").permitAll()
+                .antMatchers("/ueditor/**").permitAll()
+                .antMatchers("/uploadAvatar/**").permitAll()
+                .antMatchers("/answer/**").permitAll()
                 .antMatchers("/index","/register").permitAll()
                 .anyRequest().authenticated();
         // add JWT filter
         httpSecurity
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
-                httpSecurity.headers().cacheControl();
+        httpSecurity.headers().cacheControl().and().contentTypeOptions().disable()
+        .frameOptions().disable();
     }
 }
 

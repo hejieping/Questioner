@@ -1,5 +1,6 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -16,7 +17,9 @@ public class Role {
     private Long id;
     @Column(nullable = false)
     private String roleName;
-    @ManyToMany(mappedBy = "roles",fetch = FetchType.LAZY)
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Account> accounts;
 
     public Role(){

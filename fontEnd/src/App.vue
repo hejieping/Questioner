@@ -6,7 +6,9 @@
     </transition>
   </div>
 </template>
-
+<style>
+  html,body{background: #f1efe2;}
+</style>
 <script>
 export default {
   name: 'app'
@@ -14,14 +16,22 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  * {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    word-wrap: break-word;
+    box-sizing:border-box;
+    font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+    line-height: 1.7;
+  }
+  ol, ul {
+    list-style: none;
+  }
+  a{
+    text-decoration: none;
+  }
 
 .fade-enter-active,
 .fade-leave-active {

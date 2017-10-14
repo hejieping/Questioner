@@ -7,6 +7,7 @@ import com.sitp.questioner.repository.RoleRepository;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class AccountSercviceImpl implements AccountService {
     @Autowired
     RoleService roleService;
 
+    @Value("${default.avatarUrl}")
+    private String defaultAvatarUrl;
+
     @Override
     public Account register(Account account) {
         final String username = account.getUsername();
@@ -35,6 +39,7 @@ public class AccountSercviceImpl implements AccountService {
         // set default the user role
         Role userRole = roleService.getUserRole();
         account.setRoles(Collections.singleton(userRole));
+        account.setAvatarURL(defaultAvatarUrl);
         return accountRepository.save(account);
     }
 }

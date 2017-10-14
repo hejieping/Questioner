@@ -40,7 +40,7 @@ public class AccountControllerTest {
     @Test
     public void testRegister() throws Exception
     {
-        String content = "{\"username\":\"123\",\"password\":\"123\"}";
+        String content = "{\"username\":\"12345\",\"password\":\"123\"}";
         mockMvc.perform(post("/register","json")
                 .characterEncoding("UTF-8")
                 .content(content.getBytes())
