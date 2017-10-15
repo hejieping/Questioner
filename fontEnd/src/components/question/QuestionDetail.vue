@@ -132,13 +132,16 @@
           return
         }
         this.lastScrollTop = $(document).scrollTop()
-        if (!this.loadingMore && ($(document).scrollTop() + $(window).height() > $(document).height() - 10)) {
+        if (!this.loadingMore && this.canLoading() && ($(document).scrollTop() + $(window).height() > $(document).height() - 10)) {
           this.loadingMore = true
           this.getData()
         }
       },
+      canLoading () {
+        return this.answerNum > 0 && this.startIndex < this.answerNum
+      },
       getData () {
-        if (this.answerNum < 0) {
+        if (this.answerNum <= 0) {
           return
         }
         if (this.startIndex >= this.answerNum) {

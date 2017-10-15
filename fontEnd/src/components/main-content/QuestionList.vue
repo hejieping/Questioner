@@ -1,240 +1,34 @@
 <template>
   <div id="container">
-    <div id="question-list">
+    <div id="question-list" v-loading.lock='isLoadingQuestion' element-loading-text="玩命加载中">
       <div id="choose-params-panel">
         请在这里选择问题排序
       </div>
-      <div class="question-overview">
-      <div class="publisherInfo">
-        <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-        <span class=".publisher"> 罗宇侠 </span>
-      </div>
-      <div class="summary">
-        <h3> <a href=""> 怎么解决</a> </h3>
-        <div class="types">
-          defef
-        </div>
-        <div class="publish-date">
-          发布与2017-9-17大幅度的辅导费
-        </div>
-      </div>
-      <div class="info">
-        <div class=".answers">
-          <el-tag type="gray">100000 回答</el-tag>
-        </div>
-        <div class=".solved">
-          <el-tag type="gray">标签二</el-tag>
-        </div>
-      </div>
-    </div>
-      <div class="question-overview">
+      <div class="question-overview" v-for="questionOverview in questionOverviewList">
         <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
+          <img class="avatar" :src="questionOverview.publisherImgSrc">
+          <span class=".publisher"> {{ questionOverview.publisherName }} </span>
         </div>
         <div class="summary">
           <h3>
-            <router-link to="/questionDetail/1">
-              怎么解决
+            <router-link :to="{ path : '/questionDetail/' + questionOverview.id }">
+              {{ questionOverview.title }}
             </router-link>
           </h3>
           <div class="types">
-            defef
+            {{ questionOverview.subject }} -> {{ questionOverview.course }}
           </div>
           <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
+            发布于 <span>{{ questionOverview.publishDateTime | moment("ddd, MMM Do YYYY") }} </span>
           </div>
         </div>
         <div class="info">
-          <div class=".answers">
-            HH
+          <div class="answers">
+            <el-tag type="gray">{{ questionOverview.answers }}回答</el-tag>
           </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
-          </div>
-        </div>
-      </div>
-      <div class="question-overview">
-        <div class="publisherInfo">
-          <img class="avatar" src="http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg" style=""/>
-          <span class=".publisher"> 罗宇侠 </span>
-        </div>
-        <div class="summary">
-          <h3> <a href=""> 怎么解决</a> </h3>
-          <div class="types">
-            defef
-          </div>
-          <div class="publish-date">
-            发布与2017-9-17大幅度的辅导费
-          </div>
-        </div>
-        <div class="info">
-          <div class=".answers">
-            HH
-          </div>
-          <div class=".solved">
-            HH
+          <div class="solved">
+            <el-tag v-if="questionOverview.solved" type="green">已解决</el-tag>
+            <el-tag v-else type="gray">未解决</el-tag>
           </div>
         </div>
       </div>
@@ -242,13 +36,14 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 40]"
-          :page-size="100"
+          :current-page="currentPage + 1"
+          :page-sizes="pageSizes"
+          :page-size='pageSize'
           layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
+          :total='total'>
         </el-pagination>
       </div>
+      <div style="clear: both"></div>
     </div>
   </div>
 
@@ -258,6 +53,7 @@
     margin-left: 5%;
     margin-right: 5%;
     width: 90%;
+    position: relative;
   }
   #question-list>div.question-overview{
     border-bottom: 2px solid #c0ccda;
@@ -312,20 +108,28 @@
     margin-right: 10px;
     padding: 8px 5px;
     text-align: center;
+    width: 50%;
     vertical-align: middle;
   }
-
-
-
   #question-list #pagination-panel{
     float: right;
   }
+  .summary a {
+    color: #38935f;
+  }
 </style>
 <script>
+  import { getAllQuestion } from '@/api/question'
+  import { Message } from 'element-ui'
   export default {
     data () {
       return {
-        currentPage: 4
+        currentPage: 0,
+        pageSize: 5,
+        total: 0,
+        isLoadingQuestion: true,
+        questionOverviewList: [],
+        pageSizes: [5, 10]
       }
     },
     created () {
@@ -333,13 +137,52 @@
     },
     methods: {
       updateQuestionType () {
-        this.message = this.$route.params.questionType || '所有问题'
+        this.resetData()
+        this.fetchQuestion()
+      },
+      fetchQuestion () {
+        const questionType = this.$route.params.questionType
+        this.isLoadingQuestion = true
+        if (questionType) {
+          this.fetchQuestionByType(questionType)
+        } else {
+          this.fetchAllQuestion()
+        }
       },
       handleSizeChange (val) {
-        console.log(`每页 ${val} 条`)
+        this.pageSize = val
+        this.fetchQuestion()
       },
       handleCurrentChange (val) {
-        console.log(`当前页: ${val}`)
+        this.currentPage = val - 1
+        this.fetchQuestion()
+      },
+      fetchAllQuestion () {
+        getAllQuestion(this.currentPage, this.pageSize).then((response) => {
+          if (response.status === '200') {
+            this.questionOverviewList = response.result.questionOverviewList
+            this.total = response.result.totalNumber
+            this.currentPage = response.result.currentPage
+          }
+          this.isLoadingQuestion = false
+        }).catch((e) => {
+          Message({
+            message: '无法获取问题，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+          this.isLoadingQuestion = false
+        })
+      },
+      fetchQuestionByType (questionType) {
+        alert(questionType + ' ' + this.currentPage + ' ' + this.pageSize)
+      },
+      resetData () {
+        this.currentPage = 0
+        this.pageSize = 5
+        this.total = 0
+        this.isLoadingQuestion = true
+        this.questionOverviewList = []
       }
     },
     watch: {

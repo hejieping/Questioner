@@ -3,19 +3,33 @@
  */
 import fetch from '@/utils/fetch'
 
-export function raiseQuestion (questionTitle, questionTypeId, questionContent, questionContentTxt) {
+export function raiseQuestion (userId, questionTitle, questionTypeId, questionContent, questionContentTxt) {
   const data = {
     questionTitle: questionTitle,
     questionContent: questionContent,
     questionContentTxt: questionContentTxt,
     questionType: {
       id: questionTypeId
+    },
+    publisher: {
+      id: userId
     }
   }
   return fetch({
     url: '/question',
     method: 'post',
     data
+  })
+}
+
+export function getAllQuestion (currentPage, pageSize) {
+  return fetch({
+    url: '/question',
+    method: 'get',
+    params: {
+      currentPage: currentPage,
+      pageSize: pageSize
+    }
   })
 }
 

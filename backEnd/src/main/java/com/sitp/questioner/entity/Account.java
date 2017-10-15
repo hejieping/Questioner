@@ -1,5 +1,7 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,6 +29,7 @@ public class Account {
     private List<Role> roles = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Answer> answers = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -35,7 +38,13 @@ public class Account {
     },inverseJoinColumns = {
             @JoinColumn(name = "question_id", referencedColumnName = "id")
     })
+    @JsonIgnore
     private List<Question> followQuestion = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Question> questions = new ArrayList<>();
+
 
     public void setId(Long id) {
         this.id = id;
@@ -90,6 +99,14 @@ public class Account {
 
     public void setFollowQuestion(List<Question> followQuestion) {
         this.followQuestion = followQuestion;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 
     @Override

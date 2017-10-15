@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 public interface QuestionService {
     boolean saveQuestion(Question question);
 
+    Long getAnswerNumber(Long questionId);
+
     Question getQuestion(Long questionId);
 
     Page<Question> getAllQuestionByPage(int pageSize, int currentPage);
