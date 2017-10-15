@@ -32,8 +32,7 @@ public class AnswerServiceImpl implements AnswerService{
                 .setSortParam("id").buildPage();
         return answerRepository.getLimitAnswers(questionId,pageable).getContent();
         */
-        int end = startIndex + limitNum;
-        return answerRepository.getLimitAnswers(questionId, startIndex, end);
+        return answerRepository.getLimitAnswers(questionId, startIndex, limitNum);
     }
 
     @Override

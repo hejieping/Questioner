@@ -57,3 +57,15 @@ export function getAnswerNum (questionId) {
   })
 }
 
+export function getLimitAnswer (questionId, startIndex, limitNum) {
+  return fetch({
+    url: '/answer/getLimitAnswers',
+    method: 'get',
+    params: {
+      questionId: questionId,
+      startIndex: startIndex,
+      limitNum: limitNum
+    }
+  })
+}
+

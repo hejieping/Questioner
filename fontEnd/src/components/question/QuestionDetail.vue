@@ -1,7 +1,7 @@
 <template>
   <div id="questionDetail">
     <div id="question-answer">
-      <div id="questionContent" v-loading.lock='questionLoading'>
+      <div id="questionContent" v-loading='questionLoading' element-loading-text="拼命加载中">
         <div id="question-top-panel">
           <div class="question-title">
             <h3>
@@ -16,53 +16,16 @@
         <div id="question-detail" v-html="question.questionContent">
         </div>
       </div>
-      <div id="answers-panel" v-loading.lock="answerLoading">
+      <div id="answers-panel" v-loading="answerLoading" element-loading-text="拼命加载中">
         <div id="answer-summary">
           共有 {{ answerNum }} 个回答
           <span id="sort-panel">排序</span>
         </div>
-
-        <div class="answer">
-          <div class="user-info">
-            <span><img class="user-avatar" /></span>
-            <span>名字</span>
-          </div>
-          <div class="answer-info">
-            回答信息
-          </div>
-          <div class="feedback">
-            好评
-          </div>
-        </div>
-        <div class="answer">
-          <div class="user-info">
-            <span><img class="user-avatar" /></span>
-            <span>名字</span>
-          </div>
-          <div class="answer-info">
-            回答信息
-          </div>
-          <div class="feedback">
-            好评
-          </div>
-        </div>
-        <div class="answer">
-          <div class="user-info">
-            <span><img src="" class="user-avatar" /></span>
-            <span>名字</span>
-          </div>
-          <div class="answer-info">
-            回答信息
-          </div>
-          <div class="feedback">
-            好评
-          </div>
-        </div>
-
         <div v-for="answer in answers" class="answer">
           <div class="user-info">
             <span><img :src="answer.userAvatar"   class="user-avatar"/></span>
             <span>{{ answer.username }}</span>
+            发布于 <span>{{ answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
           </div>
           <div class="answer-info" v-html="answer.answerContent">
           </div>
@@ -70,7 +33,9 @@
             好评
           </div>
         </div>
-
+        <div style="text-align: center" v-if="loadingMore">
+          <i class="el-icon-loading"></i> 玩命加载中，请稍后
+        </div>
       </div>
     </div>
     <answer-dialog @submitAnswer="submit" ref="dialog"></answer-dialog>
@@ -91,6 +56,7 @@
 
   #answers-panel .answer{
     border-bottom: 1px solid grey;
+    margin-bottom: 10px;
   }
 
   #question-detail{
@@ -126,10 +92,11 @@
   }
 </style>
 <script>
-  import { getQuestion, postAnswer, getAnswerNum } from '@/api/question'
+  import { getQuestion, postAnswer, getAnswerNum, getLimitAnswer } from '@/api/question'
   import { Message } from 'element-ui'
   import '../../../static/UE/ueditor.parse'
   import AnswerInputDialog from '@/components/answer/AnswerInputDialog'
+  import $ from 'jquery'
   export default {
     components: { 'answer-dialog': AnswerInputDialog },
     data () {
@@ -142,10 +109,13 @@
         questionLoading: true,
         answerLoading: true,
         answerNum: -1,
-        limit: 0,
+        startIndex: 0,
+        onceNum: 5,
         answers: [],
         userId: 1,
-        questionId: null
+        questionId: null,
+        loadingMore: false,
+        lastScrollTop: 0
       }
     },
     mounted: function () {
@@ -155,21 +125,53 @@
     },
     methods: {
       scrollMethod () {
-        let sumH = document.body.scrollHeight
-        let viewH = document.documentElement.clientHeight
-        let scrollH = document.body.scrollTop === 0 ? document.documentElement.scrollTop : document.body.scrollTop
-        if (viewH + scrollH > sumH) {
+        if ($(document).scrollTop() < this.lastScrollTop) {
+          return
+        }
+        this.lastScrollTop = $(document).scrollTop()
+        if (!this.loadingMore && ($(document).scrollTop() + $(window).height() > $(document).height() - 10)) {
+          this.loadingMore = true
           this.getData()
         }
       },
       getData () {
-        this.limit += 5
-        for (var i = 0; i < 5; i++) {
-          this.answers.push({
-            username: '罗宇侠',
-            userAvatar: 'http://localhost:8080/img/ueditor/20171011/1507732693731046207.jpg',
-            answerContent: '来自罗宇侠的答案'
+        if (this.startIndex >= this.answerNum) {
+          this.changeLoadingStatus()
+          Message({
+            message: '哥，这回真没有了！',
+            type: 'info',
+            duration: 1000
           })
+          return
+        }
+        const questionId = this.$route.params.questionId
+        getLimitAnswer(questionId, this.startIndex, this.onceNum)
+          .then((response) => {
+            let answers = response.result
+            let length = answers.length
+            this.startIndex += length
+            for (var i = 0; i < length; i++) {
+              let answer = answers[i]
+              this.answers.push({
+                username: answer.account.username,
+                userAvatar: answer.account.avatarURL,
+                answerContent: answer.answerContent,
+                answerDateTime: new Date(answer.answerDateTime)
+              })
+              this.answerLoading = false
+              this.changeLoadingStatus()
+            }
+          }).catch((e) => {
+            Message({
+              message: '获取答案失败，请稍后再试',
+              type: 'error',
+              duration: 5 * 1000
+            })
+          })
+      },
+      changeLoadingStatus () {
+        if (this.loadingMore) {
+          this.loadingMore = false
         }
       },
       getQuestion () {
@@ -197,8 +199,11 @@
         const questionId = this.$route.params.questionId
         let _this = this
         getAnswerNum(questionId).then((response) => {
+          _this.answers = []
           _this.answerNum = response.result
-          _this.answerLoading = false
+          _this.startIndex = 0
+          _this.getData()
+          _this.lastScrollTop = 0
         }).catch((e) => {
           Message({
             message: '请求数据出错，请稍后再试！',
@@ -214,6 +219,7 @@
             type: 'success',
             duration: 5 * 1000
           })
+          this.getAnswer()
         }).catch((e) => {
           Message({
             message: '对不起，回答失败，请稍后再试！',

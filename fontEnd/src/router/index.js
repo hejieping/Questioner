@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import Index from '@/components/Index'
-import All from '@/components/All'
 import PersonInfo from '@/components/PersonInfo'
 import Content from '@/components/main-content/Content'
 import QuestionList from '@/components/main-content/QuestionList'
@@ -65,12 +64,6 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login,
-      meta: {needAuth: false}
-    },
-    {
-      path: '/all',
-      name: 'all',
-      component: All,
       meta: {needAuth: false}
     }
   ]
