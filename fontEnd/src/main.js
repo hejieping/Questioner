@@ -6,9 +6,11 @@ import router from './router'
 import Element from 'element-ui'
 import store from './store'
 import 'element-ui/lib/theme-default/index.css'
+import VueParticles from 'vue-particles'
 
 Vue.use(Element)
 Vue.use(require('vue-moment'))
+Vue.use(VueParticles)
 
 Vue.config.productionTip = false
 

@@ -135,6 +135,9 @@
         }
       },
       getData () {
+        if (this.answerNum === -1) {
+          return
+        }
         if (this.startIndex >= this.answerNum) {
           this.changeLoadingStatus()
           Message({
