@@ -69,3 +69,36 @@ export function getLimitAnswer (questionId, startIndex, limitNum) {
   })
 }
 
+export function hasFollowQuestion (questionId, userId) {
+  return fetch({
+    url: '/question/hasFollow',
+    method: 'get',
+    params: {
+      questionId: questionId,
+      userId: userId
+    }
+  })
+}
+
+export function unFollowQuestion (questionId, userId) {
+  return fetch({
+    url: '/question/unFollowQuestion',
+    method: 'put',
+    params: {
+      questionId: questionId,
+      userId: userId
+    }
+  })
+}
+
+export function followQuestion (questionId, userId) {
+  return fetch({
+    url: '/question/followQuestion',
+    method: 'put',
+    params: {
+      questionId: questionId,
+      userId: userId
+    }
+  })
+}
+

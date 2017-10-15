@@ -33,6 +33,25 @@ public class QuestionController {
         return new ResJsonTemplate<>("200", question);
     }
 
+    @RequestMapping(value = "/hasFollow", method = RequestMethod.GET)
+    public ResJsonTemplate hasFollow(@RequestParam("questionId") Long questionId,
+                                     @RequestParam("userId") Long userId){
+        return new ResJsonTemplate<>("200",
+                questionService.hasFollowQuestion(questionId, userId));
+    }
+
+    @RequestMapping(value = "/followQuestion", method = RequestMethod.PUT)
+    public ResJsonTemplate followQuestion(@RequestParam("questionId") Long questionId,
+                                          @RequestParam("userId") Long userId){
+        return new ResJsonTemplate<>("200",questionService.userFollowQuestion(questionId,userId));
+    }
+
+    @RequestMapping(value = "/unFollowQuestion", method = RequestMethod.PUT)
+    public ResJsonTemplate unFollowQuestion(@RequestParam("questionId") Long questionId,
+                                            @RequestParam("userId") Long userId){
+        return new ResJsonTemplate<>("200", questionService.userUnFollowQuestion(questionId, userId));
+    }
+
     @RequestMapping(value = "/questionOverview", method = RequestMethod.GET)
     public ResJsonTemplate getAllQuestionOverview(){
         Page<Question> questionPageable = questionService.getAllQuestionByPage(10,0);

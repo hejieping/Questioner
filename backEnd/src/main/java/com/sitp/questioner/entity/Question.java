@@ -1,8 +1,12 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by qi on 2017/10/11.
@@ -27,7 +31,12 @@ public class Question {
     private QuestionType questionType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Answer> answers = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "followQuestion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Account> followers = new ArrayList<>();
 
 
 
@@ -77,6 +86,14 @@ public class Question {
 
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
+    }
+
+    public List<Account> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Account> followers) {
+        this.followers = followers;
     }
 
     @Override

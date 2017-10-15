@@ -9,7 +9,8 @@
             </h3>
           </div>
           <div class="question-info">
-            <el-button size="small" type="success">关注问题</el-button>
+            <el-button :disabled="isSendingFollow" @click.prevent="unFollowQuestion()" v-if="hasFollow" size="small" type="success">取消关注</el-button>
+            <el-button :disabled="isSendingFollow" @click.prevent="followQuestion()" v-else size="small" type="success">关注问题</el-button>
             <el-button @click.prevent="$refs.dialog.open()" size="small" icon="edit" type="info">写回答</el-button>
           </div>
         </div>
@@ -25,7 +26,7 @@
           <div class="user-info">
             <span><img :src="answer.userAvatar"   class="user-avatar"/></span>
             <span>{{ answer.username }}</span>
-            发布于 <span>{{ answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
+            发布于 <span>{{ answer.answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
           </div>
           <div class="answer-info" v-html="answer.answerContent">
           </div>
@@ -92,7 +93,7 @@
   }
 </style>
 <script>
-  import { getQuestion, postAnswer, getAnswerNum, getLimitAnswer } from '@/api/question'
+  import { getQuestion, postAnswer, getAnswerNum, getLimitAnswer, hasFollowQuestion, unFollowQuestion, followQuestion } from '@/api/question'
   import { Message } from 'element-ui'
   import '../../../static/UE/ueditor.parse'
   import AnswerInputDialog from '@/components/answer/AnswerInputDialog'
@@ -106,6 +107,7 @@
           questionContent: '',
           questionId: null
         },
+        hasFollow: false,
         questionLoading: true,
         answerLoading: true,
         answerNum: -1,
@@ -115,7 +117,8 @@
         userId: 1,
         questionId: null,
         loadingMore: false,
-        lastScrollTop: 0
+        lastScrollTop: 0,
+        isSendingFollow: false
       }
     },
     mounted: function () {
@@ -135,7 +138,7 @@
         }
       },
       getData () {
-        if (this.answerNum === -1) {
+        if (this.answerNum < 0) {
           return
         }
         if (this.startIndex >= this.answerNum) {
@@ -152,7 +155,6 @@
           .then((response) => {
             let answers = response.result
             let length = answers.length
-            this.startIndex += length
             for (var i = 0; i < length; i++) {
               let answer = answers[i]
               this.answers.push({
@@ -161,9 +163,10 @@
                 answerContent: answer.answerContent,
                 answerDateTime: new Date(answer.answerDateTime)
               })
-              this.answerLoading = false
-              this.changeLoadingStatus()
             }
+            this.startIndex += length
+            this.answerLoading = false
+            this.changeLoadingStatus()
           }).catch((e) => {
             Message({
               message: '获取答案失败，请稍后再试',
@@ -184,6 +187,7 @@
           _this.question.questionTitle = response.result.questionTitle
           _this.question.questionContent = response.result.questionContent
           _this.question.questionId = response.result.id
+          _this.getFollowStatus()
           _this.$nextTick(function () {
             window.uParse('#questionContent', {
               rootPath: '../../static/UE/'
@@ -205,8 +209,12 @@
           _this.answers = []
           _this.answerNum = response.result
           _this.startIndex = 0
-          _this.getData()
           _this.lastScrollTop = 0
+          if (_this.answerNum === 0) {
+            this.answerLoading = false
+          } else {
+            _this.getData()
+          }
         }).catch((e) => {
           Message({
             message: '请求数据出错，请稍后再试！',
@@ -229,6 +237,62 @@
             type: 'error',
             duration: 5 * 1000
           })
+        })
+      },
+      getFollowStatus () {
+        const questionId = this.question.questionId
+        hasFollowQuestion(questionId, this.userId).then((response) => {
+          this.hasFollow = response.result
+        }).catch((e) => {
+          Message({
+            message: '获取信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      unFollowQuestion () {
+        const questionId = this.question.questionId
+        this.isSendingFollow = true
+        unFollowQuestion(questionId, this.userId).then((response) => {
+          if (response.result === true) {
+            this.hasFollow = false
+            Message({
+              message: '取消关注成功！',
+              type: 'success',
+              duration: 1000
+            })
+          }
+          this.isSendingFollow = false
+        }).catch((e) => {
+          Message({
+            message: '取消关注失败，请稍后再试！',
+            type: 'error',
+            duration: 1000
+          })
+          this.isSendingFollow = false
+        })
+      },
+      followQuestion () {
+        const questionId = this.question.questionId
+        this.isSendingFollow = true
+        followQuestion(questionId, this.userId).then((response) => {
+          if (response.result === true) {
+            this.hasFollow = true
+            Message({
+              message: '关注问题成功！',
+              type: 'success',
+              duration: 1000
+            })
+          }
+          this.isSendingFollow = false
+        }).catch((e) => {
+          Message({
+            message: '关注问题失败，请稍后再试！',
+            type: 'error',
+            duration: 1000
+          })
+          this.isSendingFollow = false
         })
       }
     }
