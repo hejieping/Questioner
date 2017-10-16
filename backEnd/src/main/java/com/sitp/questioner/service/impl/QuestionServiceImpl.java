@@ -49,11 +49,28 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
+    public Page<Question> getQuestionTitleLike(String questionTitle, int pageSize, int currentPage) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setSortParam("id")
+                .setDirection(Sort.Direction.DESC).buildPage();
+        return questionRepository.getQuestionTitleLike(questionTitle,pageable);
+    }
+
+    @Override
     public Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage) {
         Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
                 .setPageSize(pageSize).setSortParam("id")
                 .setDirection(Sort.Direction.DESC).buildPage();
         return questionRepository.getQuestionByPageAndType(typeId, pageable);
+    }
+
+    @Override
+    public Page<Question> getQuestionTitleLikeByType(Long questionTypeId, String questionTitle,
+                                                     int pageSize, int currentPage) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setSortParam("id")
+                .setDirection(Sort.Direction.DESC).buildPage();
+        return questionRepository.getQuestionTitleLikeByType(questionTypeId, questionTitle, pageable);
     }
 
     @Override

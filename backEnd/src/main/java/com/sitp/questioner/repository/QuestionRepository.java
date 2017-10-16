@@ -18,6 +18,15 @@ public interface QuestionRepository extends CrudRepository<Question,Long>{
     Page<Question> getQuestionByPageAndType(@Param("questionTypeId") Long questionTypeId,
                                              Pageable pageable);
 
+    @Query("select q from Question as q where q.questionTitle like %:questionTitle%")
+    Page<Question> getQuestionTitleLike(@Param("questionTitle") String questionTitle,
+                                        Pageable pageable);
+
+    @Query("select q from Question as q where q.questionType.id = :questionTypeId and q.questionTitle like %:questionTitle%")
+    Page<Question> getQuestionTitleLikeByType(@Param("questionTypeId") Long questionTypeId,
+                                              @Param("questionTitle") String questionTitle,
+                                              Pageable pageable);
+
     @Query("select count(a.id) from Answer a where a.question.id = :questionId")
     Long getTotalAnswerOfQuestion(@Param("questionId") Long questionId);
 

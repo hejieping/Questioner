@@ -55,8 +55,31 @@ public class QuestionController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResJsonTemplate getAllQuestions(@RequestParam("pageSize") int pageSize,
-                                           @RequestParam("currentPage") int currentPage){
-        Page<Question> questions = questionService.getAllQuestionByPage(pageSize, currentPage);
+                                           @RequestParam("currentPage") int currentPage,
+                                           @RequestParam(value = "questionTitle",defaultValue = "") String questionTitle){
+        Page<Question> questions;
+        if(questionTitle.equals("")){
+            questions = questionService.getAllQuestionByPage(pageSize, currentPage);
+        }
+        else {
+            questions = questionService.getQuestionTitleLike(questionTitle,pageSize,currentPage);
+        }
+        QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
+        return new ResJsonTemplate<>("200", questionOverviewList);
+    }
+
+    @RequestMapping(value = "getQuestionByType/{questionTypeId}", method = RequestMethod.GET)
+    public ResJsonTemplate getQuestionsByType(@RequestParam("pageSize") int pageSize,
+                                              @RequestParam("currentPage") int currentPage,
+                                              @PathVariable("questionTypeId") Long typeId,
+                                              @RequestParam(value = "questionTitle",defaultValue = "") String questionTitle){
+        Page<Question> questions;
+        if(questionTitle.equals("")){
+            questions = questionService.getQuestionByPageAndType(typeId, pageSize, currentPage);
+        }
+        else {
+            questions = questionService.getQuestionTitleLikeByType(typeId,questionTitle,pageSize,currentPage);
+        }
         QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
         return new ResJsonTemplate<>("200", questionOverviewList);
     }

@@ -5,7 +5,8 @@ const getters = {
   token: state => state.user.token,
   hasLogin: state => {
     return true
-  }
+  },
+  isQuestionListPage: state => state.common.inQuestionListPage
 }
 
 export default getters

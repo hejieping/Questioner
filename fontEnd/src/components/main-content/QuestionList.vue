@@ -1,6 +1,12 @@
 <template>
   <div id="container">
     <div id="question-list" v-loading.lock='isLoadingQuestion' element-loading-text="玩命加载中">
+      <div v-if="isNoData">
+        <el-alert :closable="false" title="对不起，找不到任何问题！" type="info" show-icon>
+        </el-alert>
+        <el-button @click.prevent="$router.push('/editQuestion')" style="margin-top: 20px; float: right" size="small" type="success" icon="edit">去提问</el-button>
+      </div>
+      <div v-else>
       <div id="choose-params-panel">
         请在这里选择问题排序
       </div>
@@ -43,7 +49,8 @@
           :total='total'>
         </el-pagination>
       </div>
-      <div style="clear: both"></div>
+      <div style="clear: both; margin-bottom: 20px"></div>
+      </div>
     </div>
   </div>
 
@@ -55,7 +62,7 @@
     width: 90%;
     position: relative;
   }
-  #question-list>div.question-overview{
+  #question-list div.question-overview{
     border-bottom: 2px solid #c0ccda;
     padding: 12px 0 10px 0;
     background: #f9fafd;
@@ -119,9 +126,15 @@
   }
 </style>
 <script>
-  import { getAllQuestion } from '@/api/question'
+  import { getAllQuestion, getQuestionByType } from '@/api/question'
   import { Message } from 'element-ui'
+  import bus from '../../assets/eventBus.js'
+  import store from '@/store'
   export default {
+    beforeRouteEnter (to, from, next) {
+      store.dispatch('enter_questionList_page')
+      next(true)
+    },
     data () {
       return {
         currentPage: 0,
@@ -129,16 +142,26 @@
         total: 0,
         isLoadingQuestion: true,
         questionOverviewList: [],
-        pageSizes: [5, 10]
+        pageSizes: [5, 10],
+        searchKeyWord: ''
       }
     },
+    mounted () {
+      bus.$off('searchQuestion')
+      bus.$on('searchQuestion', (keyWord) => {
+        this.searchQuestion(keyWord)
+      })
+    },
     created () {
-      this.updateQuestionType()
+      if (this.$route.params.keyWord) {
+        this.searchKeyWord = this.$route.params.keyWord
+      }
+      this.updateQuestion()
     },
     methods: {
-      updateQuestionType () {
-        this.resetData()
+      updateQuestion () {
         this.fetchQuestion()
+        this.resetData()
       },
       fetchQuestion () {
         const questionType = this.$route.params.questionType
@@ -158,24 +181,34 @@
         this.fetchQuestion()
       },
       fetchAllQuestion () {
-        getAllQuestion(this.currentPage, this.pageSize).then((response) => {
-          if (response.status === '200') {
-            this.questionOverviewList = response.result.questionOverviewList
-            this.total = response.result.totalNumber
-            this.currentPage = response.result.currentPage
-          }
-          this.isLoadingQuestion = false
+        getAllQuestion(this.searchKeyWord, this.currentPage, this.pageSize).then((response) => {
+          this.handleResponse(response)
         }).catch((e) => {
-          Message({
-            message: '无法获取问题，请稍后重试！',
-            type: 'error',
-            duration: 1000
-          })
-          this.isLoadingQuestion = false
+          this.handleError(e)
         })
       },
+      handleResponse (response) {
+        if (response.status === '200') {
+          this.questionOverviewList = response.result.questionOverviewList
+          this.total = response.result.totalNumber
+          this.currentPage = response.result.currentPage
+        }
+        this.isLoadingQuestion = false
+      },
+      handleError (e) {
+        Message({
+          message: '无法获取问题，请稍后重试！',
+          type: 'error',
+          duration: 1000
+        })
+        this.isLoadingQuestion = false
+      },
       fetchQuestionByType (questionType) {
-        alert(questionType + ' ' + this.currentPage + ' ' + this.pageSize)
+        getQuestionByType(this.searchKeyWord, questionType, this.currentPage, this.pageSize).then((response) => {
+          this.handleResponse(response)
+        }).catch((e) => {
+          this.handleError(e)
+        })
       },
       resetData () {
         this.currentPage = 0
@@ -183,12 +216,26 @@
         this.total = 0
         this.isLoadingQuestion = true
         this.questionOverviewList = []
+        this.searchKeyWord = ''
+      },
+      searchQuestion (keyWord) {
+        this.searchKeyWord = keyWord
+        this.updateQuestion()
+      }
+    },
+    computed: {
+      isNoData: function () {
+        return !this.isLoadingQuestion && this.questionOverviewList.length === 0
       }
     },
     watch: {
       '$route' (to, from) {
-        this.updateQuestionType()
+        this.updateQuestion()
       }
+    },
+    beforeRouteLeave (to, from, next) {
+      store.dispatch('leave_questionList_page')
+      next(true)
     }
   }
 </script>

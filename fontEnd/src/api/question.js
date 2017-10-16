@@ -22,11 +22,24 @@ export function raiseQuestion (userId, questionTitle, questionTypeId, questionCo
   })
 }
 
-export function getAllQuestion (currentPage, pageSize) {
+export function getAllQuestion (questionTitle, currentPage, pageSize) {
   return fetch({
     url: '/question',
     method: 'get',
     params: {
+      questionTitle: questionTitle,
+      currentPage: currentPage,
+      pageSize: pageSize
+    }
+  })
+}
+
+export function getQuestionByType (questionTitle, questionTypeId, currentPage, pageSize) {
+  return fetch({
+    url: '/question/getQuestionByType/' + questionTypeId,
+    method: 'get',
+    params: {
+      questionTitle: questionTitle,
       currentPage: currentPage,
       pageSize: pageSize
     }

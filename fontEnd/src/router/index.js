@@ -45,7 +45,27 @@ export default new Router({
           component: Content,
           children: [
             {
-              name: 'questions', path: '/questions/:questionType', component: QuestionList, meta: {needAuth: false}
+              name: 'questions', path: '/questions/questionType/:questionType', component: QuestionList, meta: {needAuth: false}
+            }
+          ]
+        },
+        {
+          name: 'searchQuestion',
+          path: 'questions',
+          component: Content,
+          children: [
+            {
+              name: 'search', path: '/questions/searchQuestion/:keyWord', component: QuestionList, meta: {needAuth: false}
+            }
+          ]
+        },
+        {
+          name: 'searchQuestion',
+          path: 'questions',
+          component: Content,
+          children: [
+            {
+              name: 'search', path: '/questions/searchQuestion', component: QuestionList, meta: {needAuth: false}
             }
           ]
         },

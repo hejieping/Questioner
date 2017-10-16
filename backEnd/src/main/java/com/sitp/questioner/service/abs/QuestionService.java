@@ -15,7 +15,12 @@ public interface QuestionService {
 
     Page<Question> getAllQuestionByPage(int pageSize, int currentPage);
 
+    Page<Question> getQuestionTitleLike(String questionTitle, int pageSize, int currentPage);
+
     Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage);
+
+    Page<Question> getQuestionTitleLikeByType(Long questionTypeId, String questionTitle,
+                                              int pageSize, int currentPage);
 
     boolean userFollowQuestion(Long questionId, Long userId);
 
