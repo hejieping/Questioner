@@ -27,10 +27,7 @@ public class QuestionController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResJsonTemplate getAllQuestions(@RequestParam("pageSize") int pageSize,
-                                           @RequestParam("currentPage") int currentPage){
-        Page<Question> questions = questionService.getAllQuestionByPage(pageSize, currentPage);
+    private static QuestionOverviewList buildQuestionOverviewList(QuestionService questionService,Page<Question> questions){
         Iterable<Question> questionContent = questions.getContent();
         QuestionOverviewList questionOverviewList = new QuestionOverviewList();
         for (Question question : questionContent) {
@@ -53,6 +50,14 @@ public class QuestionController {
         questionOverviewList.setHasPre(questions.hasPrevious());
         questionOverviewList.setTotalPage(questions.getTotalPages());
         questionOverviewList.setTotalNumber(questions.getTotalElements());
+        return questionOverviewList;
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResJsonTemplate getAllQuestions(@RequestParam("pageSize") int pageSize,
+                                           @RequestParam("currentPage") int currentPage){
+        Page<Question> questions = questionService.getAllQuestionByPage(pageSize, currentPage);
+        QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
         return new ResJsonTemplate<>("200", questionOverviewList);
     }
 

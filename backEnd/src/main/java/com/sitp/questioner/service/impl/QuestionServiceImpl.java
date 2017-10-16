@@ -49,6 +49,14 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
+    public Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setSortParam("id")
+                .setDirection(Sort.Direction.DESC).buildPage();
+        return questionRepository.getQuestionByPageAndType(typeId, pageable);
+    }
+
+    @Override
     public boolean userFollowQuestion(Long questionId, Long userId) {
         Account account = accountRepository.findOne(userId);
         if(account !=null){
@@ -80,6 +88,6 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     public boolean hasFollowQuestion(Long questionId, Long userId) {
-        return questionRepository.hasFollowQuestion(questionId,userId) > 0;
+        return questionRepository.hasFollowQuestion(userId,questionId) > 0;
     }
 }

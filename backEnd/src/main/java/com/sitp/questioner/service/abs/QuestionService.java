@@ -15,6 +15,8 @@ public interface QuestionService {
 
     Page<Question> getAllQuestionByPage(int pageSize, int currentPage);
 
+    Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage);
+
     boolean userFollowQuestion(Long questionId, Long userId);
 
     boolean userUnFollowQuestion(Long questionId, Long userId);

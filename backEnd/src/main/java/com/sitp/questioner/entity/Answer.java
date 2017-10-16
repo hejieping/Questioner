@@ -23,7 +23,6 @@ public class Answer {
 
     @JoinColumn(name = "question_id")
     @ManyToOne
-    @JsonIgnore
     private Question question;
 
     @JoinColumn(name = "account_id")

@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
  * Created by qi on 2017/10/13.
  */
 public class PageableBuilder {
-    private Sort.Direction direction;
+    private Sort.Direction direction = Sort.Direction.DESC;
     private String sortParam ;
     private int pageSize;
     private int currentPage;

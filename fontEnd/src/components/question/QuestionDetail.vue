@@ -124,7 +124,7 @@
     mounted: function () {
       this.getQuestion()
       this.getAnswer()
-      window.addEventListener('scroll', this.scrollMethod)
+      $(window).bind('scroll', this.scrollMethod)
     },
     methods: {
       scrollMethod () {
@@ -132,15 +132,6 @@
           return
         }
         this.lastScrollTop = $(document).scrollTop()
-        if (!this.loadingMore && this.canLoading() && ($(document).scrollTop() + $(window).height() > $(document).height() - 10)) {
-          this.loadingMore = true
-          this.getData()
-        }
-      },
-      canLoading () {
-        return this.answerNum > 0 && this.startIndex < this.answerNum
-      },
-      getData () {
         if (this.answerNum <= 0) {
           return
         }
@@ -153,6 +144,15 @@
           })
           return
         }
+        if (!this.loadingMore && this.canLoading() && ($(document).scrollTop() + $(window).height() > $(document).height() - 10)) {
+          this.loadingMore = true
+          this.getData()
+        }
+      },
+      canLoading () {
+        return this.answerNum > 0 && this.startIndex < this.answerNum
+      },
+      getData () {
         const questionId = this.$route.params.questionId
         getLimitAnswer(questionId, this.startIndex, this.onceNum)
           .then((response) => {
@@ -298,6 +298,12 @@
           this.isSendingFollow = false
         })
       }
+    },
+    beforeRouteLeave (to, from, next) {
+      // 导航离开该组件的对应路由时调用
+      // 可以访问组件实例 `this`
+      $(window).unbind()
+      next(true)
     }
   }
 </script>
