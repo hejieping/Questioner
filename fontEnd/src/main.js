@@ -7,6 +7,7 @@ import Element from 'element-ui'
 import store from './store'
 import 'element-ui/lib/theme-default/index.css'
 import VueParticles from 'vue-particles'
+import 'font-awesome/css/font-awesome.css'
 
 Vue.use(Element)
 Vue.use(require('vue-moment'))

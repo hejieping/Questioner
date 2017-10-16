@@ -32,6 +32,13 @@
           </div>
           <div class="feedfack">
             好评
+            <span @click="toggleComment(answer)"  class="comment"><i class="fa  fa-comments-o fa-lg"></i>
+            <span v-show="!answer.showComment">200条评论</span>
+            <span v-show="answer.showComment"> 收起评论 </span>
+            </span>
+          </div>
+          <div class="commentDetail" v-show="answer.showComment">
+            <comment></comment>
           </div>
         </div>
         <div style="text-align: center" v-if="loadingMore">
@@ -82,6 +89,14 @@
     padding-bottom: 5px;
   }
 
+  .comment{
+    cursor: pointer;
+  }
+
+  .commentDetail{
+    position: relative;
+  }
+
   .answer .user-avatar{
     width: 38px;
     height: 38px;
@@ -93,13 +108,14 @@
   }
 </style>
 <script>
+  import Comment from '../comment/Comment.vue'
   import { getQuestion, postAnswer, getAnswerNum, getLimitAnswer, hasFollowQuestion, unFollowQuestion, followQuestion } from '@/api/question'
   import { Message } from 'element-ui'
   import '../../../static/UE/ueditor.parse'
   import AnswerInputDialog from '@/components/answer/AnswerInputDialog'
   import $ from 'jquery'
   export default {
-    components: { 'answer-dialog': AnswerInputDialog },
+    components: { 'answer-dialog': AnswerInputDialog, 'comment': Comment },
     data () {
       return {
         question: {
@@ -127,11 +143,22 @@
       $(window).bind('scroll', this.scrollMethod)
     },
     methods: {
+      toggleComment (answer) {
+        answer.showComment = !answer.showComment
+        this.lastScrollTop = -1
+      },
       scrollMethod () {
         if ($(document).scrollTop() < this.lastScrollTop) {
           return
         }
+        let last = this.lastScrollTop
         this.lastScrollTop = $(document).scrollTop()
+        if (last < 0) {
+          return
+        }
+        if (!($(document).scrollTop() + $(window).height() > $(document).height() - 1)) {
+          return
+        }
         if (this.answerNum <= 0) {
           return
         }
@@ -144,7 +171,7 @@
           })
           return
         }
-        if (!this.loadingMore && this.canLoading() && ($(document).scrollTop() + $(window).height() > $(document).height() - 10)) {
+        if (!this.loadingMore && this.canLoading()) {
           this.loadingMore = true
           this.getData()
         }
@@ -164,7 +191,8 @@
                 username: answer.account.username,
                 userAvatar: answer.account.avatarURL,
                 answerContent: answer.answerContent,
-                answerDateTime: new Date(answer.answerDateTime)
+                answerDateTime: new Date(answer.answerDateTime),
+                showComment: false
               })
             }
             this.startIndex += length
