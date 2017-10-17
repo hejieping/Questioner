@@ -38,7 +38,7 @@ public class AccountSercviceImpl implements AccountService {
         account.setPassword(encoder.encode(rawPassword));
         // set default the user role
         Role userRole = roleService.getUserRole();
-        account.setRoles(Collections.singleton(userRole));
+        account.getRoles().add(userRole);
         account.setAvatarURL(defaultAvatarUrl);
         return accountRepository.save(account);
     }

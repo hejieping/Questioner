@@ -1,8 +1,10 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by qi on 2017/10/11.
@@ -22,13 +24,30 @@ public class Question {
     @Column(name = "questionContentTxt", columnDefinition = "TEXT")
     private String questionContentTxt; // plain text of the question remove the format
 
+    @Column
+    private Date publishDateTime = new Date();
+
+    @Column
+    private Boolean solved;
+
+    @Column
+    private Long views = 0L;
+
     @JoinColumn(name = "type_id")
     @ManyToOne
     private QuestionType questionType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Answer> answers = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "followQuestion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Account> followers = new ArrayList<>();
+
+    @JoinColumn(name = "account_id")
+    @ManyToOne
+    private Account publisher;
 
 
     public Long getId() {
@@ -63,6 +82,30 @@ public class Question {
         this.questionContentTxt = questionContentTxt;
     }
 
+    public Date getPublishDateTime() {
+        return publishDateTime;
+    }
+
+    public void setPublishDateTime(Date publishDateTime) {
+        this.publishDateTime = publishDateTime;
+    }
+
+    public Boolean getSolved() {
+        return solved;
+    }
+
+    public void setSolved(Boolean solved) {
+        this.solved = solved;
+    }
+
+    public Long getViews() {
+        return views;
+    }
+
+    public void setViews(Long views) {
+        this.views = views;
+    }
+
     public QuestionType getQuestionType() {
         return questionType;
     }
@@ -77,6 +120,22 @@ public class Question {
 
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
+    }
+
+    public List<Account> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Account> followers) {
+        this.followers = followers;
+    }
+
+    public Account getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(Account publisher) {
+        this.publisher = publisher;
     }
 
     @Override

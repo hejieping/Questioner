@@ -37,6 +37,8 @@
   }
 </style>
 <script>
+  import bus from '../../assets/eventBus.js'
+  import store from '@/store'
   export default {
     data () {
       return {
@@ -49,7 +51,15 @@
         console.log(key, keyPath)
       },
       search () {
-        alert(this.question)
+        if (store.getters.isQuestionListPage) {
+          bus.$emit('searchQuestion', this.question)
+        } else {
+          let path = '/questions/searchQuestion'
+          if (this.question !== '') {
+            path = path + '/' + this.question
+          }
+          this.$router.push(path)
+        }
       },
       logout () {
         this.$store.dispatch('logout')

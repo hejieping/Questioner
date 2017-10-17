@@ -7,7 +7,7 @@
     </div>
     <div style="margin-top: 20px">
       <div>
-        <UE  :config="config" ref="ue"></UE>
+        <UE :fullscreen="false"  :config="config" ref="ue"></UE>
       </div>
     </div>
     <div slot="footer" class="dialog-footer">

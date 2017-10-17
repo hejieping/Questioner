@@ -1,5 +1,6 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,7 @@ public class Role {
         return accounts;
     }
 
+    @JsonBackReference
     public void setAccounts(Set<Account> accounts) {
         this.accounts = accounts;
     }

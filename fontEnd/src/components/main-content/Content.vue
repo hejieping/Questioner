@@ -16,7 +16,7 @@
           </div>
           <ul>
             <li v-for="type in value">
-              <router-link :to="{ path : '/questions/' + type.id }">
+              <router-link  :to="{ path : '/questions/questionType/' + type.id }">
                 {{ type.course }}
               </router-link>
             </li>
@@ -141,6 +141,10 @@
     background: #1f9d55;
   }
 
+  #toggle ul li a.active{
+    background: #1f9d55;
+  }
+
   #toggle ul li a {
     margin-left: 0;
   }
@@ -233,8 +237,11 @@
           $currIcon.toggleClass('el-icon-plus el-icon-minus')
 
           $(this).next().slideToggle()
-
           $('#toggle > li > div').removeClass('active')
+          $(this).addClass('active')
+        })
+        $('#toggle ul li a').click(function () {
+          $('#toggle ul li a').removeClass('active')
           $(this).addClass('active')
         })
       },

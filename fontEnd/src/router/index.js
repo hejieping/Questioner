@@ -2,11 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import Index from '@/components/Index'
-import All from '@/components/All'
 import PersonInfo from '@/components/PersonInfo'
 import Content from '@/components/main-content/Content'
 import QuestionList from '@/components/main-content/QuestionList'
-import EditQuestion from '@/components/EditQuestion'
+import EditQuestion from '@/components/question/EditQuestion'
 import ShowContent from '@/components/ShowContent'
 import PersonQuestion from '@/components/PersonQuestion'
 import QuestionDetail from '@/components/question/QuestionDetail'
@@ -46,7 +45,27 @@ export default new Router({
           component: Content,
           children: [
             {
-              name: 'questions', path: '/questions/:questionType', component: QuestionList, meta: {needAuth: false}
+              name: 'questions', path: '/questions/questionType/:questionType', component: QuestionList, meta: {needAuth: false}
+            }
+          ]
+        },
+        {
+          name: 'searchQuestion',
+          path: 'questions',
+          component: Content,
+          children: [
+            {
+              name: 'search', path: '/questions/searchQuestion/:keyWord', component: QuestionList, meta: {needAuth: false}
+            }
+          ]
+        },
+        {
+          name: 'searchQuestion',
+          path: 'questions',
+          component: Content,
+          children: [
+            {
+              name: 'search', path: '/questions/searchQuestion', component: QuestionList, meta: {needAuth: false}
             }
           ]
         },
@@ -65,12 +84,6 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login,
-      meta: {needAuth: false}
-    },
-    {
-      path: '/all',
-      name: 'all',
-      component: All,
       meta: {needAuth: false}
     }
   ]

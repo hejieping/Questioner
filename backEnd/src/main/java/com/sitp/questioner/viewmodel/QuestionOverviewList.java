@@ -7,12 +7,20 @@ import java.util.List;
  * Created by qi on 2017/10/13.
  */
 public class QuestionOverviewList {
+    private Long totalNumber;
     private int currentPage ;
     private int totalPage ;
     private boolean hasPre ;
     private boolean hasNext;
-    private int totalQuestions;
     private List<QuestionOverview> questionOverviewList = new ArrayList<>();
+
+    public Long getTotalNumber() {
+        return totalNumber;
+    }
+
+    public void setTotalNumber(Long totalNumber) {
+        this.totalNumber = totalNumber;
+    }
 
     public Integer getCurrentPage() {
         return currentPage;
@@ -70,13 +78,6 @@ public class QuestionOverviewList {
         this.hasNext = hasNext;
     }
 
-    public int getTotalQuestions() {
-        return totalQuestions;
-    }
-
-    public void setTotalQuestions(int totalQuestions) {
-        this.totalQuestions = totalQuestions;
-    }
 
     public List<QuestionOverview> getQuestionOverviewList() {
         return questionOverviewList;
@@ -86,6 +87,10 @@ public class QuestionOverviewList {
         this.questionOverviewList = questionOverviewList;
     }
 
+    public void addQuestionOverview(QuestionOverview questionOverview) {
+        this.questionOverviewList.add(questionOverview);
+    }
+
     @Override
     public String toString() {
         return "QuestionOverviewList{" +
@@ -93,7 +98,7 @@ public class QuestionOverviewList {
                 ", totalPage=" + totalPage +
                 ", hasPre=" + hasPre +
                 ", hasNext=" + hasNext +
-                ", totalQuestions=" + totalQuestions +
+                ", totalNumber=" + totalNumber +
                 ", questionOverviewList=" + questionOverviewList +
                 '}';
     }

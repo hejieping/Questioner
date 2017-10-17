@@ -1,4 +1,5 @@
 <template>
+  <div id = "wrap-banner">
   <div id="loginContainer">
     <el-card class="box-card">
       <div slot="header" class="clearfix login-title">
@@ -21,6 +22,24 @@
       </div>
     </el-card>
   </div>
+    <vue-particles
+      color="#dedede"
+      :particleOpacity="0.7"
+      :particlesNumber="80"
+      shapeType="circle"
+      :particleSize="4"
+      linesColor="#dedede"
+      :linesWidth="1"
+      :lineLinked="true"
+      :lineOpacity="0.4"
+      :linesDistance="150"
+      :moveSpeed="3"
+      :hoverEffect="true"
+      hoverMode="grab"
+      :clickEffect="true"
+      clickMode="push">
+    </vue-particles>
+</div>
 </template>
 <script>
   import store from '@/store'
@@ -66,7 +85,7 @@
     }
   }
 </script>
-<style>
+<style scoped>
   #loginContainer{
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -77,6 +96,7 @@
     width: 400px;
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;
+    z-index: 1;
   }
   #loginContainer button span{
     color: white;
@@ -91,5 +111,26 @@
     color: dodgerblue ;
     font-size: 2em ;
     line-height: 36px;
+  }
+
+  #wrap-banner {
+    position: relative;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-flex;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+  }
+
+  #particles-js {
+    background-image: url("../assets/sky.jpg");
+    background-size: cover;
+    position: absolute;
+    top: 1%;
+    left: 0;
+    width: 100%;
+    height: 98%;
   }
 </style>

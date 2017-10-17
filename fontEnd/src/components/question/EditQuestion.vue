@@ -44,7 +44,7 @@
   }
 </style>
 <script>
-  import UE from '../components/UE.vue'
+  import UE from '../UE.vue'
   import { raiseQuestion, getQuestionType } from '@/api/question'
   import { Message } from 'element-ui'
   import { transformQuestionType2Map } from '@/utils/util'
@@ -53,6 +53,7 @@
     data () {
       return {
         defaultMsg: '',
+        userId: 1,
         questionTypeArray: [],
         config: {
           initialFrameWidth: null,
@@ -102,13 +103,12 @@
     },
     methods: {
       submitQuestion (formName) {
-        console.log('sd')
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let editor = this.$refs.ue.getUEditor()
             var _this = this
             editor.getKfContent(function (content) {
-              raiseQuestion(_this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
+              raiseQuestion(_this.userId, _this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
                 .then((response) => {
                   if (response.status === '201') {
                     Message({

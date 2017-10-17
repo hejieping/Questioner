@@ -24,4 +24,9 @@ public class QuestionTypeServiceImpl implements QuestionTypeService{
     public Iterable<QuestionType> getAllQuestionType() {
         return questionTypeRepository.findAll();
     }
+
+    @Override
+    public void followQuestionType(Long questionTypeId, Long userId) {
+        QuestionType questionType = questionTypeRepository.findOne(questionTypeId);
+    }
 }
