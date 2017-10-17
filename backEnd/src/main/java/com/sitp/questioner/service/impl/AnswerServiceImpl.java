@@ -38,8 +38,12 @@ public class AnswerServiceImpl implements AnswerService{
     }
 
     @Override
-    public List<Answer> getLimitAnswers(Long questionId, int startIndex, int limitNum) {
-        return answerRepository.getLimitAnswers(questionId, startIndex, limitNum);
+    public List<Answer> getLimitAnswers(Long questionId, int startIndex, int limitNum, String sortParam) {
+        if (sortParam.equals("id")) {
+            return answerRepository.getLimitAnswersOrderById(questionId, startIndex, limitNum);
+        }
+        else
+            return answerRepository.getLimitAnswersOrderByDefault(questionId, startIndex, limitNum);
     }
 
     @Override

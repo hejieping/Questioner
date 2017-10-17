@@ -7,36 +7,17 @@
         <el-button @click.prevent="$router.push('/editQuestion')" style="margin-top: 20px; float: right" size="small" type="success" icon="edit">去提问</el-button>
       </div>
       <div v-else>
-      <div id="choose-params-panel">
-        请在这里选择问题排序
-      </div>
+        <el-button size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
+        <el-button v-else size="small" type="success" icon="star-on">关注</el-button>
+      <span id="choose-params-panel">
+        <el-radio-group v-model="sortParamRadio" @change="radioChange()">
+          <el-radio-button label="最新问题"></el-radio-button>
+          <el-radio-button label="最热问题"></el-radio-button>
+        </el-radio-group>
+      </span>
+      <div style="clear: both"></div>
       <div class="question-overview" v-for="questionOverview in questionOverviewList">
-        <div class="publisherInfo">
-          <img class="avatar" :src="questionOverview.publisherImgSrc">
-          <span class=".publisher"> {{ questionOverview.publisherName }} </span>
-        </div>
-        <div class="summary">
-          <h3>
-            <router-link :to="{ path : '/questionDetail/' + questionOverview.id }">
-              {{ questionOverview.title }}
-            </router-link>
-          </h3>
-          <div class="types">
-            {{ questionOverview.subject }} -> {{ questionOverview.course }}
-          </div>
-          <div class="publish-date">
-            发布于 <span>{{ questionOverview.publishDateTime | moment("ddd, MMM Do YYYY") }} </span>
-          </div>
-        </div>
-        <div class="info">
-          <div class="answers">
-            <el-tag type="gray">{{ questionOverview.answers }}回答</el-tag>
-          </div>
-          <div class="solved">
-            <el-tag v-if="questionOverview.isSolved" type="green">已解决</el-tag>
-            <el-tag v-else type="gray">未解决</el-tag>
-          </div>
-        </div>
+        <question-overview :questionOverview="questionOverview"></question-overview>
       </div>
       <div id="pagination-panel">
         <el-pagination
@@ -74,63 +55,25 @@
   #question-list .question-overview:hover{
     box-shadow: #666 0px 0px 10px;
   }
-  #question-list .question-overview .publisherInfo{
-    float: left;
-    margin-right: 10px;
-    width: 75px;
-    text-align: center;
-    height: 100%;
-    min-width: 50px;
-  }
-  #question-list .question-overview .publisherInfo .avatar{
-    width: 50px;
-    height: 50px;
-    margin: 0 auto;
-    vertical-align: middle;
-    display: block;
-    border: green solid 1px;
-  }
-  #question-list .question-overview .summary{
-    padding: 5px;
-    float: left;
-    margin-right: 10px;
-    width: 70%;
-    min-height: 50px;
-    border-right: solid grey 1px;
-    border-left: solid grey 1px;
-  }
-  #question-list .question-overview .summary h3{
-    overflow: hidden;
-  }
-  #question-list .question-overview .summary .publish-date{
-    clear: left;
-    float: right;
-  }
-  #question-list .question-overview .info{
-    float: right;
-    width: 15%;
-  }
-  #question-list .question-overview .info div{
-    display: inline-block;
-    margin-right: 10px;
-    padding: 8px 5px;
-    text-align: center;
-    width: 50%;
-    vertical-align: middle;
-  }
+
   #question-list #pagination-panel{
     float: right;
   }
-  .summary a {
-    color: #38935f;
+
+  #choose-params-panel {
+    float: right;
+    margin-bottom: 10px;
   }
+
 </style>
 <script>
   import { getAllQuestion, getQuestionByType } from '@/api/question'
   import { Message } from 'element-ui'
   import bus from '../../assets/eventBus.js'
   import store from '@/store'
+  import QuestionOverview from '../../components/question/QuestionOverview.vue'
   export default {
+    components: { 'question-overview': QuestionOverview },
     beforeRouteEnter (to, from, next) {
       store.dispatch('enter_questionList_page')
       next(true)
@@ -143,7 +86,9 @@
         isLoadingQuestion: true,
         questionOverviewList: [],
         pageSizes: [5, 10],
-        searchKeyWord: ''
+        searchKeyWord: '',
+        sortPrams: '',
+        sortParamRadio: '最新问题'
       }
     },
     mounted () {
@@ -163,6 +108,10 @@
         this.fetchQuestion()
         this.resetData()
       },
+      radioChange () {
+        this.sortPrams = this.sortParamRadio === '最新问题' ? 'id' : 'views'
+        this.fetchQuestion()
+      },
       fetchQuestion () {
         const questionType = this.$route.params.questionType
         this.isLoadingQuestion = true
@@ -181,7 +130,7 @@
         this.fetchQuestion()
       },
       fetchAllQuestion () {
-        getAllQuestion(this.searchKeyWord, this.currentPage, this.pageSize).then((response) => {
+        getAllQuestion(this.searchKeyWord, this.currentPage, this.pageSize, this.sortPrams).then((response) => {
           this.handleResponse(response)
         }).catch((e) => {
           this.handleError(e)
@@ -204,7 +153,7 @@
         this.isLoadingQuestion = false
       },
       fetchQuestionByType (questionType) {
-        getQuestionByType(this.searchKeyWord, questionType, this.currentPage, this.pageSize).then((response) => {
+        getQuestionByType(this.searchKeyWord, questionType, this.currentPage, this.pageSize, this.sortPrams).then((response) => {
           this.handleResponse(response)
         }).catch((e) => {
           this.handleError(e)
@@ -216,7 +165,6 @@
         this.total = 0
         this.isLoadingQuestion = true
         this.questionOverviewList = []
-        this.searchKeyWord = ''
       },
       searchQuestion (keyWord) {
         this.searchKeyWord = keyWord

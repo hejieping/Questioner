@@ -11,7 +11,7 @@ public interface AnswerService {
 
     int getAnswerNumOfQuestion(Long questionId);
 
-    List<Answer> getLimitAnswers(Long questionId, int startIndex, int limitNum);
+    List<Answer> getLimitAnswers(Long questionId, int startIndex, int limitNum, String sortParam);
 
     boolean saveAnswer(Answer answer);
 

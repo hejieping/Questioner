@@ -17,6 +17,7 @@ public class QuestionOverview {
     private String publisherName ;
     private Long publisherId;
     private String publisherImgSrc;
+    private Long views ;
 
     public Long getId() {
         return id;
@@ -96,6 +97,14 @@ public class QuestionOverview {
 
     public void setPublisherImgSrc(String publisherImgSrc) {
         this.publisherImgSrc = publisherImgSrc;
+    }
+
+    public Long getViews() {
+        return views;
+    }
+
+    public void setViews(Long views) {
+        this.views = views;
     }
 
     @Override

@@ -41,6 +41,18 @@ public class Account {
     @JsonIgnore
     private List<Question> followQuestion = new ArrayList<>();
 
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(joinColumns = {
+            @JoinColumn(name = "account_id", referencedColumnName = "id")
+    }, inverseJoinColumns = {
+            @JoinColumn(name = "question_type_id", referencedColumnName = "id")
+    } )
+    @JsonIgnore
+    private List<QuestionType> followQuestionType = new ArrayList<>();
+
+
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Question> questions = new ArrayList<>();
@@ -131,6 +143,15 @@ public class Account {
 
     public void setFeedbackAnswers(List<Answer> feedbackAnswers) {
         this.feedbackAnswers = feedbackAnswers;
+    }
+
+
+    public List<QuestionType> getFollowQuestionType() {
+        return followQuestionType;
+    }
+
+    public void setFollowQuestionType(List<QuestionType> followQuestionType) {
+        this.followQuestionType = followQuestionType;
     }
 
     @Override

@@ -9,18 +9,27 @@
             </h3>
           </div>
           <div class="question-info">
-            <el-button :disabled="isSendingFollow" @click.prevent="unFollowQuestion()" v-if="hasFollow" size="small" type="success">取消关注</el-button>
-            <el-button :disabled="isSendingFollow" @click.prevent="followQuestion()" v-else size="small" type="success">关注问题</el-button>
-            <el-button @click.prevent="$refs.dialog.open()" size="small" icon="edit" type="info">写回答</el-button>
+            <el-tooltip v-if="hasFollow" content="取消关注后将不会获得更新提醒" placement="top">
+              <el-button :disabled="isSendingFollow" @click.prevent="unFollowQuestion()"  size="small" type="success">取消关注</el-button>
+            </el-tooltip>
+            <el-tooltip v-else content="关注之后将获得更新提醒" placement="top">
+              <el-button :disabled="isSendingFollow" @click.prevent="followQuestion()"  size="small" type="success">关注问题</el-button>
+            </el-tooltip>
+            <el-tooltip content="为该问题贡献自己的答案吧" placement="top">
+              <el-button @click.prevent="$refs.dialog.open()" size="small" icon="edit" type="info">写回答</el-button>
+            </el-tooltip>
           </div>
         </div>
         <div id="question-detail" v-html="question.questionContent">
         </div>
       </div>
-      <div id="answers-panel" v-loading="answerLoading" element-loading-text="拼命加载中">
+      <div id="answers-panel" v-loading.lock="answerLoading" element-loading-text="拼命加载中">
         <div id="answer-summary">
           共有 {{ answerNum }} 个回答
-          <span id="sort-panel">排序</span>
+          <el-radio-group @change="answerSortChange()" size="small" id="sort-panel" v-model="sortParamLabel">
+            <el-radio-button label="默认"></el-radio-button>
+            <el-radio-button label="时间"></el-radio-button>
+          </el-radio-group>
         </div>
         <div v-for="answer in answers" class="answer">
           <answer :answer="answer" @onToggleComment="lastScrollTop = -1"></answer>
@@ -51,6 +60,7 @@
   #question-detail{
     clear: both;
     margin-top: 70px;
+    overflow: auto;
   }
 
   #question-top-panel{
@@ -62,6 +72,9 @@
   .question-info{
     float: right;
     width: 20%;
+  }
+  .question-info span {
+    width: 100%;
   }
 
   #answer-summary{
@@ -102,13 +115,14 @@
         questionId: null,
         loadingMore: false,
         lastScrollTop: 0,
-        isSendingFollow: false
+        isSendingFollow: false,
+        sortParamLabel: '默认',
+        sortParam: ''
       }
     },
     mounted: function () {
       this.getQuestion()
       this.getAnswer()
-      $(window).bind('scroll', this.scrollMethod)
     },
     methods: {
       scrollMethod () {
@@ -135,7 +149,7 @@
           })
           return
         }
-        if (!this.loadingMore && this.canLoading()) {
+        if (!this.answerLoading && !this.loadingMore && this.canLoading()) {
           this.loadingMore = true
           this.getData()
         }
@@ -145,7 +159,7 @@
       },
       getData () {
         const questionId = this.$route.params.questionId
-        getLimitAnswer(questionId, this.startIndex, this.onceNum)
+        getLimitAnswer(questionId, this.startIndex, this.onceNum, this.sortParam)
           .then((response) => {
             let answers = response.result
             let length = answers.length
@@ -192,7 +206,9 @@
         })
       },
       getAnswer () {
+        $(window).unbind()
         const questionId = this.$route.params.questionId
+        this.answerLoading = true
         let _this = this
         getAnswerNum(questionId).then((response) => {
           _this.answers = []
@@ -204,12 +220,14 @@
           } else {
             _this.getData()
           }
+          $(window).bind('scroll', this.scrollMethod)
         }).catch((e) => {
           Message({
             message: '请求数据出错，请稍后再试！',
             type: 'error',
             duration: 5 * 1000
           })
+          $(window).bind('scroll', this.scrollMethod)
         })
       },
       submit: function (answer) {
@@ -283,6 +301,10 @@
           })
           this.isSendingFollow = false
         })
+      },
+      answerSortChange () {
+        this.sortParam = this.sortParamLabel === '默认' ? '' : 'id'
+        this.getAnswer()
       }
     },
     beforeRouteLeave (to, from, next) {

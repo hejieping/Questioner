@@ -30,6 +30,9 @@ public class Question {
     @Column
     private Boolean solved;
 
+    @Column
+    private Long views = 0L;
+
     @JoinColumn(name = "type_id")
     @ManyToOne
     private QuestionType questionType;
@@ -93,6 +96,14 @@ public class Question {
 
     public void setSolved(Boolean solved) {
         this.solved = solved;
+    }
+
+    public Long getViews() {
+        return views;
+    }
+
+    public void setViews(Long views) {
+        this.views = views;
     }
 
     public QuestionType getQuestionType() {

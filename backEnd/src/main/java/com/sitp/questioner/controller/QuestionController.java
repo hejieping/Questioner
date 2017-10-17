@@ -43,6 +43,7 @@ public class QuestionController {
             questionOverview.setSolved(question.getSolved());
             questionOverview.setPublisherName(question.getPublisher().getUsername());
             questionOverview.setPublisherImgSrc(question.getPublisher().getAvatarURL());
+            questionOverview.setViews(question.getViews());
             questionOverviewList.addQuestionOverview(questionOverview);
         }
         questionOverviewList.setCurrentPage(questions.getNumber());
@@ -56,13 +57,14 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.GET)
     public ResJsonTemplate getAllQuestions(@RequestParam("pageSize") int pageSize,
                                            @RequestParam("currentPage") int currentPage,
-                                           @RequestParam(value = "questionTitle",defaultValue = "") String questionTitle){
+                                           @RequestParam(value = "questionTitle",defaultValue = "") String questionTitle,
+                                           @RequestParam(value = "sortParam", defaultValue = "id") String sortParam){
         Page<Question> questions;
         if(questionTitle.equals("")){
-            questions = questionService.getAllQuestionByPage(pageSize, currentPage);
+            questions = questionService.getAllQuestionByPage(pageSize, currentPage, sortParam);
         }
         else {
-            questions = questionService.getQuestionTitleLike(questionTitle,pageSize,currentPage);
+            questions = questionService.getQuestionTitleLike(questionTitle,pageSize,currentPage, sortParam);
         }
         QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
         return new ResJsonTemplate<>("200", questionOverviewList);
@@ -72,13 +74,14 @@ public class QuestionController {
     public ResJsonTemplate getQuestionsByType(@RequestParam("pageSize") int pageSize,
                                               @RequestParam("currentPage") int currentPage,
                                               @PathVariable("questionTypeId") Long typeId,
-                                              @RequestParam(value = "questionTitle",defaultValue = "") String questionTitle){
+                                              @RequestParam(value = "questionTitle",defaultValue = "") String questionTitle,
+                                              @RequestParam(value = "sortParam", defaultValue = "id") String sortParam){
         Page<Question> questions;
         if(questionTitle.equals("")){
-            questions = questionService.getQuestionByPageAndType(typeId, pageSize, currentPage);
+            questions = questionService.getQuestionByPageAndType(typeId, pageSize, currentPage, sortParam);
         }
         else {
-            questions = questionService.getQuestionTitleLikeByType(typeId,questionTitle,pageSize,currentPage);
+            questions = questionService.getQuestionTitleLikeByType(typeId,questionTitle,pageSize,currentPage, sortParam);
         }
         QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
         return new ResJsonTemplate<>("200", questionOverviewList);
@@ -89,6 +92,8 @@ public class QuestionController {
         Question question = questionService.getQuestion(questionId);
         if(question == null)
             return new ResJsonTemplate<>("404","不存在的问题！");
+        question.setViews(question.getViews() + 1);
+        new Thread(() -> questionService.saveQuestion(question)).start();
         return new ResJsonTemplate<>("200", question);
     }
 
@@ -111,9 +116,4 @@ public class QuestionController {
         return new ResJsonTemplate<>("200", questionService.userUnFollowQuestion(questionId, userId));
     }
 
-    @RequestMapping(value = "/questionOverview", method = RequestMethod.GET)
-    public ResJsonTemplate getAllQuestionOverview(){
-        Page<Question> questionPageable = questionService.getAllQuestionByPage(10,0);
-        return new ResJsonTemplate<>("200", questionPageable);
-    }
 }

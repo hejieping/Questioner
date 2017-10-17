@@ -46,8 +46,9 @@ public class AnswerController {
     @RequestMapping(value = "/getLimitAnswers",method = RequestMethod.GET)
     public ResJsonTemplate getLimitAnswers(@RequestParam("questionId") Long questionId,
                                            @RequestParam("startIndex") int startIndex,
-                                           @RequestParam("limitNum") int limitNum){
-        List<Answer> answers = answerService.getLimitAnswers(questionId,startIndex,limitNum);
+                                           @RequestParam("limitNum") int limitNum,
+                                           @RequestParam(value = "sortParam", defaultValue = "thumbs_up_couniot") String sortParam){
+        List<Answer> answers = answerService.getLimitAnswers(questionId,startIndex,limitNum, sortParam);
         for(Answer answer: answers){
             answer.setCommentCount(answerCommentService.getCommentCountOfAnswer(answer.getId()));
         }

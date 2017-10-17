@@ -41,34 +41,34 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
-    public Page<Question> getAllQuestionByPage(int pageSize, int currentPage){
+    public Page<Question> getAllQuestionByPage(int pageSize, int currentPage, String sortParam){
         Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
-                .setPageSize(pageSize).setSortParam("id")
+                .setPageSize(pageSize).setSortParam(sortParam)
                 .setDirection(Sort.Direction.DESC).buildPage();
         return questionRepository.getAllQuestionByPage(pageable);
     }
 
     @Override
-    public Page<Question> getQuestionTitleLike(String questionTitle, int pageSize, int currentPage) {
+    public Page<Question> getQuestionTitleLike(String questionTitle, int pageSize, int currentPage, String sortParam) {
         Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
-                .setPageSize(pageSize).setSortParam("id")
+                .setPageSize(pageSize).setSortParam(sortParam)
                 .setDirection(Sort.Direction.DESC).buildPage();
         return questionRepository.getQuestionTitleLike(questionTitle,pageable);
     }
 
     @Override
-    public Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage) {
+    public Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage, String sortParam) {
         Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
-                .setPageSize(pageSize).setSortParam("id")
+                .setPageSize(pageSize).setSortParam(sortParam)
                 .setDirection(Sort.Direction.DESC).buildPage();
         return questionRepository.getQuestionByPageAndType(typeId, pageable);
     }
 
     @Override
     public Page<Question> getQuestionTitleLikeByType(Long questionTypeId, String questionTitle,
-                                                     int pageSize, int currentPage) {
+                                                     int pageSize, int currentPage, String sortParam) {
         Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
-                .setPageSize(pageSize).setSortParam("id")
+                .setPageSize(pageSize).setSortParam(sortParam)
                 .setDirection(Sort.Direction.DESC).buildPage();
         return questionRepository.getQuestionTitleLikeByType(questionTypeId, questionTitle, pageable);
     }

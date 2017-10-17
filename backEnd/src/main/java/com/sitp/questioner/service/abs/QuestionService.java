@@ -13,14 +13,14 @@ public interface QuestionService {
 
     Question getQuestion(Long questionId);
 
-    Page<Question> getAllQuestionByPage(int pageSize, int currentPage);
+    Page<Question> getAllQuestionByPage(int pageSize, int currentPage,String sortParam);
 
-    Page<Question> getQuestionTitleLike(String questionTitle, int pageSize, int currentPage);
+    Page<Question> getQuestionTitleLike(String questionTitle, int pageSize, int currentPage, String sortParam);
 
-    Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage);
+    Page<Question> getQuestionByPageAndType(Long typeId, int pageSize, int currentPage, String sortParam);
 
     Page<Question> getQuestionTitleLikeByType(Long questionTypeId, String questionTitle,
-                                              int pageSize, int currentPage);
+                                              int pageSize, int currentPage, String sortParam);
 
     boolean userFollowQuestion(Long questionId, Long userId);
 

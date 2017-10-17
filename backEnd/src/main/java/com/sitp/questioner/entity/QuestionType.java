@@ -1,5 +1,7 @@
 package com.sitp.questioner.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,11 @@ public class QuestionType {
 
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private List<Question> questions = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "followQuestionType", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Account> followers = new ArrayList<>();
+
 
 
     public Long getId() {
@@ -55,6 +62,15 @@ public class QuestionType {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+
+    public List<Account> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Account> followers) {
+        this.followers = followers;
     }
 
     @Override

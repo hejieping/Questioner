@@ -22,26 +22,28 @@ export function raiseQuestion (userId, questionTitle, questionTypeId, questionCo
   })
 }
 
-export function getAllQuestion (questionTitle, currentPage, pageSize) {
+export function getAllQuestion (questionTitle, currentPage, pageSize, sortParam) {
   return fetch({
     url: '/question',
     method: 'get',
     params: {
       questionTitle: questionTitle,
       currentPage: currentPage,
-      pageSize: pageSize
+      pageSize: pageSize,
+      sortParam: sortParam
     }
   })
 }
 
-export function getQuestionByType (questionTitle, questionTypeId, currentPage, pageSize) {
+export function getQuestionByType (questionTitle, questionTypeId, currentPage, pageSize, sortParam) {
   return fetch({
     url: '/question/getQuestionByType/' + questionTypeId,
     method: 'get',
     params: {
       questionTitle: questionTitle,
       currentPage: currentPage,
-      pageSize: pageSize
+      pageSize: pageSize,
+      sortParam: sortParam
     }
   })
 }
@@ -81,14 +83,15 @@ export function getAnswerNum (questionId) {
   })
 }
 
-export function getLimitAnswer (questionId, startIndex, limitNum) {
+export function getLimitAnswer (questionId, startIndex, limitNum, sortParam) {
   return fetch({
     url: '/answer/getLimitAnswers',
     method: 'get',
     params: {
       questionId: questionId,
       startIndex: startIndex,
-      limitNum: limitNum
+      limitNum: limitNum,
+      sortParam: sortParam
     }
   })
 }
