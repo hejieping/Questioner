@@ -22,7 +22,7 @@ public class Account {
     @Column(nullable = false)
     private String avatarURL;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name="account_role",joinColumns = {
             @JoinColumn(name = "account_id",referencedColumnName = "id"),
     },inverseJoinColumns = {@JoinColumn(name = "role_id",referencedColumnName = "id")})
@@ -44,6 +44,14 @@ public class Account {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Question> questions = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<AnswerComment> answerComments = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "feedbackAccounts", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Answer> feedbackAnswers = new ArrayList<>();
 
 
     public void setId(Long id) {
@@ -107,6 +115,22 @@ public class Account {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public List<AnswerComment> getAnswerComments() {
+        return answerComments;
+    }
+
+    public void setAnswerComments(List<AnswerComment> answerComments) {
+        this.answerComments = answerComments;
+    }
+
+    public List<Answer> getFeedbackAnswers() {
+        return feedbackAnswers;
+    }
+
+    public void setFeedbackAnswers(List<Answer> feedbackAnswers) {
+        this.feedbackAnswers = feedbackAnswers;
     }
 
     @Override

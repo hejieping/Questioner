@@ -40,7 +40,7 @@ public class QuestionController {
             questionOverview.setPublishDateTime(question.getPublishDateTime());
             questionOverview.setPublisherId(question.getPublisher().getId());
             questionOverview.setTitle(question.getQuestionTitle());
-            questionOverview.setSolved(false);
+            questionOverview.setSolved(question.getSolved());
             questionOverview.setPublisherName(question.getPublisher().getUsername());
             questionOverview.setPublisherImgSrc(question.getPublisher().getAvatarURL());
             questionOverviewList.addQuestionOverview(questionOverview);

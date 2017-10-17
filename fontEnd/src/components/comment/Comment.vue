@@ -28,6 +28,10 @@
     flex: 1px;
     text-align: center;
   }
+  .commentThumbnail img {
+    width: 38px;
+    height: 38px;
+  }
   .commentMain{
     flex: 11;
   }
@@ -72,30 +76,30 @@
     background: url('../../assets/img/sprites-1.9.2.4c54885a.png') no-repeat -200px -165px;
     position: relative;
     top: -25px;
-    left: 80px;
+    left: 100px;
   }
 </style>
 
 <template>
-  <div class="comment">
+  <div class="comment" v-loading.lock="isLoadingComment" element-loading-text="玩命加载中">
     <i class="triangle"></i>
     <ul>
       <li v-for="comment in commentsList" class="commentLi">
         <div class="commentThumbnail">
-          <img :src="comment.thubnail"/>
+          <img :src="comment.commenter.avatarURL"/>
         </div>
         <div class="commentMain">
-          <a>{{ comment.author }}</a>
-          <p class="paragraph"> {{ comment.paragraph }}</p>
+          <a>{{ comment.commenter.username }}</a>
+          <p class="paragraph"> {{ comment.commentContent }}</p>
           <div class="commentInfo">
             <div class="option">
-              <span> {{ comment.commentTime  | moment("ddd, MMM Do YYYY") }}</span>
+              <span> {{ comment.commentDateTime  | moment("ddd, MMM Do YYYY") }}</span>
               <span><i></i> 回复 </span>
               <span><i></i> 赞 </span>
               <span><i></i> 踩 </span>
               <span><i></i> 举报 </span>
             </div>
-            <div class="thumbupCount"> {{ comment.thumbUp | formatThumbup }}</div>
+            <div class="thumbupCount"> {{ comment.thumbsUpCount | formatThumbup }}</div>
           </div>
         </div>
       </li>
@@ -111,11 +115,73 @@
   </div>
 </template>
 <script>
-  export default({
+  import { postAnswerComment, getAnswerCommentsOfAnswer } from '@/api/answerComment'
+  import { Message } from 'element-ui'
+  import bus from '../../assets/eventBus'
+  export default {
     data () {
       return {
         commentsList: [],
-        newComment: ''
+        newComment: '',
+        userId: 1,
+        username: '罗宇侠',
+        isLoadingComment: true
+      }
+    },
+    props: {
+      answerId: {
+        type: Number
+      }
+    },
+    mounted: function () {
+      const eventName = 'comment_' + this.answerId
+      bus.$off(eventName)
+      bus.$on(eventName, this.getComment)
+    },
+    methods: {
+      addNewComment () {
+        var _this = this
+        postAnswerComment(this.answerId, this.userId, this.newComment).then((response) => {
+          if (response.status === '201') {
+            Message({
+              message: '发表评论成功！',
+              type: 'success',
+              duration: 1000
+            })
+            this.commentsList.push({
+              commentContent: this.newComment,
+              thumbsUpCount: 0,
+              commentDateTime: new Date(),
+              commenter: {
+                username: _this.username,
+                avatarURL: 'http://localhost:8080/img/avatar/default.png'
+              }
+            })
+            _this.newComment = ''
+          }
+        }).catch((e) => {
+          Message({
+            message: '发表评论失败，请稍后再试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      getComment () {
+        if (this.commentsList.length > 0) {
+          return
+        }
+        this.isLoadingComment = true
+        getAnswerCommentsOfAnswer(this.answerId).then((response) => {
+          this.commentsList = response.result
+          this.isLoadingComment = false
+        }).catch((e) => {
+          Message({
+            message: '获取评论失败，请稍后再试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
       }
     },
     filters: {
@@ -123,5 +189,5 @@
         return times + '赞'
       }
     }
-  })
+  }
 </script>

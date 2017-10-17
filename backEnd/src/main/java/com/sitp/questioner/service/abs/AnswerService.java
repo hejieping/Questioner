@@ -14,4 +14,12 @@ public interface AnswerService {
     List<Answer> getLimitAnswers(Long questionId, int startIndex, int limitNum);
 
     boolean saveAnswer(Answer answer);
+
+    boolean userHasFeedback(Long answerId, Long userId);
+
+    boolean giveAnswerFeedBack(Long answerId, Long userId, boolean isGood);
+
+    Long getQuestionPublisherByAnswer(Long answerId);
+
+    boolean acceptAnswer(Long answerId);
 }

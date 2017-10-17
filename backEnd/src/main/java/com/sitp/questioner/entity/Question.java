@@ -1,6 +1,7 @@
 package com.sitp.questioner.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.*;
@@ -26,6 +27,9 @@ public class Question {
     @Column
     private Date publishDateTime = new Date();
 
+    @Column
+    private Boolean solved;
+
     @JoinColumn(name = "type_id")
     @ManyToOne
     private QuestionType questionType;
@@ -41,7 +45,6 @@ public class Question {
     @JoinColumn(name = "account_id")
     @ManyToOne
     private Account publisher;
-
 
 
     public Long getId() {
@@ -82,6 +85,14 @@ public class Question {
 
     public void setPublishDateTime(Date publishDateTime) {
         this.publishDateTime = publishDateTime;
+    }
+
+    public Boolean getSolved() {
+        return solved;
+    }
+
+    public void setSolved(Boolean solved) {
+        this.solved = solved;
     }
 
     public QuestionType getQuestionType() {

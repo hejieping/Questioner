@@ -63,15 +63,12 @@ export function getQuestionType () {
 export function postAnswer (answerContent, questionId, userId) {
   const data = {
     answerContent: answerContent,
-    question: {
-      id: questionId
-    },
     account: {
       id: userId
     }
   }
   return fetch({
-    url: '/answer',
+    url: '/answer/' + questionId,
     method: 'post',
     data
   })

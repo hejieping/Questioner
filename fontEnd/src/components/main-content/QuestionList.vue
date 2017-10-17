@@ -33,7 +33,7 @@
             <el-tag type="gray">{{ questionOverview.answers }}回答</el-tag>
           </div>
           <div class="solved">
-            <el-tag v-if="questionOverview.solved" type="green">已解决</el-tag>
+            <el-tag v-if="questionOverview.isSolved" type="green">已解决</el-tag>
             <el-tag v-else type="gray">未解决</el-tag>
           </div>
         </div>

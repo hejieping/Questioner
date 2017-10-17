@@ -3,6 +3,7 @@ package com.sitp.questioner.controller;
 import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.jwt.JwtAuthenticationRequest;
 import com.sitp.questioner.jwt.JwtAuthenticationResponse;
+import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AuthService;
 import com.sitp.questioner.util.FIleSaveUtil;
@@ -10,6 +11,9 @@ import com.sitp.questioner.util.ResJsonTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -71,6 +75,8 @@ public class AccountController {
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/user",method = RequestMethod.POST)
     public ResJsonTemplate testUser(){
+        JwtUser jwtUser =(JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(jwtUser.getId());
         return new ResJsonTemplate<>("400","you are user");
     }
 
