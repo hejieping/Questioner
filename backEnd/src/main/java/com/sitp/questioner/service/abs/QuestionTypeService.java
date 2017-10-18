@@ -8,5 +8,9 @@ import com.sitp.questioner.entity.QuestionType;
 public interface QuestionTypeService {
     Iterable<QuestionType> getAllQuestionType();
 
-    void followQuestionType(Long questionTypeId, Long userId);
+    boolean hasFollowQuestionType(Long questionTypeId, Long userId);
+
+    boolean followQuestionType(Long questionTypeId, Long userId);
+
+    boolean unFollowQuestionType(Long questionTypeId, Long userId);
 }
