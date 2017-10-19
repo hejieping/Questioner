@@ -9,6 +9,14 @@ import EditQuestion from '@/components/question/EditQuestion'
 import ShowContent from '@/components/ShowContent'
 import PersonQuestion from '@/components/PersonQuestion'
 import QuestionDetail from '@/components/question/QuestionDetail'
+import UserProfile from '@/components/user/UserProfile'
+import Home from '@/components/user/Home'
+import Followers from '@/components/user/Followers'
+import MyFollow from '@/components/user/MyFollow'
+import Reputation from '@/components/user/Reputation'
+import UserActivity from '@/components/user/UserActivity'
+import UserAnswer from '@/components/user/UserAnswer'
+import UserQuestion from '@/components/user/UserQuestion'
 
 Vue.use(Router)
 
@@ -17,11 +25,9 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'index',
       component: Index,
       children: [
         {
-          name: 'index',
           path: '/',
           component: Content,
           children: [
@@ -67,6 +73,20 @@ export default new Router({
             {
               name: 'search', path: '/questions/searchQuestion', component: QuestionList, meta: {needAuth: false}
             }
+          ]
+        },
+        {
+          path: '/user/:userId',
+          component: UserProfile,
+          children: [
+            { name: 'userDefaultHome', path: '/', component: Home, meta: {needAuth: false, index: '1'} },
+            { name: 'userHome', path: '/user/:userId/home', component: Home, meta: {needAuth: false, index: '1'} },
+            { name: 'followers', path: '/user/:userId/followers', component: Followers, meta: {needAuth: false, index: ''} },
+            { name: 'myFollow', path: '/user/:userId/myFollow', component: MyFollow, meta: {needAuth: false, index: ''} },
+            { name: 'reputation', path: '/user/:userId/reputation', component: Reputation, meta: {needAuth: false, index: '5'} },
+            { name: 'userActivity', path: '/user/:userId/userActivity', component: UserActivity, meta: {needAuth: false, index: '4'} },
+            { name: 'userAnswer', path: '/user/:userId/userAnswer', component: UserAnswer, meta: {needAuth: false, index: '3'} },
+            { name: 'userQuestion', path: '/user/:userId/userQuestion', component: UserQuestion, meta: {needAuth: false, index: '2'} }
           ]
         },
         {

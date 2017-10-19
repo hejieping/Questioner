@@ -1,0 +1,280 @@
+<template>
+  <div v-loading.lock="isCheckingUser">
+  <div v-if="userIdIsValidate">
+  <div class="profile">
+    <header class="profile__heading">
+      <el-row  style="padding-left: 5%; margin-top: 10px">
+        <el-col :span="3">
+          <div class="userAvatar">
+            <a>
+              <img style="border-radius: 50%; background: white; vertical-align: middle" width="100%" :src="user.avatarURL"/>
+            </a>
+          </div>
+        </el-col>
+        <el-col :span="10">
+          <div style="margin-left: 20px" class="userInfo">
+            <h2>{{ user.username }}</h2>
+            <div class="profile__heading--award">
+              <a class="profile__rank-btn">
+                <span class="h4">{{ user.creditPoint }}</span>
+                <span class="profile__rank-btn-text">声望</span>
+              </a>
+            </div>
+            <div class="profile__heading--award-badge">
+              <span class="badge">
+                <span> <i style="color: gold" class="fa fa-star"></i> </span>
+                <span> 0 </span>
+              </span>
+              <span class="badge">
+                <span> <i style="color: grey" class="fa fa-star"></i> </span>
+                <span> 0 </span>
+              </span>
+              <span class="badge">
+                <span> <i style="color: saddlebrown" class="fa fa-star"></i> </span>
+                <span> 0 </span>
+              </span>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="profile__heading--desc">
+            <div class="profile__heading--desc-heading">
+              <span class="profile__heading--desc-heading-dot-warp">
+                <span class="profile__heading-dot profile__heading-dot--red"></span>
+                <span class="profile__heading-dot profile__heading-dot--yellow"></span>
+                <span class="profile__heading-dot profile__heading-dot--green"></span>
+              </span>
+            </div>
+            <div class="profile__heading--desc-body">
+              <div class="profile__desc">
+                <div style="white-space: pre">
+                  该用户太懒什么也没留下.....
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+    </header>
+    <div class="container-warp">
+      <div class="container">
+        <el-row style="padding-left: 5%">
+          <el-col :span="4">
+            <div class="follow-panel">
+              <el-button  size="small" type="success" icon="star-on">加关注</el-button>
+              <div v-loading.lock="loadingFollowInfo" style="margin-top: 10px" class="follower-panel">
+                <el-row style="padding-bottom:15px; border-bottom: solid 1px black">
+                  <el-col :span="12" style="border-right: solid 1px #5CB85C">
+                    <a @click="$router.push({ path: `/user/${userId}/myFollow` })" href="javascript:void">
+                      <span>关注了</span>
+                      <span style="display: block"> {{ followed }} 人 </span>
+                    </a>
+                  </el-col>
+                  <el-col :span="12" style="padding-left: 15px">
+                    <a @click="$router.push({ path: `/user/${userId}/followers` })" href="javascript:void">
+                      <span>粉丝</span>
+                      <span style="display: block"> {{ followers }} 人 </span>
+                    </a>
+                  </el-col>
+                </el-row>
+              </div>
+            </div>
+            <div class="operation-option">
+              <el-menu :defaultActive="activeIndex">
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/` })" index="1"><i class="fa fa-home fa-lg"></i>他的主页</el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userQuestion` })"  index="2"><i class="fa fa-question-circle fa-lg"></i>他的提问 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userAnswer` })" index="3"><i class="fa fa-key fa-lg"></i>他的回答 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userActivity` })" index="4"><i class="fa fa-line-chart fa-lg"></i>他的动态 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/reputation` })" index="5"><i class="fa fa-star fa-lg"></i>声望记录 </el-menu-item>
+              </el-menu>
+            </div>
+          </el-col>
+          <el-col :span="19" style="padding-left: 20px">
+            <router-view></router-view>
+          </el-col>
+        </el-row>
+        <div style="margin-bottom: 100px">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div v-if="userIdIsValidate === false">
+    <div style="margin: 100px 50px">
+      <el-alert
+        title="找不到该用户"
+        type="error"
+        description="该用户不存在或已被永久注销" :closable="false">
+      </el-alert>
+    </div>
+  </div>
+  </div>
+</template>
+<style>
+  h2,h3 {
+    font-weight: 500;
+  }
+  .pagination {
+    float: right;
+    margin-top: 10px;
+  }
+  .follow {
+    padding: 12px 5px;
+    border-bottom: solid 1px #666666;
+  }
+</style>
+<style scoped>
+  .profile__heading {
+    background-color: #f6f6f6;
+    padding: 40px 0 0 0;
+  }
+  .profile__heading h2 {
+    font-weight: 500;
+  }
+  .profile__rank-btn {
+    margin-top: 5px;
+    background: #DFF0D8;
+    border: 1px solid #5CB85C;
+    border-radius: 100px;
+    font-size: 15px;
+    color: #43894E;
+    padding: 4px 12px;
+    line-height: 1;
+    display: inline-block;
+  }
+  .profile__rank-btn-text {
+    font-size: 14px;
+    margin-left: 1px;
+  }
+  .profile__heading--award {
+    display: inline-block;
+  }
+  .profile__heading--award-badge {
+    display: inline-block;
+    margin-left: 15px;
+    line-height: 1;
+    color: #333;
+    vertical-align: middle;
+  }
+  .profile__heading--award-badge .badge {
+    margin-left: 10px;
+  }
+  .profile__heading--desc-heading {
+    height: 32px;
+    background-color: #E3E3E3;
+    padding: 0 12px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+  .profile__heading--desc-heading-dot-warp {
+    height: 32px;
+  }
+  .profile__heading-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #eee;
+    margin-right: 8px;
+  }
+  .profile__heading-dot--red {
+    background-color: #FF5F57;
+  }
+  .profile__heading-dot--yellow {
+    background-color: #FFBD2E;
+  }
+  .profile__heading-dot--green {
+    background-color: #28CA42;
+  }
+  .profile__heading--desc-body {
+    background-color: #EEEEEE;
+    width: 100%;
+    font-size: 13px;
+    color: #666666;
+    overflow: auto;
+    height: 150px;
+    padding: 20px;
+    font-family: "Source Code Pro", Consolas, Menlo, Monaco, "Courier New", monospace;
+  }
+  .container-warp {
+    margin-top: 30px;
+  }
+  .follower-panel a {
+    color: black;
+  }
+  .follower-panel a:hover {
+    color: grey;
+  }
+
+  .container .operation-option .el-menu-item i {
+    margin-right: 5px;
+  }
+</style>
+<script>
+  import { getUser, getFollowInfo } from '@/api/user'
+  import { Message } from 'element-ui'
+  export default {
+    data () {
+      return {
+        userId: '',
+        userIdIsValidate: '',
+        isCheckingUser: false,
+        user: null,
+        loadingFollowInfo: false,
+        followers: 0,
+        followed: 0,
+        activeIndex: '1'
+      }
+    },
+    mounted () {
+      this.updateUserInfo()
+    },
+    methods: {
+      updateUserInfo () {
+        this.userId = this.$route.params.userId
+        this.isCheckingUser = true
+        this.loadingFollowInfo = true
+        this.getUserInfo()
+        this.getFollowInfo()
+      },
+      getUserInfo () {
+        getUser(this.userId).then((response) => {
+          this.userIdIsValidate = response.status === '200'
+          this.isCheckingUser = false
+          this.user = response.result
+        }).catch((e) => {
+          Message({
+            message: '请求用户的信息出错，请稍后再试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      getFollowInfo () {
+        getFollowInfo(this.userId).then((response) => {
+          this.loadingFollowInfo = false
+          this.followers = response.result.followerCount
+          this.followed = response.result.followedCount
+        }).catch((e) => {
+          Message({
+            message: '获取用户的关注信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      }
+    },
+    beforeRouteUpdate (to, from, next) {
+      this.activeIndex = to.meta.index
+      next()
+    },
+    watch: {
+      '$route' (to, from) {
+        if (from.params.userId !== to.params.userId) {
+          this.updateUserInfo()
+        }
+      }
+    }
+  }
+</script>

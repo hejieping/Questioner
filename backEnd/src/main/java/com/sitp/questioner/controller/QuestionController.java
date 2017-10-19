@@ -116,4 +116,24 @@ public class QuestionController {
         return new ResJsonTemplate<>("200", questionService.userUnFollowQuestion(questionId, userId));
     }
 
+    @RequestMapping(value = "/getFollow/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getFollowQuestion(@PathVariable("userId") Long userId,
+                                             @RequestParam(value = "currentPage",defaultValue = "0") int currentPage,
+                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return new ResJsonTemplate<>("200",questionService.getUserFollowQuestions(userId,currentPage,pageSize));
+    }
+
+    @RequestMapping(value = "/getUserQuestionByViews/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUserQuestionByViews(@PathVariable("userId") Long userId,
+                                                  @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
+                                                  @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return new ResJsonTemplate<>("200", questionService.getUserQuestionByViews(userId, currentPage, pageSize));
+    }
+
+    @RequestMapping(value = "/getUserQuestionByDateTime/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUserQuestionByDateTIme(@PathVariable("userId") Long userId,
+                                                     @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
+                                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return new ResJsonTemplate<>("200", questionService.getUserQuestionByDateTime(userId, currentPage, pageSize));
+    }
 }

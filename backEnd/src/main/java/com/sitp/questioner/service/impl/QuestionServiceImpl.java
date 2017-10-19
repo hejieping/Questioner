@@ -107,4 +107,29 @@ public class QuestionServiceImpl implements QuestionService{
     public boolean hasFollowQuestion(Long questionId, Long userId) {
         return questionRepository.hasFollowQuestion(userId,questionId) > 0;
     }
+
+    @Override
+    public Page<Question> getUserFollowQuestions(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setSortParam("id").setDirection(Sort.Direction.DESC).buildPage();
+        return questionRepository.getUserFollowQuestions(userId, pageable);
+    }
+
+    @Override
+    public Page<Question> getUserQuestionByViews(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setSortParam("views")
+                .setDirection(Sort.Direction.DESC).buildPage();
+        return questionRepository.getUserQuestions(userId, pageable);
+    }
+
+    @Override
+    public Page<Question> getUserQuestionByDateTime(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setSortParam("id")
+                .setDirection(Sort.Direction.DESC).buildPage();
+        // even sort by dateTime, but maybe id is ok for id is incremental by dateTime
+        // and sort by id is more efficient
+        return questionRepository.getUserQuestions(userId, pageable);
+    }
 }

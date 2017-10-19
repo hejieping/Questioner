@@ -5,7 +5,11 @@ import com.sitp.questioner.entity.QuestionType;
 import com.sitp.questioner.repository.AccountRepository;
 import com.sitp.questioner.repository.QuestionTypeRepository;
 import com.sitp.questioner.service.abs.QuestionTypeService;
+import com.sitp.questioner.util.PageableBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -59,5 +63,12 @@ public class QuestionTypeServiceImpl implements QuestionTypeService{
            return true;
         }
         return false;
+    }
+
+    @Override
+    public Page<QuestionType> getUserFollowQuestionType(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setDirection(Sort.Direction.DESC).setSortParam("id").buildPage();
+        return questionTypeRepository.getUserFollowQuestionType(userId, pageable);
     }
 }

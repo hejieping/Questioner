@@ -4,10 +4,7 @@ import com.sitp.questioner.entity.QuestionType;
 import com.sitp.questioner.service.abs.QuestionTypeService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by qi on 2017/10/12.
@@ -41,5 +38,12 @@ public class QuestionTypeController {
     public ResJsonTemplate unFollowQuestionType(@RequestParam("questionTypeId") Long questionTypeId,
                                                 @RequestParam("userId") Long userId) {
         return new ResJsonTemplate<>("200", questionTypeService.unFollowQuestionType(questionTypeId,userId));
+    }
+
+    @RequestMapping(value = "/getFollow/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getFollow(@PathVariable("userId") Long userId,
+                                     @RequestParam(value = "currentPage",defaultValue = "0") int currentPage,
+                                     @RequestParam(value = "pageSize", defaultValue = "0") int pageSize) {
+        return new ResJsonTemplate<>("200", questionTypeService.getUserFollowQuestionType(userId, currentPage, pageSize));
     }
 }

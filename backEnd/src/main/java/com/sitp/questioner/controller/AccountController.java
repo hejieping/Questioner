@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by jieping on 2017-07-08.
  */
@@ -78,6 +81,53 @@ public class AccountController {
         JwtUser jwtUser =(JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         System.out.println(jwtUser.getId());
         return new ResJsonTemplate<>("400","you are user");
+    }
+
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUser(@PathVariable("userId") Long userId) {
+        Account account = accountService.getUser(userId);
+        if (account == null) {
+            return new ResJsonTemplate<>("404", null);
+        }
+        else {
+            return new ResJsonTemplate<>("200", account);
+        }
+    }
+
+    @RequestMapping(value = "/user/followersInfo/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getFollowerInfo(@PathVariable("userId") Long userId) {
+        Long followerCount = accountService.getUserFollowersCount(userId);
+        Long followedCount = accountService.getUserFollowedCount(userId);
+        Map<String, Long> followInfo = new HashMap<>();
+        followInfo.put("followerCount", followerCount);
+        followInfo.put("followedCount", followedCount);
+        return new ResJsonTemplate<>("200", followInfo);
+    }
+
+    @RequestMapping(value = "/user/follow", method = RequestMethod.PUT)
+    public ResJsonTemplate followUser(@RequestParam("userId") Long userId,
+                                      @RequestParam("followedId") Long followedId) {
+        return new ResJsonTemplate<>("200", accountService.followUser(userId, followedId));
+    }
+
+    @RequestMapping(value = "/user/unFollow", method = RequestMethod.PUT)
+    public ResJsonTemplate unFollowUser(@RequestParam("userId") Long userId,
+                                        @RequestParam("followedId") Long followedId) {
+        return new ResJsonTemplate<>("200", accountService.unFollowUser(userId, followedId));
+    }
+
+    @RequestMapping(value = "/user/getFollowers/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getFollowers(@PathVariable("userId") Long userId,
+                                        @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
+                                        @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return new ResJsonTemplate<>("200", accountService.getUserFollowers(userId, currentPage, pageSize));
+    }
+
+    @RequestMapping(value = "/user/getFollowed/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getFollowed(@PathVariable("userId") Long userId,
+                                       @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
+                                       @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return new ResJsonTemplate<>("200", accountService.getUserFollowed(userId, currentPage,pageSize));
     }
 
 }

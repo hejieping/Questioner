@@ -22,6 +22,9 @@ public class Account {
     @Column(nullable = false)
     private String avatarURL;
 
+    @Column
+    private Long creditPoint = 0L;
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name="account_role",joinColumns = {
             @JoinColumn(name = "account_id",referencedColumnName = "id"),
@@ -65,6 +68,18 @@ public class Account {
     @JsonIgnore
     private List<Answer> feedbackAnswers = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "follower_followed", joinColumns = @JoinColumn(name = "followed_id"),
+    inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    @JsonIgnore
+    private List <Account> followers = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "follower_followed",joinColumns = @JoinColumn(name = "follower_id"),
+    inverseJoinColumns = @JoinColumn(name = "followed_id"))
+    @JsonIgnore
+    private List<Account> followed = new ArrayList<>();
+
 
     public void setId(Long id) {
         this.id = id;
@@ -95,6 +110,14 @@ public class Account {
 
     public void setAvatarURL(String avatarURL) {
         this.avatarURL = avatarURL;
+    }
+
+    public Long getCreditPoint() {
+        return creditPoint;
+    }
+
+    public void setCreditPoint(Long creditPoint) {
+        this.creditPoint = creditPoint;
     }
 
     public List<Role> getRoles() {
@@ -152,6 +175,23 @@ public class Account {
 
     public void setFollowQuestionType(List<QuestionType> followQuestionType) {
         this.followQuestionType = followQuestionType;
+    }
+
+
+    public List<Account> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Account> followers) {
+        this.followers = followers;
+    }
+
+    public List<Account> getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(List<Account> followed) {
+        this.followed = followed;
     }
 
     @Override

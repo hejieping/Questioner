@@ -4,6 +4,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by qi on 2017/10/13.
  */
@@ -12,6 +15,8 @@ public class PageableBuilder {
     private String sortParam ;
     private int pageSize;
     private int currentPage;
+
+    private List<Sort.Order> orders = new ArrayList<>();
 
     public PageableBuilder setDirection(Sort.Direction direction) {
         this.direction = direction;
@@ -33,8 +38,13 @@ public class PageableBuilder {
         return this;
     }
 
+    public PageableBuilder addSortParam(Sort.Direction direction, String sortParam) {
+        orders.add(new Sort.Order(direction, sortParam));
+        return this;
+    }
+
     public  Pageable buildPage(){
-        Sort sort = new Sort(direction, sortParam);
-        return new PageRequest(currentPage, pageSize, sort);
+        orders.add(new Sort.Order(direction, sortParam));
+        return new PageRequest(currentPage, pageSize, new Sort(orders));
     }
 }

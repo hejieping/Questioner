@@ -87,6 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers("/answer/**").permitAll()
                 .antMatchers("/answerComment/**").permitAll()
                 .antMatchers("/index","/register").permitAll()
+                .antMatchers("/user/**").permitAll()
                 .anyRequest().authenticated();
         // add JWT filter
         httpSecurity

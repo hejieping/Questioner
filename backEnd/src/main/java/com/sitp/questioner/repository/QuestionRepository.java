@@ -33,4 +33,10 @@ public interface QuestionRepository extends CrudRepository<Question,Long>{
     @Query("select count(a.id) from Account a join a.followQuestion q where a.id = :userId and q.id = :questionId")
   //  @Query(value = "select count(account_id) from account_follow_question WHERE account_id = :userId AND question_id = :questionId", nativeQuery = true)
     int hasFollowQuestion(@Param("userId") Long userId, @Param("questionId") Long questionId);
+
+    @Query("select q from Question q join q.followers u where u.id = ?1")
+    Page<Question> getUserFollowQuestions(Long userId, Pageable pageable);
+
+    @Query("select q from Question q where q.publisher.id = ?1")
+    Page<Question> getUserQuestions(Long userId, Pageable pageable);
 }
