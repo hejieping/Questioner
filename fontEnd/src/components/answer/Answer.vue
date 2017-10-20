@@ -1,5 +1,5 @@
-<template xmlns="http://www.w3.org/1999/html">
-  <div>
+<template>
+  <div class="answer">
     <div class="user-info">
       <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
       <span>{{ answer.account.username }}</span>
@@ -35,6 +35,10 @@
   </div>
 </template>
 <style scoped>
+  .answer{
+    border-bottom: 1px solid grey;
+    margin-bottom: 20px;
+  }
   .answer .user-avatar{
     width: 38px;
     height: 38px;
@@ -58,6 +62,7 @@
   import Comment from '../comment/Comment.vue'
   import bus from '../../assets/eventBus'
   import { giveAnswerFeedback } from '@/api/answer'
+  import '../../../static/UE/ueditor.parse'
   import { Message } from 'element-ui'
   export default {
     components: { 'comment': Comment },
@@ -70,6 +75,13 @@
     },
     props: {
       answer: Object
+    },
+    mounted: function () {
+      this.$nextTick(function () {
+        window.uParse('.answer', {
+          rootPath: '../../static/UE/'
+        })
+      })
     },
     methods: {
       toggleComment () {

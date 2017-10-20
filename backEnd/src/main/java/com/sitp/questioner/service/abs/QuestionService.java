@@ -33,4 +33,6 @@ public interface QuestionService {
     Page<Question> getUserQuestionByViews(Long userId, int currentPage, int pageSize);
 
     Page<Question> getUserQuestionByDateTime(Long userId, int currentPage, int pageSize);
+
+    Question getQuestionByAnswerId(Long answerId);
 }

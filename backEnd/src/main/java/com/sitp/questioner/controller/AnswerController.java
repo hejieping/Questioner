@@ -5,12 +5,14 @@ import com.sitp.questioner.entity.AnswerComment;
 import com.sitp.questioner.entity.Question;
 import com.sitp.questioner.service.abs.AnswerCommentService;
 import com.sitp.questioner.service.abs.AnswerService;
+import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
+import com.sitp.questioner.viewmodel.AnswerOverview;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by qi on 2017/10/14.
@@ -20,6 +22,9 @@ import java.util.Objects;
 public class AnswerController {
     @Autowired
     private AnswerService answerService;
+
+    @Autowired
+    private QuestionService questionService;
 
     @Autowired
     private AnswerCommentService answerCommentService;
@@ -40,6 +45,18 @@ public class AnswerController {
         }
         else {
             return new ResJsonTemplate<>("400", "书写答案失败！");
+        }
+    }
+
+    @RequestMapping(value = "/{questionId}/{answerId}", method = RequestMethod.GET)
+    public ResJsonTemplate getQuestionSingleAnswer(@PathVariable("questionId") Long questionId,
+                                                   @PathVariable("answerId") Long answerId) {
+        Answer answer = answerService.getAnswer(answerId);
+        if (answer == null || !answer.getQuestion().getId().equals(questionId)) {
+            return new ResJsonTemplate<>("404", null);
+        }
+        else {
+            return new ResJsonTemplate<>("200", answer);
         }
     }
 
@@ -76,6 +93,43 @@ public class AnswerController {
             return new ResJsonTemplate<>("401", "你无权采纳该回答！");
         }
         return new ResJsonTemplate<>("200",answerService.acceptAnswer(answerId));
+    }
+
+    private static Map<String, Object> buildAnswerOverviewResult(Page<Answer> answerPage, QuestionService questionService) {
+        List<AnswerOverview> answerOverviewList = new ArrayList<>();
+        List<Answer> answers = answerPage.getContent();
+        for(Answer answer: answers) {
+            AnswerOverview answerOverview = new AnswerOverview();
+            answerOverview.setAccepted(answer.getAccepted());
+            answerOverview.setAnswerDateTime(answer.getAnswerDateTime());
+            answerOverview.setId(answer.getId());
+            answerOverview.setThumbsUpCount(answer.getThumbsUpCount());
+            answerOverview.setThumbsDownCount(answer.getThumbsDownCount());
+            answerOverview.setQuestionId(answer.getQuestion().getId());
+            answerOverview.setQuestionTitle(answer.getQuestion().getQuestionTitle());
+            answerOverviewList.add(answerOverview);
+        }
+        Long total = answerPage.getTotalElements();
+        Map<String, Object> result = new HashMap<>();
+        result.put("content", answerOverviewList);
+        result.put("total", total);
+        return result;
+    }
+
+    @RequestMapping(value = "/getUserAnswersByDateTime/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUserAnswersByDateTime(@PathVariable("userId") Long userId,
+                                                    @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
+                                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        Page<Answer> answerPage = answerService.getUserAnswersByDateTime(userId, currentPage, pageSize);
+        return new ResJsonTemplate<>("200", buildAnswerOverviewResult(answerPage, questionService));
+    }
+
+    @RequestMapping(value = "/getUserAnswersByThumbsUpCount/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUserAnswersByThumbsUpCount(@PathVariable("userId") Long userId,
+                                                         @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
+                                                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        Page<Answer> answerPage = answerService.getUserAnswerByThumbsUpCount(userId, currentPage, pageSize);
+        return new ResJsonTemplate<>("200", buildAnswerOverviewResult(answerPage, questionService));
     }
 
 }

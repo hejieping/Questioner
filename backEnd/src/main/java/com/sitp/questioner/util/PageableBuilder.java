@@ -44,7 +44,8 @@ public class PageableBuilder {
     }
 
     public  Pageable buildPage(){
-        orders.add(new Sort.Order(direction, sortParam));
+        if (direction != null && sortParam != null)
+            orders.add(new Sort.Order(direction, sortParam));
         return new PageRequest(currentPage, pageSize, new Sort(orders));
     }
 }

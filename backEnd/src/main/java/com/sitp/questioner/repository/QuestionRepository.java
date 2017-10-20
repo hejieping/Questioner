@@ -39,4 +39,8 @@ public interface QuestionRepository extends CrudRepository<Question,Long>{
 
     @Query("select q from Question q where q.publisher.id = ?1")
     Page<Question> getUserQuestions(Long userId, Pageable pageable);
+
+    @Query("select q from Question q join q.answers a where a.id = ?1")
+    Question getQuestionByAnswerId(Long answerId);
+
 }

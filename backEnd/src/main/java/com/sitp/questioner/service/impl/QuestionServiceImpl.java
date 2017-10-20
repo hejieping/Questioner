@@ -132,4 +132,9 @@ public class QuestionServiceImpl implements QuestionService{
         // and sort by id is more efficient
         return questionRepository.getUserQuestions(userId, pageable);
     }
+
+    @Override
+    public Question getQuestionByAnswerId(Long answerId) {
+        return questionRepository.getQuestionByAnswerId(answerId);
+    }
 }

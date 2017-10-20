@@ -14,3 +14,10 @@ export function giveAnswerFeedback (answerId, userId, isGood) {
     }
   })
 }
+
+export function getQuestionSingleAnswer (questionId, answerId) {
+  return fetch({
+    url: '/answer/' + questionId + '/' + answerId,
+    method: 'get'
+  })
+}

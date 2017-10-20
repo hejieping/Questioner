@@ -9,29 +9,32 @@
         </el-radio-group>
       </span>
     </h3>
-    <div class="answers-container">
-      <div class="answer">
+    <div class="answers-container" v-loading.lock="isLoadingData">
+      <div class="answer" v-for="answer in answers">
         <el-row>
           <el-col :span="20">
-            <el-tag type="success"><i class="fa fa-thumbs-o-up"></i> 10</el-tag>
-            <el-tag><i class="fa fa-thumbs-o-down"></i> 5 </el-tag>
-            <span style="margin-left: 10px">
+            <el-tag type="success"><i class="fa fa-thumbs-o-up"></i> {{ answer.thumbsUpCount }}</el-tag>
+            <el-tag> <i class="fa fa-thumbs-o-down"></i> {{ answer.thumbsDownCount }}</el-tag>
+            <span @click="$router.push({ path: `/questionDetail/${answer.questionId}/${answer.id}` })" style="margin-left: 10px">
               <a href="javascript:void 0" class="questionTitle">
-                HELLO WORLD
+                {{ answer.questionTitle }}
               </a>
             </span>
           </el-col>
-          <el-col :span="4" style="text-align: right">
-            三天前
+          <el-col :span="4" style="text-align: right; padding-right: 10px">
+            {{ answer.answerDateTime | moment('YYYY-MM-DD') }}
           </el-col>
         </el-row>
       </div>
-      <div class="answer">
-        HELLO
-      </div>
-      <div class="answer">
-        HELLO
-      </div>
+    </div>
+    <div v-show="showPagination" class="pagination">
+      <el-pagination
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage"
+        :page-size="pageSize"
+        layout="prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </div>
   </div>
 </template>
@@ -53,10 +56,73 @@
    }
 </style>
 <script>
+  import { getUserAnswerByDateTime, getUserAnswersByThumbsUpCount } from '@/api/user'
+  import { Message } from 'element-ui'
   export default {
     data () {
       return {
-        sortParam: '时间'
+        sortParam: '时间',
+        isSortByDateTime: true,
+        isLoadingData: false,
+        answers: [],
+        userId: '',
+        currentPage: 1,
+        total: 0,
+        pageSize: 5
+      }
+    },
+    mounted: function () {
+      this.userId = this.$route.params.userId
+      this.getUserAnswer()
+    },
+    computed: {
+      showPagination () {
+        return this.total > this.pageSize
+      }
+    },
+    methods: {
+      getUserAnswer () {
+        if (this.isSortByDateTime) {
+          this.getUserAnswerByDatTime()
+        } else {
+          this.getUserAnswerByThumbsUpCount()
+        }
+      },
+      getUserAnswerByDatTime () {
+        this.isLoadingData = true
+        getUserAnswerByDateTime(this.userId, this.currentPage - 1, this.pageSize).then((response) => {
+          this.answers = response.result.content
+          this.total = response.result.total
+          this.isLoadingData = false
+        }).catch((e) => {
+          this.showError()
+        })
+      },
+      getUserAnswerByThumbsUpCount () {
+        this.isLoadingData = true
+        getUserAnswersByThumbsUpCount(this.userId, this.currentPage - 1, this.pageSize).then((response) => {
+          this.answers = response.result.content
+          this.total = response.result.total
+          this.isLoadingData = false
+        }).catch((e) => {
+          this.showError()
+        })
+      },
+      showError () {
+        Message({
+          message: '得到用户发表的回答失败，请稍后重试!',
+          type: 'error',
+          duration: 1000
+        })
+      },
+      handleCurrentChange () {
+        this.getUserAnswer()
+      }
+    },
+    watch: {
+      sortParam: function () {
+        this.isSortByDateTime = !this.isSortByDateTime
+        this.getUserAnswer()
       }
     }
   }

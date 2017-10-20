@@ -9,6 +9,7 @@ import EditQuestion from '@/components/question/EditQuestion'
 import ShowContent from '@/components/ShowContent'
 import PersonQuestion from '@/components/PersonQuestion'
 import QuestionDetail from '@/components/question/QuestionDetail'
+import QuestionSingleAnswer from '@/components/question/QuestionSingleAnswer'
 import UserProfile from '@/components/user/UserProfile'
 import Home from '@/components/user/Home'
 import Followers from '@/components/user/Followers'
@@ -97,6 +98,9 @@ export default new Router({
         },
         {
           name: 'questionDetail', path: '/questionDetail/:questionId', component: QuestionDetail, meta: {needAuth: false}
+        },
+        {
+          name: 'questionSingleAnswer', path: '/questionDetail/:questionId/:answerId', component: QuestionSingleAnswer, meta: {needAuth: false}
         }
       ]
     },

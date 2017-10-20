@@ -102,3 +102,25 @@ export function getUserQuestionByDateTime (userId, currentPage, pageSize) {
     }
   })
 }
+
+export function getUserAnswerByDateTime (userId, currentPage, pageSize) {
+  return fetch({
+    url: '/answer/getUserAnswersByDateTime/' + userId,
+    type: 'get',
+    params: {
+      currentPage: currentPage,
+      pageSize: pageSize
+    }
+  })
+}
+
+export function getUserAnswersByThumbsUpCount (userId, currentPage, pageSize) {
+  return fetch({
+    url: '/answer/getUserAnswersByThumbsUpCount/' + userId,
+    type: 'get',
+    params: {
+      currentPage: currentPage,
+      pageSize: pageSize
+    }
+  })
+}
