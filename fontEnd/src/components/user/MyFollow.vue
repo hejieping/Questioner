@@ -2,7 +2,7 @@
   <el-tabs v-model="activeName">
     <el-tab-pane v-loading.lock="follow_user.isLoadingData" label="关注的人" name="follow_user">
       <div v-for="follower in follow_user.followed">
-        <follower :follower="follower"></follower>
+        <follower @onRemoveUser="removeUser($event)" :isCurrentUser="isCurrentUser" :follower="follower"></follower>
       </div>
       <div v-show="showPagination(follow_user)" class="pagination">
         <el-pagination
@@ -16,7 +16,7 @@
     </el-tab-pane>
     <el-tab-pane v-loading.lock="follow_course.isLoadingData" label="关注的课程" name="follow_course">
       <div v-for="course in follow_course.courses">
-        <follow-course :course="course"></follow-course>
+        <follow-course :isCurrentUser="isCurrentUser" @onRemoveCourse="removeCourse($event)" :course="course"></follow-course>
       </div>
       <div v-show="showPagination(follow_course)" class="pagination">
         <el-pagination
@@ -30,7 +30,7 @@
     </el-tab-pane>
     <el-tab-pane v-loading.lock="follow_question.isLoadingData" label="关注的问题" name="follow_question">
       <div v-for="question in follow_question.questions">
-        <follow-question :question="question"></follow-question>
+        <follow-question @onRemoveQuestion ="removeQuestion($event)" :isCurrentUser="isCurrentUser" :question="question"></follow-question>
       </div>
       <div v-show="showPagination(follow_question)" class="pagination">
         <el-pagination
@@ -50,6 +50,7 @@
   import Follower from './components/FollowerComponent.vue'
   import FollowCourse from './components/FollowCourseComponent.vue'
   import FollowQuestion from './components/FollowQuestionComponent.vue'
+  import { mapGetters } from 'vuex'
   export default {
     components: { 'follower': Follower, 'follow-course': FollowCourse, 'follow-question': FollowQuestion },
     data () {
@@ -82,6 +83,12 @@
     mounted: function () {
       this.userId = this.$route.params.userId
       this.updateDataAccordingTab()
+    },
+    computed: {
+      ...mapGetters(['hasLogin', 'user']),
+      isCurrentUser: function () {
+        return this.user !== null && parseInt(this.user.id) === parseInt(this.userId)
+      }
     },
     methods: {
       updateDataAccordingTab () {
@@ -146,6 +153,28 @@
       },
       handleCurrentChange_question (value) {
         this.getUserFollowQuestion()
+      },
+
+      removeUser (user) {
+        for (let i = 0; i < this.follow_user.followed.length; i++) {
+          if (this.follow_user.followed[i].id === user.id) {
+            this.follow_user.followed.splice(i, 1)
+          }
+        }
+      },
+      removeCourse (course) {
+        for (let i = 0; i < this.follow_course.courses.length; i++) {
+          if (this.follow_course.courses[i].id === course.id) {
+            this.follow_course.courses.splice(i, 1)
+          }
+        }
+      },
+      removeQuestion (question) {
+        for (let i = 0; i < this.follow_question.questions.length; i++) {
+          if (this.follow_question.questions[i].id === question.id) {
+            this.follow_question.questions.splice(i, 1)
+          }
+        }
       }
     },
     watch: {

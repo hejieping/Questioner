@@ -1,11 +1,10 @@
 <template>
-  <div id="container">
+  <div>
     <div id="question-list" v-loading.lock='isLoadingQuestion' element-loading-text="玩命加载中">
-
       <div v-if="isNoData">
         <span v-if="canFollow">
-        <el-button @click="unFollowQuestionType()"  :disabled="isSendingFollow" size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
-        <el-button @click="followQuestionType()" :disabled="isSendingFollow" v-else size="small" type="success" icon="star-on">关注</el-button>
+          <el-button @click="unFollowQuestionType()"  :disabled="isSendingFollow" size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
+          <el-button @click="followQuestionType()" :disabled="isSendingFollow" v-else size="small" type="success" icon="star-on">关注</el-button>
         </span>
         <el-alert style="margin-top: 10px" :closable="false" title="对不起，找不到任何问题！" type="info" show-icon>
         </el-alert>
@@ -48,7 +47,6 @@
     margin-left: 5%;
     margin-right: 5%;
     width: 90%;
-    position: relative;
   }
   #question-list div.question-overview{
     border-bottom: 2px solid #c0ccda;
@@ -79,6 +77,7 @@
   import { getFollowStatus, followQuestionType, unFollowQuestionType } from '@/api/questionType'
   import bus from '../../assets/eventBus.js'
   import store from '@/store'
+  import { mapGetters } from 'vuex'
   import QuestionOverview from '../../components/question/QuestionOverview.vue'
   export default {
     components: { 'question-overview': QuestionOverview },
@@ -106,6 +105,11 @@
       bus.$off('searchQuestion')
       bus.$on('searchQuestion', (keyWord) => {
         this.searchQuestion(keyWord)
+      })
+      let _this = this
+      bus.$off('loginSuccess')
+      bus.$on('loginSuccess', function () {
+        _this.getFollowStatus()
       })
     },
     created () {
@@ -185,14 +189,16 @@
         this.updateQuestion()
       },
       getFollowStatus () {
-        if (this.userId === '') {
-          this.isSendingFollow = false
-        }
         const questionType = this.$route.params.questionType
         if (!(questionType > 0)) {
           return
         }
-        getFollowStatus(questionType, this.userId).then((response) => {
+        if (this.hasLogin === false) {
+          this.isSendingFollow = false
+          this.hasFollow = false
+          return
+        }
+        getFollowStatus(questionType).then((response) => {
           this.isSendingFollow = false
           this.hasFollow = response.result
         }).catch((e) => {
@@ -208,8 +214,12 @@
         if (!(questionType > 0)) {
           return
         }
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
         this.isSendingFollow = true
-        followQuestionType(questionType, this.userId).then((response) => {
+        followQuestionType(questionType).then((response) => {
           if (response.status === '200') {
             if (response.result === true) {
               this.hasFollow = true
@@ -236,7 +246,7 @@
           return
         }
         this.isSendingFollow = true
-        unFollowQuestionType(questionType, this.userId).then((response) => {
+        unFollowQuestionType(questionType).then((response) => {
           if (response.status === '200') {
             if (response.result === true) {
               this.hasFollow = false
@@ -264,7 +274,8 @@
       },
       canFollow () {
         return this.$route.params.questionType >= 0
-      }
+      },
+      ...mapGetters(['hasLogin'])
     },
     watch: {
       '$route' (to, from) {

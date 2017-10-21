@@ -1,12 +1,13 @@
 /**
  * Created by qi on 2017/9/3.
  */
-import { getToken, setToken, removeToken } from '@/utils/auth'
-import { login } from '@/api/login'
+import { getToken, setToken, removeToken, setUser, getUser, removeUser } from '@/utils/auth'
+import { login, getUserOwnInfo } from '@/api/login'
 import { Message } from 'element-ui'
 const user = {
   state: {
-    token: getToken()
+    token: getToken(),
+    userInfo: getUser()
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -14,6 +15,12 @@ const user = {
     },
     REMOVE_TOKEN: (state) => {
       state.token = getToken()
+    },
+    SET_USER: (state, userInfo) => {
+      state.userInfo = userInfo
+    },
+    REMOVE_USER: (state) => {
+      state.userInfo = getUser()
     }
   },
   actions: {
@@ -34,7 +41,12 @@ const user = {
             const token = response.result.token
             setToken(token)
             commit('SET_TOKEN', token)
-            resolve()
+            getUserOwnInfo().then((response) => {
+              const userInfo = response.result
+              setUser(userInfo)
+              commit('SET_USER', userInfo)
+              resolve()
+            })
           }).catch(error => {
             reject(error)
           })
@@ -43,6 +55,14 @@ const user = {
     logout ({commit}) {
       removeToken()
       commit('REMOVE_TOKEN')
+      removeUser()
+      commit('REMOVE_USER')
+    },
+    changeAvatar ({commit}, userAvatar) {
+      let newUserInfo = getUser()
+      newUserInfo.avatarURL = userAvatar
+      setUser(newUserInfo)
+      commit('SET_USER', newUserInfo)
     }
   }
 }

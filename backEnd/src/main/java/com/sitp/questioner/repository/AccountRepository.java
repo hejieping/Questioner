@@ -34,4 +34,7 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
 
     @Query("select f from Account a join a.followed f where a.id = ?1")
     Page<Account> getUserFollowed(Long userId, Pageable pageable);
+
+    @Query("select count(a.id) from Account a join a.followed f where a.id = ?1 and f.id = ?2")
+    int hasFollow(Long userId, Long followedId);
 }

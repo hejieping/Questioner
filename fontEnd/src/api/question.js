@@ -3,16 +3,13 @@
  */
 import fetch from '@/utils/fetch'
 
-export function raiseQuestion (userId, questionTitle, questionTypeId, questionContent, questionContentTxt) {
+export function raiseQuestion (questionTitle, questionTypeId, questionContent, questionContentTxt) {
   const data = {
     questionTitle: questionTitle,
     questionContent: questionContent,
     questionContentTxt: questionContentTxt,
     questionType: {
       id: questionTypeId
-    },
-    publisher: {
-      id: userId
     }
   }
   return fetch({
@@ -62,12 +59,9 @@ export function getQuestionType () {
   })
 }
 
-export function postAnswer (answerContent, questionId, userId) {
+export function postAnswer (answerContent, questionId) {
   const data = {
-    answerContent: answerContent,
-    account: {
-      id: userId
-    }
+    answerContent: answerContent
   }
   return fetch({
     url: '/answer/' + questionId,
@@ -96,35 +90,32 @@ export function getLimitAnswer (questionId, startIndex, limitNum, sortParam) {
   })
 }
 
-export function hasFollowQuestion (questionId, userId) {
+export function hasFollowQuestion (questionId) {
   return fetch({
-    url: '/question/hasFollow',
+    url: '/question/personal/hasFollow',
     method: 'get',
     params: {
-      questionId: questionId,
-      userId: userId
+      questionId: questionId
     }
   })
 }
 
-export function unFollowQuestion (questionId, userId) {
+export function unFollowQuestion (questionId) {
   return fetch({
-    url: '/question/unFollowQuestion',
+    url: '/question/personal/unFollowQuestion',
     method: 'put',
     params: {
-      questionId: questionId,
-      userId: userId
+      questionId: questionId
     }
   })
 }
 
-export function followQuestion (questionId, userId) {
+export function followQuestion (questionId) {
   return fetch({
-    url: '/question/followQuestion',
+    url: '/question/personal/followQuestion',
     method: 'put',
     params: {
-      questionId: questionId,
-      userId: userId
+      questionId: questionId
     }
   })
 }

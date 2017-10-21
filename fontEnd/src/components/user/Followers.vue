@@ -1,7 +1,7 @@
 <template>
   <div v-loading.lock="isLoadingFollowers">
     <h3 class="follower_heading">
-      <span>他的粉丝</span>
+      <span>{{ textPrefix }}粉丝</span>
     </h3>
     <hr style="solid-color: black 1px">
     <div class="followers-panel">
@@ -32,6 +32,7 @@
   import { getFollowersByPage } from '@/api/user'
   import { Message } from 'element-ui'
   import Follower from './components/FollowerComponent.vue'
+  import { mapGetters } from 'vuex'
   export default {
     components: { 'follower': Follower },
     data () {
@@ -51,6 +52,13 @@
     computed: {
       showPagination () {
         return this.total > this.pageSize
+      },
+      ...mapGetters(['user']),
+      isCurrentUser: function () {
+        return this.user !== null && parseInt(this.user.id) === parseInt(this.userId)
+      },
+      textPrefix: function () {
+        return this.isCurrentUser ? '我的' : '他的'
       }
     },
     methods: {

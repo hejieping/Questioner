@@ -3,13 +3,12 @@
  */
 import fetch from '@/utils/fetch'
 
-export function giveAnswerFeedback (answerId, userId, isGood) {
+export function giveAnswerFeedback (answerId, isGood) {
   return fetch({
     url: '/answer/giveFeedback',
     method: 'put',
     params: {
       answerId: answerId,
-      userId: userId,
       isGood: isGood
     }
   })
@@ -19,5 +18,15 @@ export function getQuestionSingleAnswer (questionId, answerId) {
   return fetch({
     url: '/answer/' + questionId + '/' + answerId,
     method: 'get'
+  })
+}
+
+export function acceptAnswer (answerId) {
+  return fetch({
+    url: '/answer/acceptAnswer',
+    method: 'put',
+    params: {
+      answerId: answerId
+    }
   })
 }

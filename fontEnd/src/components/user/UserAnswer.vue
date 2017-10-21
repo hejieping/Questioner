@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="answers_heading">
-      <span>他的回答</span>
+      <span>{{ infoPrefix }}回答</span>
       <span class="sort-box" style="float: right">
         <el-radio-group v-model="sortParam">
           <el-radio-button label="时间"></el-radio-button>
@@ -58,6 +58,7 @@
 <script>
   import { getUserAnswerByDateTime, getUserAnswersByThumbsUpCount } from '@/api/user'
   import { Message } from 'element-ui'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
@@ -78,6 +79,13 @@
     computed: {
       showPagination () {
         return this.total > this.pageSize
+      },
+      ...mapGetters(['user']),
+      isCurrentUser: function () {
+        return this.user !== null && parseInt(this.user.id) === parseInt(this.userId)
+      },
+      infoPrefix: function () {
+        return this.isCurrentUser ? '我的' : '他的'
       }
     },
     methods: {

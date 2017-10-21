@@ -9,6 +9,9 @@ import java.util.List;
  * Created by jieping on 2017-07-08.
  */
 public interface AccountService {
+
+    Account save(Account account);
+
     Account register(Account userToAdd);
 
     Account getUser(Long userId);
@@ -24,4 +27,6 @@ public interface AccountService {
     boolean followUser(Long userId, Long followedUserId);
 
     boolean unFollowUser(Long userId, Long followedUserId);
+
+    boolean hasFollowUser(Long userId, Long followedUserId);
 }

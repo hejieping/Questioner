@@ -5,9 +5,22 @@
     <header class="profile__heading">
       <el-row  style="padding-left: 5%; margin-top: 10px">
         <el-col :span="3">
-          <div class="userAvatar">
+          <div @click="uploadAvatar()" v-if="isCurrentUser" class="userAvatar uploadImg">
+            <el-tooltip  class="item" effect="dark" content="点此上传头像" placement="top">
+              <img :src="loginUser.avatarURL">
+            </el-tooltip>
+            <my-upload field="avatar"
+                       @crop-upload-success="cropUploadSuccess"
+                       v-model="avatarUploadShow"
+                       :width="100"
+                       :height="100"
+                       url="http://localhost:8080/uploadAvatar"
+                       :headers="headers"
+                       img-format="png"></my-upload>
+          </div>
+          <div v-else class="userAvatar">
             <a>
-              <img style="border-radius: 50%; background: white; vertical-align: middle" width="100%" :src="user.avatarURL"/>
+              <img :src="user.avatarURL"/>
             </a>
           </div>
         </el-col>
@@ -61,17 +74,18 @@
         <el-row style="padding-left: 5%">
           <el-col :span="4">
             <div class="follow-panel">
-              <el-button  size="small" type="success" icon="star-on">加关注</el-button>
+              <el-button :disabled="isSendingFollow" v-loading.lock="isLoadingFollowUserStatus"  @click="followUser()" v-if="!isCurrentUser && !hasFollow"  size="small" type="success" icon="star-on">加关注</el-button>
+              <el-button :disabled="isSendingFollow" v-loading.lock="isLoadingFollowUserStatus" @click="unFollowUser()" v-if="!isCurrentUser && hasFollow" size="small" type="success" icon="star-off">取消关注</el-button>
               <div v-loading.lock="loadingFollowInfo" style="margin-top: 10px" class="follower-panel">
                 <el-row style="padding-bottom:15px; border-bottom: solid 1px black">
                   <el-col :span="12" style="border-right: solid 1px #5CB85C">
-                    <a @click="$router.push({ path: `/user/${userId}/myFollow` })" href="javascript:void">
+                    <a @click="myFollow()" href="javascript:void">
                       <span>关注了</span>
                       <span style="display: block"> {{ followed }} 人 </span>
                     </a>
                   </el-col>
                   <el-col :span="12" style="padding-left: 15px">
-                    <a @click="$router.push({ path: `/user/${userId}/followers` })" href="javascript:void">
+                    <a @click="myFollower()" href="javascript:void">
                       <span>粉丝</span>
                       <span style="display: block"> {{ followers }} 人 </span>
                     </a>
@@ -81,11 +95,11 @@
             </div>
             <div class="operation-option">
               <el-menu :defaultActive="activeIndex">
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/` })" index="1"><i class="fa fa-home fa-lg"></i>他的主页</el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/userQuestion` })"  index="2"><i class="fa fa-question-circle fa-lg"></i>他的提问 </el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/userAnswer` })" index="3"><i class="fa fa-key fa-lg"></i>他的回答 </el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/userActivity` })" index="4"><i class="fa fa-line-chart fa-lg"></i>他的动态 </el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/reputation` })" index="5"><i class="fa fa-star fa-lg"></i>声望记录 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/` })" index="1"><i class="fa fa-home fa-lg"></i>{{ infoPrefix }}主页</el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userQuestion` })"  index="2"><i class="fa fa-question-circle fa-lg"></i>{{ infoPrefix }}提问 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userAnswer` })" index="3"><i class="fa fa-key fa-lg"></i>{{ infoPrefix }}回答 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userActivity` })" index="4"><i class="fa fa-line-chart fa-lg"></i>{{ infoPrefix }}动态 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/reputation` })" index="5"><i class="fa fa-star fa-lg"></i>声望记录</el-menu-item>
               </el-menu>
             </div>
           </el-col>
@@ -210,11 +224,24 @@
   .container .operation-option .el-menu-item i {
     margin-right: 5px;
   }
+  .userAvatar img {
+    width: 100%;
+    border-radius: 50%;
+    background: white;
+    vertical-align: middle
+  }
+  .uploadImg {
+    cursor: pointer;
+  }
 </style>
 <script>
-  import { getUser, getFollowInfo } from '@/api/user'
+  import { getUser, getFollowInfo, hasFollowUser, followUser, unFollowUser } from '@/api/user'
   import { Message } from 'element-ui'
+  import { mapGetters } from 'vuex'
+  import myUpload from 'vue-image-crop-upload'
+  import bus from '../../assets/eventBus'
   export default {
+    components: { 'my-upload': myUpload },
     data () {
       return {
         userId: '',
@@ -224,11 +251,31 @@
         loadingFollowInfo: false,
         followers: 0,
         followed: 0,
-        activeIndex: '1'
+        activeIndex: '1',
+        avatarUploadShow: false,
+        headers: null,
+        hasFollow: false,
+        isSendingFollow: false,
+        isLoadingFollowUserStatus: false
       }
     },
     mounted () {
       this.updateUserInfo()
+      const _this = this
+      bus.$off('loginSuccess')
+      bus.$on('loginSuccess', function () {
+        _this.updateFollowUserStatus()
+      })
+    },
+    computed: {
+      ...mapGetters({loginUser: 'user'}),
+      ...mapGetters(['token', 'hasLogin']),
+      isCurrentUser: function () {
+        return this.loginUser !== null && parseInt(this.loginUser.id) === parseInt(this.userId)
+      },
+      infoPrefix: function () {
+        return this.isCurrentUser ? '我的' : '他的'
+      }
     },
     methods: {
       updateUserInfo () {
@@ -237,6 +284,7 @@
         this.loadingFollowInfo = true
         this.getUserInfo()
         this.getFollowInfo()
+        this.updateFollowUserStatus()
       },
       getUserInfo () {
         getUser(this.userId).then((response) => {
@@ -263,6 +311,96 @@
             duration: 1000
           })
         })
+      },
+      uploadAvatar () {
+        let token = this.token
+        this.headers = {
+          Authorization: token
+        }
+        this.avatarUploadShow = true
+      },
+      cropUploadSuccess (response, field) {
+        this.$store.dispatch('changeAvatar', response.result)
+      },
+      followUser () {
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
+        this.isSendingFollow = true
+        const _this = this
+        followUser(this.userId).then((response) => {
+          if (response.status === '200') {
+            if (response.result === true) {
+              _this.hasFollow = true
+              Message({
+                message: '关注用户成功！',
+                type: 'success',
+                duration: 1000
+              })
+            }
+          }
+          _this.isSendingFollow = false
+        }).catch((e) => {
+          Message({
+            message: '关注用户失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      unFollowUser () {
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
+        this.isSendingFollow = true
+        const _this = this
+        unFollowUser(this.userId).then((response) => {
+          if (response.status === '200') {
+            if (response.result === true) {
+              _this.hasFollow = false
+              Message({
+                message: '取消关注成功',
+                type: 'success',
+                duration: 1000
+              })
+            }
+          }
+          _this.isSendingFollow = false
+        }).catch((e) => {
+          Message({
+            message: '取消关注失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      updateFollowUserStatus () {
+        if (this.isCurrentUser) {
+          return
+        }
+        this.isLoadingFollowUserStatus = true
+        hasFollowUser(this.userId).then((response) => {
+          this.isLoadingFollowUserStatus = false
+          this.hasFollow = response.result
+        }).catch((e) => {
+          Message({
+            message: '加载数据失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      myFollow () {
+        let aimPath = '/user/' + this.userId + '/myFollow'
+        this.$router.push({ path: aimPath })
+        this.getFollowInfo()
+      },
+      myFollower () {
+        let aimPath = '/user/' + this.userId + '/followers'
+        this.$router.push({ path: aimPath })
+        this.getFollowInfo()
       }
     },
     beforeRouteUpdate (to, from, next) {

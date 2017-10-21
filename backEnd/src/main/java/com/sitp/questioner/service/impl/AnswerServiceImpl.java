@@ -86,7 +86,7 @@ public class AnswerServiceImpl implements AnswerService{
             Long questionId = answer.getQuestion().getId();
             Question question = questionRepository.findOne(questionId);
             if(question != null) {
-                if(!question.getSolved()) {
+                if(question.getSolved() == null || !question.getSolved()) {
                     question.setSolved(true);
                     questionRepository.save(question);
                 }

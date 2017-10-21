@@ -3,35 +3,32 @@
  */
 import fetch from '@/utils/fetch'
 
-export function getFollowStatus (questionTypeId, userId) {
+export function getFollowStatus (questionTypeId) {
   return fetch({
     url: '/questionType/hasFollow',
     method: 'get',
     params: {
-      questionTypeId: questionTypeId,
-      userId: userId
+      questionTypeId: questionTypeId
     }
   })
 }
 
-export function followQuestionType (questionTypeId, userId) {
+export function followQuestionType (questionTypeId) {
   return fetch({
     url: '/questionType/follow',
     method: 'put',
     params: {
-      questionTypeId: questionTypeId,
-      userId: userId
+      questionTypeId: questionTypeId
     }
   })
 }
 
-export function unFollowQuestionType (questionTypeId, userId) {
+export function unFollowQuestionType (questionTypeId) {
   return fetch({
     url: '/questionType/unFollow',
     method: 'put',
     params: {
-      questionTypeId: questionTypeId,
-      userId: userId
+      questionTypeId: questionTypeId
     }
   })
 }

@@ -1,7 +1,7 @@
 <template>
   <div id="questionDetail">
     <div id="question-answer">
-      <question @getAnswer="getAnswer()"></question>
+      <question @onPublisherId="initQuestionPublisherId($event)" @getAnswer="getAnswer()"></question>
       <div id="answers-panel" v-loading.lock="answerLoading" element-loading-text="拼命加载中">
         <div id="answer-summary">
           共有 {{ answerNum }} 个回答
@@ -11,7 +11,7 @@
           </el-radio-group>
         </div>
         <div v-for="answer in answers" class="answer">
-          <answer :answer="answer" @onToggleComment="lastScrollTop = -1"></answer>
+          <answer :isCurrentUser="isCurrentUser" :answer="answer" @onToggleComment="lastScrollTop = -1"></answer>
         </div>
         <div style="text-align: center" v-if="loadingMore">
           <i class="el-icon-loading"></i> 玩命加载中，请稍后
@@ -46,6 +46,8 @@
   import { getAnswerNum, getLimitAnswer } from '@/api/question'
   import { Message } from 'element-ui'
   import $ from 'jquery'
+  import { mapGetters } from 'vuex'
+
   export default {
     components: { 'answer': Answer, 'question': Question },
     data () {
@@ -55,7 +57,8 @@
         startIndex: 0,
         onceNum: 5,
         answers: [],
-        userId: 1,
+        questionId: '',
+        publisherId: '',
         loadingMore: false,
         lastScrollTop: 0,
         isSendingFollow: false,
@@ -64,7 +67,14 @@
       }
     },
     mounted: function () {
+      this.questionId = this.$route.params.questionId
       this.getAnswer()
+    },
+    computed: {
+      ...mapGetters(['user']),
+      isCurrentUser: function () {
+        return this.user !== null && this.publisherId === this.user.id
+      }
     },
     methods: {
       scrollMethod () {
@@ -100,8 +110,7 @@
         return this.answerNum > 0 && this.startIndex < this.answerNum
       },
       getData () {
-        const questionId = this.$route.params.questionId
-        getLimitAnswer(questionId, this.startIndex, this.onceNum, this.sortParam)
+        getLimitAnswer(this.questionId, this.startIndex, this.onceNum, this.sortParam)
           .then((response) => {
             let answers = response.result
             let length = answers.length
@@ -127,10 +136,9 @@
       },
       getAnswer () {
         $(window).unbind()
-        const questionId = this.$route.params.questionId
         this.answerLoading = true
         let _this = this
-        getAnswerNum(questionId).then((response) => {
+        getAnswerNum(_this.questionId).then((response) => {
           _this.answers = []
           _this.answerNum = response.result
           _this.startIndex = 0
@@ -153,6 +161,9 @@
       answerSortChange () {
         this.sortParam = this.sortParamLabel === '默认' ? '' : 'id'
         this.getAnswer()
+      },
+      initQuestionPublisherId (userId) {
+        this.publisherId = userId
       }
     },
     beforeRouteLeave (to, from, next) {

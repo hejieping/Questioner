@@ -1,8 +1,10 @@
 package com.sitp.questioner.controller;
 
+import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Answer;
 import com.sitp.questioner.entity.AnswerComment;
 import com.sitp.questioner.entity.Question;
+import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AnswerCommentService;
 import com.sitp.questioner.service.abs.AnswerService;
 import com.sitp.questioner.service.abs.QuestionService;
@@ -10,6 +12,8 @@ import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.AnswerOverview;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -29,23 +33,53 @@ public class AnswerController {
     @Autowired
     private AnswerCommentService answerCommentService;
 
-    @RequestMapping(value = "/getAnswerNum/{questionId}", method = RequestMethod.GET)
-    public ResJsonTemplate getAnswerNum(@PathVariable("questionId") Long questionId){
-        return new ResJsonTemplate<>("200", answerService.getAnswerNumOfQuestion(questionId));
-    }
-
+    @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/{questionId}", method = RequestMethod.POST)
     public ResJsonTemplate postAnswer(@RequestBody Answer answer,
                                       @PathVariable("questionId") Long questionId){
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         Question question = new Question();
         question.setId(questionId);
         answer.setQuestion(question);
+        Account account = new Account();
+        account.setId(userId);
+        answer.setAccount(account);
         if(answerService.saveAnswer(answer)){
             return new ResJsonTemplate<>("201", "书写答案成功！");
         }
         else {
             return new ResJsonTemplate<>("400", "书写答案失败！");
         }
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/giveFeedback", method = RequestMethod.PUT)
+    public ResJsonTemplate giveFeedback(@RequestParam("answerId") Long answerId,
+                                        @RequestParam("isGood") boolean isGood){
+        Long userId = ((JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        if(answerService.userHasFeedback(answerId,userId)){
+            return new ResJsonTemplate<>("412", "已经对该问题作出反馈了！");//412  (Precondition Failed/先决条件错误)
+        }
+        else {
+            answerService.giveAnswerFeedBack(answerId, userId, isGood);
+            return new ResJsonTemplate<>("200", "对答案反馈成功！");
+        }
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/acceptAnswer", method = RequestMethod.PUT)
+    public ResJsonTemplate acceptAnswer(@RequestParam("answerId") Long answerId) {
+        Long userId = ((JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Long publisher_id = answerService.getQuestionPublisherByAnswer(answerId);
+        if(publisher_id == null || !publisher_id.equals(userId)) {
+            return new ResJsonTemplate<>("401", "你无权采纳该回答！");
+        }
+        return new ResJsonTemplate<>("200",answerService.acceptAnswer(answerId));
+    }
+
+    @RequestMapping(value = "/getAnswerNum/{questionId}", method = RequestMethod.GET)
+    public ResJsonTemplate getAnswerNum(@PathVariable("questionId") Long questionId){
+        return new ResJsonTemplate<>("200", answerService.getAnswerNumOfQuestion(questionId));
     }
 
     @RequestMapping(value = "/{questionId}/{answerId}", method = RequestMethod.GET)
@@ -70,29 +104,6 @@ public class AnswerController {
             answer.setCommentCount(answerCommentService.getCommentCountOfAnswer(answer.getId()));
         }
         return new ResJsonTemplate<>("200", answers);
-    }
-
-    @RequestMapping(value = "/giveFeedback", method = RequestMethod.PUT)
-    public ResJsonTemplate giveFeedback(@RequestParam("answerId") Long answerId,
-                                        @RequestParam("userId") Long userId,
-                                        @RequestParam("isGood") boolean isGood){
-        if(answerService.userHasFeedback(answerId,userId)){
-            return new ResJsonTemplate<>("412", "已经对该问题作出反馈了！");//412  (Precondition Failed/先决条件错误)
-        }
-        else {
-            answerService.giveAnswerFeedBack(answerId, userId, isGood);
-            return new ResJsonTemplate<>("200", "对答案反馈成功！");
-        }
-    }
-
-    @RequestMapping(value = "/acceptAnswer", method = RequestMethod.PUT)
-    public ResJsonTemplate acceptAnswer(@RequestParam("answerId") Long answerId,
-                                        @RequestParam("userId") Long userId) {
-        Long publisher_id = answerService.getQuestionPublisherByAnswer(answerId);
-        if(publisher_id == null || !publisher_id.equals(userId)) {
-            return new ResJsonTemplate<>("401", "你无权采纳该回答！");
-        }
-        return new ResJsonTemplate<>("200",answerService.acceptAnswer(answerId));
     }
 
     private static Map<String, Object> buildAnswerOverviewResult(Page<Answer> answerPage, QuestionService questionService) {

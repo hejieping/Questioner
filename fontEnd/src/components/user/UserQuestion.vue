@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="question_heading">
-      <span>他的提问</span>
+      <span>{{ infoPrefix }}提问</span>
       <span class="sort-box" style="float: right">
         <el-radio-group v-model="sortParam">
           <el-radio-button label="时间"></el-radio-button>
@@ -57,6 +57,7 @@
 </style>
 <script>
   import { getUserQuestionByDateTime, getUserQuestionByViews } from '@/api/user'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
@@ -73,6 +74,13 @@
     computed: {
       showPagination () {
         return this.total > this.pageSize
+      },
+      ...mapGetters(['user']),
+      isCurrentUser: function () {
+        return this.user !== null && parseInt(this.user.id) === parseInt(this.userId)
+      },
+      infoPrefix: function () {
+        return this.isCurrentUser ? '我的' : '他的'
       }
     },
     methods: {

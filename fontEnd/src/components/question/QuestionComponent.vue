@@ -11,16 +11,16 @@
           <el-button :disabled="isSendingFollow" @click.prevent="unFollowQuestion()"  size="small" type="success">取消关注</el-button>
         </el-tooltip>
         <el-tooltip v-else content="关注之后将获得更新提醒" placement="top">
-          <el-button :disabled="isSendingFollow" @click.prevent="followQuestion()"  size="small" type="success">关注问题</el-button>
+          <el-button :loading="loadingFollowStatus" :disabled="isSendingFollow" @click.prevent="followQuestion()"  size="small" type="success">关注问题</el-button>
         </el-tooltip>
         <el-tooltip content="为该问题贡献自己的答案吧" placement="top">
-          <el-button @click.prevent="$refs.dialog.open()" size="small" icon="edit" type="info">写回答</el-button>
+          <el-button @click.prevent="writeAnswer()" size="small" icon="edit" type="info">写回答</el-button>
         </el-tooltip>
       </div>
     </div>
     <div id="question-detail" v-html="question.questionContent">
     </div>
-    <answer-dialog @submitAnswer="submit" ref="dialog"></answer-dialog>
+    <answer-dialog :userInfo="user" @submitAnswer="submit" ref="dialog"></answer-dialog>
   </div>
 </template>
 <style scoped>
@@ -55,6 +55,8 @@
   import '../../../static/UE/ueditor.parse'
   import { Message } from 'element-ui'
   import AnswerInputDialog from '@/components/answer/AnswerInputDialog'
+  import bus from '../../assets/eventBus.js'
+  import { mapGetters } from 'vuex'
   export default {
     components: { 'answer-dialog': AnswerInputDialog },
     props: {
@@ -74,17 +76,26 @@
         questionLoading: false,
         userId: 1,
         questionId: null,
-        isSendingFollow: false
+        isSendingFollow: false,
+        loadingFollowStatus: false
       }
     },
     mounted () {
       this.getQuestion()
+      let _this = this
+      bus.$off('loginSuccess')
+      bus.$on('loginSuccess', function () {
+        _this.getFollowStatus()
+      })
+    },
+    computed: {
+      ...mapGetters(['hasLogin', 'user'])
     },
     methods: {
       unFollowQuestion () {
         const questionId = this.question.questionId
         this.isSendingFollow = true
-        unFollowQuestion(questionId, this.userId).then((response) => {
+        unFollowQuestion(questionId).then((response) => {
           if (response.result === true) {
             this.hasFollow = false
             Message({
@@ -104,9 +115,13 @@
         })
       },
       followQuestion () {
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
         const questionId = this.question.questionId
         this.isSendingFollow = true
-        followQuestion(questionId, this.userId).then((response) => {
+        followQuestion(questionId).then((response) => {
           if (response.result === true) {
             this.hasFollow = true
             Message({
@@ -139,6 +154,7 @@
               rootPath: '../../static/UE/'
             })
             _this.questionLoading = false
+            _this.$emit('onPublisherId', response.result.publisher.id)
           })
         }).catch((e) => {
           Message({
@@ -149,9 +165,14 @@
         })
       },
       getFollowStatus () {
+        if (!this.hasLogin) {
+          return
+        }
+        this.loadingFollowStatus = true
         const questionId = this.question.questionId
-        hasFollowQuestion(questionId, this.userId).then((response) => {
+        hasFollowQuestion(questionId).then((response) => {
           this.hasFollow = response.result
+          this.loadingFollowStatus = false
         }).catch((e) => {
           Message({
             message: '获取信息失败，请稍后重试！',
@@ -161,7 +182,7 @@
         })
       },
       submit: function (answer) {
-        postAnswer(answer, this.question.questionId, this.userId).then((response) => {
+        postAnswer(answer, this.question.questionId).then((response) => {
           Message({
             message: '感谢你的答案!',
             type: 'success',
@@ -177,6 +198,13 @@
             duration: 5 * 1000
           })
         })
+      },
+      writeAnswer () {
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
+        this.$refs.dialog.open()
       }
     }
   }

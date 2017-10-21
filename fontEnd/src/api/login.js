@@ -14,3 +14,10 @@ export function login (username, password) {
     data
   })
 }
+
+export function getUserOwnInfo () {
+  return fetch({
+    url: '/userOwnInfo',
+    method: 'get'
+  })
+}

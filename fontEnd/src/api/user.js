@@ -37,25 +37,24 @@ export function getFollowedByPage (userId, currentPage, pageSize) {
   })
 }
 
-export function followUser (userId, followedId) {
+export function hasFollowUser (followedId) {
   return fetch({
-    url: '/user/follow',
-    type: 'put',
-    params: {
-      userId: userId,
-      followedId: followedId
-    }
+    url: '/user/hasFollow/' + followedId,
+    type: 'get'
   })
 }
 
-export function unFollowUser (userId, followedId) {
+export function followUser (followedId) {
   return fetch({
-    url: '/user/unFollow',
-    type: 'put',
-    params: {
-      userId: userId,
-      followedId: followedId
-    }
+    url: '/user/follow/' + followedId,
+    type: 'get'
+  })
+}
+
+export function unFollowUser (followedId) {
+  return fetch({
+    url: '/user/unFollow/' + followedId,
+    type: 'get'
   })
 }
 

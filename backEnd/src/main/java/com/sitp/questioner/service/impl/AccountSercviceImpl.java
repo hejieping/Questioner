@@ -33,6 +33,11 @@ public class AccountSercviceImpl implements AccountService {
     private String defaultAvatarUrl;
 
     @Override
+    public Account save(Account account) {
+        return accountRepository.save(account);
+    }
+
+    @Override
     public Account register(Account account) {
         final String username = account.getUsername();
         if (accountRepository.findByUsername(username) != null) {
@@ -90,6 +95,7 @@ public class AccountSercviceImpl implements AccountService {
         if (account != null) {
             Account followed_account = accountRepository.findOne(followedUserId);
             if (followed_account != null) {
+                account.getFollowed().removeIf(user -> user.getId().equals(userId));
                 account.getFollowed().add(followed_account);
                 accountRepository.save(account);
                 return true;
@@ -110,5 +116,10 @@ public class AccountSercviceImpl implements AccountService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean hasFollowUser(Long userId, Long followedUserId) {
+        return accountRepository.hasFollow(userId, followedUserId) > 0;
     }
 }

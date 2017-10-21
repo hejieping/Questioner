@@ -1,12 +1,16 @@
 package com.sitp.questioner.controller;
 
+import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Question;
+import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.QuestionOverview;
 import com.sitp.questioner.viewmodel.QuestionOverviewList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,8 +22,13 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
+    @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = RequestMethod.POST)
     public ResJsonTemplate raiseQuestion(@RequestBody Question question){
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Account account = new Account();
+        account.setId(userId);
+        question.setPublisher(account);
         if(questionService.saveQuestion(question)){
             return new ResJsonTemplate<>("201","成功发布问题！");
         } else {
@@ -70,7 +79,7 @@ public class QuestionController {
         return new ResJsonTemplate<>("200", questionOverviewList);
     }
 
-    @RequestMapping(value = "getQuestionByType/{questionTypeId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getQuestionByType/{questionTypeId}", method = RequestMethod.GET)
     public ResJsonTemplate getQuestionsByType(@RequestParam("pageSize") int pageSize,
                                               @RequestParam("currentPage") int currentPage,
                                               @PathVariable("questionTypeId") Long typeId,
@@ -97,22 +106,25 @@ public class QuestionController {
         return new ResJsonTemplate<>("200", question);
     }
 
-    @RequestMapping(value = "/hasFollow", method = RequestMethod.GET)
-    public ResJsonTemplate hasFollow(@RequestParam("questionId") Long questionId,
-                                     @RequestParam("userId") Long userId){
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/personal/hasFollow", method = RequestMethod.GET)
+    public ResJsonTemplate hasFollow(@RequestParam("questionId") Long questionId){
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return new ResJsonTemplate<>("200",
                 questionService.hasFollowQuestion(questionId, userId));
     }
 
-    @RequestMapping(value = "/followQuestion", method = RequestMethod.PUT)
-    public ResJsonTemplate followQuestion(@RequestParam("questionId") Long questionId,
-                                          @RequestParam("userId") Long userId){
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/personal/followQuestion", method = RequestMethod.PUT)
+    public ResJsonTemplate followQuestion(@RequestParam("questionId") Long questionId){
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return new ResJsonTemplate<>("200",questionService.userFollowQuestion(questionId,userId));
     }
 
-    @RequestMapping(value = "/unFollowQuestion", method = RequestMethod.PUT)
-    public ResJsonTemplate unFollowQuestion(@RequestParam("questionId") Long questionId,
-                                            @RequestParam("userId") Long userId){
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/personal/unFollowQuestion", method = RequestMethod.PUT)
+    public ResJsonTemplate unFollowQuestion(@RequestParam("questionId") Long questionId){
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return new ResJsonTemplate<>("200", questionService.userUnFollowQuestion(questionId, userId));
     }
 

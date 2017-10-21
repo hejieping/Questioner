@@ -108,7 +108,7 @@
             let editor = this.$refs.ue.getUEditor()
             var _this = this
             editor.getKfContent(function (content) {
-              raiseQuestion(_this.userId, _this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
+              raiseQuestion(_this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
                 .then((response) => {
                   if (response.status === '201') {
                     Message({

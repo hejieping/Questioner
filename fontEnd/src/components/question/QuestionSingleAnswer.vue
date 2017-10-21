@@ -1,11 +1,11 @@
 <template>
   <div>
-    <question :isAllAnswer="false"></question>
+    <question @onPublisherId="initQuestionPublisherId($event)" :isAllAnswer="false"></question>
     <div style="padding-right: 1rem">
       <el-button @click="$router.push({ path: `/questionDetail/${questionId}` })" style="float: right" size="mini"  type="success">查看该问题的所有答案</el-button>
     </div>
     <div id="answers-panel" v-loading.lock="loadingAnswer">
-      <answer :answer="answer"></answer>
+      <answer :isCurrentUser="isCurrentUser" :answer="answer" ></answer>
     </div>
   </div>
 </template>
@@ -23,6 +23,7 @@
   import Answer from '../answer/Answer.vue'
   import { getQuestionSingleAnswer } from '@/api/answer'
   import { Message } from 'element-ui'
+  import { mapGetters } from 'vuex'
 
   export default {
     components: { 'question': Question, 'answer': Answer },
@@ -31,7 +32,14 @@
         questionId: null,
         answerId: null,
         answer: null,
-        loadingAnswer: false
+        loadingAnswer: false,
+        publisherId: null
+      }
+    },
+    computed: {
+      ...mapGetters(['user']),
+      isCurrentUser: function () {
+        return this.publisherId === this.user.id
       }
     },
     mounted: function () {
@@ -60,6 +68,9 @@
             duration: 1000
           })
         })
+      },
+      initQuestionPublisherId (userId) {
+        this.publisherId = userId
       }
     }
   }

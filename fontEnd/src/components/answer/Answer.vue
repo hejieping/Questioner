@@ -28,6 +28,11 @@
           <i class="el-icon-circle-check"></i>
         </el-tooltip>
       </span>
+      <span v-if="showAccept">
+        <el-tooltip effect="dark" content="该回答解决了我的问题，采纳该回答" placement="top">
+          <i @click="acceptAnswer()"  style="color: green" class="fa fa-check"></i>
+        </el-tooltip>
+      </span>
     </div>
     <div class="commentDetail" v-show="showComment">
       <comment :answerId="answer.id"></comment>
@@ -37,7 +42,7 @@
 <style scoped>
   .answer{
     border-bottom: 1px solid grey;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   .answer .user-avatar{
     width: 38px;
@@ -61,7 +66,7 @@
 <script>
   import Comment from '../comment/Comment.vue'
   import bus from '../../assets/eventBus'
-  import { giveAnswerFeedback } from '@/api/answer'
+  import { giveAnswerFeedback, acceptAnswer } from '@/api/answer'
   import '../../../static/UE/ueditor.parse'
   import { Message } from 'element-ui'
   export default {
@@ -69,12 +74,17 @@
     data () {
       return {
         isFeedback: false,
-        userId: 1,
         showComment: false
       }
     },
     props: {
-      answer: Object
+      answer: Object,
+      isCurrentUser: Boolean
+    },
+    computed: {
+      showAccept: function () {
+        return this.isCurrentUser && !this.answer.accepted
+      }
     },
     mounted: function () {
       this.$nextTick(function () {
@@ -95,7 +105,7 @@
         if (this.isFeedback) {
           return
         }
-        giveAnswerFeedback(this.answer.id, this.userId, isGood).then((response) => {
+        giveAnswerFeedback(this.answer.id, isGood).then((response) => {
           if (response.status === '412') {
             Message({
               message: '您已经对该回答做出反馈了！',
@@ -122,6 +132,29 @@
             duration: 1000
           })
           this.isFeedback = false
+        })
+      },
+      acceptAnswer () {
+        acceptAnswer(this.answer.id).then((response) => {
+          if (response.status === '200') {
+            Message({
+              message: '采纳该回答成功！',
+              type: 'success',
+              duration: 1000
+            })
+            this.answer.accepted = true
+          } else {
+            this.handlerError()
+          }
+        }).catch((e) => {
+          this.handlerError()
+        })
+      },
+      handlerError () {
+        Message({
+          message: '采纳该回答失败，请稍后重试！',
+          type: 'error',
+          duration: 1000
         })
       }
     }

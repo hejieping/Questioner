@@ -118,6 +118,7 @@
   import { postAnswerComment, getAnswerCommentsOfAnswer } from '@/api/answerComment'
   import { Message } from 'element-ui'
   import bus from '../../assets/eventBus'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
@@ -133,6 +134,9 @@
         type: Number
       }
     },
+    computed: {
+      ...mapGetters(['hasLogin'])
+    },
     mounted: function () {
       const eventName = 'comment_' + this.answerId
       bus.$off(eventName)
@@ -140,8 +144,12 @@
     },
     methods: {
       addNewComment () {
-        var _this = this
-        postAnswerComment(this.answerId, this.userId, this.newComment).then((response) => {
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
+        let _this = this
+        postAnswerComment(this.answerId, this.newComment).then((response) => {
           if (response.status === '201') {
             Message({
               message: '发表评论成功！',

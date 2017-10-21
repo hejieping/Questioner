@@ -6,17 +6,14 @@ import com.sitp.questioner.jwt.JwtAuthenticationResponse;
 import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AuthService;
-import com.sitp.questioner.util.FIleSaveUtil;
+import com.sitp.questioner.util.AvatarUtil;
 import com.sitp.questioner.util.ResJsonTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,13 +57,24 @@ public class AccountController {
     }
 
 
+    @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/uploadAvatar", consumes = "multipart/form-data",method = RequestMethod.POST)
     public ResJsonTemplate uploadAvatar(@RequestParam("avatar") MultipartFile avatarFile){
         if(!avatarFile.isEmpty())
         {
-            FIleSaveUtil.saveAvatar(avatarFile);
+            String relativeUrl = AvatarUtil.saveAvatar(avatarFile);
+            Long userId = ((JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+            Account account = accountService.getUser(userId);
+            if (account != null) {
+                String oldAvatarPath = account.getAvatarURL();
+                AvatarUtil.deleteAvatar(oldAvatarPath, deploymentURL);
+                String imgAbsoluteUrl = deploymentURL + relativeUrl;
+                account.setAvatarURL(imgAbsoluteUrl);
+                accountService.save(account);
+                return new ResJsonTemplate<>("200", imgAbsoluteUrl);
+            }
         }
-        return new ResJsonTemplate<>("200","上传头像成功");
+        return new ResJsonTemplate<>("404","上传头像失败");
     }
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/admin",method = RequestMethod.GET)
@@ -76,12 +84,13 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @RequestMapping(value = "/user",method = RequestMethod.POST)
-    public ResJsonTemplate testUser(){
+    @RequestMapping(value = "/userOwnInfo",method = RequestMethod.GET)
+    public ResJsonTemplate getOwnInfo(){
         JwtUser jwtUser =(JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(jwtUser.getId());
-        return new ResJsonTemplate<>("400","you are user");
+        Account account = accountService.getUser(jwtUser.getId());
+        return new ResJsonTemplate<>("200",account);
     }
+
 
     @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
     public ResJsonTemplate getUser(@PathVariable("userId") Long userId) {
@@ -104,15 +113,26 @@ public class AccountController {
         return new ResJsonTemplate<>("200", followInfo);
     }
 
-    @RequestMapping(value = "/user/follow", method = RequestMethod.PUT)
-    public ResJsonTemplate followUser(@RequestParam("userId") Long userId,
-                                      @RequestParam("followedId") Long followedId) {
+
+
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/user/hasFollow/{followedId}", method = RequestMethod.GET)
+    public ResJsonTemplate hasFollow(@PathVariable("followedId") Long followedId) {
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return new ResJsonTemplate<>("200", accountService.hasFollowUser(userId, followedId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/user/follow/{followedId}", method = RequestMethod.GET)
+    public ResJsonTemplate followUser(@PathVariable("followedId") Long followedId) {
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return new ResJsonTemplate<>("200", accountService.followUser(userId, followedId));
     }
 
-    @RequestMapping(value = "/user/unFollow", method = RequestMethod.PUT)
-    public ResJsonTemplate unFollowUser(@RequestParam("userId") Long userId,
-                                        @RequestParam("followedId") Long followedId) {
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/user/unFollow/{followedId}", method = RequestMethod.GET)
+    public ResJsonTemplate unFollowUser(@PathVariable("followedId") Long followedId) {
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return new ResJsonTemplate<>("200", accountService.unFollowUser(userId, followedId));
     }
 
