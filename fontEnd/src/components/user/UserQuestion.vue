@@ -9,7 +9,7 @@
         </el-radio-group>
       </span>
     </h3>
-    <div class="question-container" v-loading.lock="isLoadingData">
+    <div class="question-container" v-loading.lock="isLoadingData" element-loading-text="玩命加载中">
       <div v-for="question in questions" class="question">
         <el-row>
           <el-col :span="20">
@@ -58,6 +58,7 @@
 <script>
   import { getUserQuestionByDateTime, getUserQuestionByViews } from '@/api/user'
   import { mapGetters } from 'vuex'
+  import { Message } from 'element-ui'
   export default {
     data () {
       return {
@@ -97,6 +98,12 @@
           this.questions = response.result.content
           this.total = response.result.totalElements
           this.isLoadingData = false
+        }).catch((e) => {
+          Message({
+            message: '获取用户问题信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
         })
       },
       getQuestionByViews () {
@@ -105,6 +112,12 @@
           this.questions = response.result.content
           this.total = response.result.totalElements
           this.isLoadingData = false
+        }).catch((e) => {
+          Message({
+            message: '获取用户问题信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
         })
       },
       handleCurrentChange () {

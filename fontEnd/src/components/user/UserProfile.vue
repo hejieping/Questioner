@@ -96,8 +96,8 @@
             <div class="operation-option">
               <el-menu :defaultActive="activeIndex">
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/` })" index="1"><i class="fa fa-home fa-lg"></i>{{ infoPrefix }}主页</el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/userQuestion` })"  index="2"><i class="fa fa-question-circle fa-lg"></i>{{ infoPrefix }}提问 </el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/userAnswer` })" index="3"><i class="fa fa-key fa-lg"></i>{{ infoPrefix }}回答 </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userQuestion` })"  index="2"><span v-loading.lock="isGettingQuestionCount"><i class="fa fa-question-circle fa-lg"></i>{{ infoPrefix }}提问 {{ questionCount }}</span> </el-menu-item>
+                <el-menu-item @click="$router.push({ path: `/user/${userId}/userAnswer` })" index="3"><span v-loading.lock="isGettingAnswerCount"><i class="fa fa-key fa-lg"></i>{{ infoPrefix }}回答 {{ answerCount }}</span></el-menu-item>
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/userActivity` })" index="4"><i class="fa fa-line-chart fa-lg"></i>{{ infoPrefix }}动态 </el-menu-item>
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/reputation` })" index="5"><i class="fa fa-star fa-lg"></i>声望记录</el-menu-item>
               </el-menu>
@@ -236,6 +236,8 @@
 </style>
 <script>
   import { getUser, getFollowInfo, hasFollowUser, followUser, unFollowUser } from '@/api/user'
+  import { getUserQuestionCount } from '@/api/question'
+  import { getUserAnswerCount } from '@/api/answer'
   import { Message } from 'element-ui'
   import { mapGetters } from 'vuex'
   import myUpload from 'vue-image-crop-upload'
@@ -256,7 +258,11 @@
         headers: null,
         hasFollow: false,
         isSendingFollow: false,
-        isLoadingFollowUserStatus: false
+        isLoadingFollowUserStatus: false,
+        isGettingAnswerCount: false,
+        isGettingQuestionCount: false,
+        answerCount: null,
+        questionCount: null
       }
     },
     mounted () {
@@ -285,6 +291,7 @@
         this.getUserInfo()
         this.getFollowInfo()
         this.updateFollowUserStatus()
+        this.getQuestionAnswerCount()
       },
       getUserInfo () {
         getUser(this.userId).then((response) => {
@@ -307,6 +314,30 @@
         }).catch((e) => {
           Message({
             message: '获取用户的关注信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      getQuestionAnswerCount () {
+        this.isGettingAnswerCount = true
+        getUserAnswerCount(this.userId).then((response) => {
+          this.isGettingAnswerCount = false
+          this.answerCount = response.result
+        }).catch((e) => {
+          Message({
+            message: '获取信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+        this.isGettingQuestionCount = true
+        getUserQuestionCount(this.userId).then((response) => {
+          this.isGettingQuestionCount = false
+          this.questionCount = response.result
+        }).catch((e) => {
+          Message({
+            message: '获取信息失败，请稍后重试！',
             type: 'error',
             duration: 1000
           })
@@ -377,7 +408,7 @@
         })
       },
       updateFollowUserStatus () {
-        if (this.isCurrentUser) {
+        if (this.isCurrentUser || !this.hasLogin) {
           return
         }
         this.isLoadingFollowUserStatus = true

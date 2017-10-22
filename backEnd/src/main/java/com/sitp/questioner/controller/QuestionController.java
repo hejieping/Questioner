@@ -148,4 +148,9 @@ public class QuestionController {
                                                      @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         return new ResJsonTemplate<>("200", questionService.getUserQuestionByDateTime(userId, currentPage, pageSize));
     }
+
+    @RequestMapping(value = "/getUserQuestionCount/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUserQuestionCount(@PathVariable("userId") Long userId) {
+        return new ResJsonTemplate<>("200", questionService.getUserQuestionCount(userId));
+    }
 }

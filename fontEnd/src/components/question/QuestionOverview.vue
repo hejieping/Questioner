@@ -1,6 +1,6 @@
 <template>
   <div>
-  <div class="publisherInfo">
+  <div class="publisherInfo" @click="$router.push({ path: `/user/${questionOverview.publisherId}` })">
     <img class="avatar" :src="questionOverview.publisherImgSrc">
     <span class=".publisher"> {{ questionOverview.publisherName }} </span>
   </div>
@@ -39,6 +39,7 @@
     text-align: center;
     height: 100%;
     min-width: 50px;
+    cursor: pointer;
   }
   .publisherInfo .avatar{
     width: 50px;

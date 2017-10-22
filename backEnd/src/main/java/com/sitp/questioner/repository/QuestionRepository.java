@@ -43,4 +43,6 @@ public interface QuestionRepository extends CrudRepository<Question,Long>{
     @Query("select q from Question q join q.answers a where a.id = ?1")
     Question getQuestionByAnswerId(Long answerId);
 
+    Long countByPublisherId(Long publisherId);
+
 }

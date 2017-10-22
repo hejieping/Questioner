@@ -120,3 +120,9 @@ export function followQuestion (questionId) {
   })
 }
 
+export function getUserQuestionCount (userId) {
+  return fetch({
+    url: '/question/getUserQuestionCount/' + userId,
+    methods: 'get'
+  })
+}

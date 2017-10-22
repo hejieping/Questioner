@@ -27,6 +27,7 @@
   .commentThumbnail {
     flex: 1px;
     text-align: center;
+    cursor: pointer;
   }
   .commentThumbnail img {
     width: 38px;
@@ -85,7 +86,7 @@
     <i class="triangle"></i>
     <ul>
       <li v-for="comment in commentsList" class="commentLi">
-        <div class="commentThumbnail">
+        <div class="commentThumbnail" @click="$router.push({ path: `/user/${comment.commenter.id}/` })">
           <img :src="comment.commenter.avatarURL"/>
         </div>
         <div class="commentMain">

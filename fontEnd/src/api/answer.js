@@ -30,3 +30,10 @@ export function acceptAnswer (answerId) {
     }
   })
 }
+
+export function getUserAnswerCount (userId) {
+  return fetch({
+    url: '/answer/getUserAnswerCount/' + userId,
+    method: 'get'
+  })
+}

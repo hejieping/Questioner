@@ -30,4 +30,6 @@ public interface AnswerService {
     Page<Answer> getUserAnswerByThumbsUpCount(Long userId, int currentPage, int pageSize);
 
     Answer getAnswer(Long answerId);
+
+    Long getUserAnswerCount(Long userId);
 }

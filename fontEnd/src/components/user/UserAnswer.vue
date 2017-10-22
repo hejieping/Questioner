@@ -9,7 +9,7 @@
         </el-radio-group>
       </span>
     </h3>
-    <div class="answers-container" v-loading.lock="isLoadingData">
+    <div class="answers-container" v-loading.lock="isLoadingData" element-loading-text="玩命加载中">
       <div class="answer" v-for="answer in answers">
         <el-row>
           <el-col :span="20">
@@ -69,7 +69,7 @@
         userId: '',
         currentPage: 1,
         total: 0,
-        pageSize: 5
+        pageSize: 10
       }
     },
     mounted: function () {

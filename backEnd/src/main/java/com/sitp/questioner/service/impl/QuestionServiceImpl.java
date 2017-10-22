@@ -137,4 +137,9 @@ public class QuestionServiceImpl implements QuestionService{
     public Question getQuestionByAnswerId(Long answerId) {
         return questionRepository.getQuestionByAnswerId(answerId);
     }
+
+    @Override
+    public Long getUserQuestionCount(Long userId) {
+        return questionRepository.countByPublisherId(userId);
+    }
 }

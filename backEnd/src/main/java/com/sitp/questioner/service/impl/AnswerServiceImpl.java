@@ -119,4 +119,9 @@ public class AnswerServiceImpl implements AnswerService{
     public Answer getAnswer(Long answerId) {
         return answerRepository.findOne(answerId);
     }
+
+    @Override
+    public Long getUserAnswerCount(Long userId) {
+        return answerRepository.countByAccountId(userId);
+    }
 }

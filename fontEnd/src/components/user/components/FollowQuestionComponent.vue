@@ -13,8 +13,8 @@
       <div style="float: right">
         <el-tag>{{ question.views }} 次浏览</el-tag>
         <span style="margin-left: 10px">
-          <el-button :disabled="isSendingFollow" v-loading.lock="isSendingFollow" v-if="showunFollowButton" @click="unFollow()" style="float: right" size="small" type="primary" icon="star-off">取消关注</el-button>
-          <el-button :disabled="isSendingFollow" v-loading.lock="isSendingFollow" v-else @click="follow()" style="float: right" size="small" type="primary" icon="star-on">加关注</el-button>
+          <el-button :disabled="isSendingFollow" v-loading.lock="isLoadingFollow" v-if="showunFollowButton" @click="unFollow()" style="float: right" size="small" type="primary" icon="star-off">取消关注</el-button>
+          <el-button :disabled="isSendingFollow" v-loading.lock="isLoadingFollow" v-else @click="follow()" style="float: right" size="small" type="primary" icon="star-on">加关注</el-button>
         </span>
       </div>
     </el-col>

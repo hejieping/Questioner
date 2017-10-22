@@ -1,6 +1,6 @@
 <template>
   <div class="answer">
-    <div class="user-info">
+    <div class="user-info" @click="$router.push({ path: `/user/${answer.account.id}/` })">
       <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
       <span>{{ answer.account.username }}</span>
       发布于 <span>{{ answer.answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
@@ -15,7 +15,7 @@
         <span @click="giveFeedback(false)" ><i class="fa fa-thumbs-o-down fa-lg"></i> {{ answer.thumbsDownCount }} </span>
       </el-tooltip>
       <span @click="toggleComment()"  class="comment"><i class="fa  fa-comments-o fa-lg"></i>
-            <span v-show="!showComment">{{ answer.commentCount }}条评论</span>
+            <span v-show="!showComment">{{ answer.commentCount || 0 }}条评论</span>
             <span v-show="showComment"> 收起评论 </span>
       </span>
       <span v-if="answer.accepted">
@@ -61,6 +61,9 @@
   }
   .feedback>span:hover{
     color: #017E66;
+  }
+  .user-info {
+    cursor: pointer;
   }
 </style>
 <script>

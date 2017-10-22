@@ -35,4 +35,6 @@ public interface QuestionService {
     Page<Question> getUserQuestionByDateTime(Long userId, int currentPage, int pageSize);
 
     Question getQuestionByAnswerId(Long answerId);
+
+    Long getUserQuestionCount(Long userId);
 }

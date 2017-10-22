@@ -143,4 +143,9 @@ public class AnswerController {
         return new ResJsonTemplate<>("200", buildAnswerOverviewResult(answerPage, questionService));
     }
 
+    @RequestMapping(value = "/getUserAnswerCount/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getUserAnswerCount(@PathVariable("userId") Long userId) {
+        return new ResJsonTemplate<>("200", answerService.getUserAnswerCount(userId));
+    }
+
 }

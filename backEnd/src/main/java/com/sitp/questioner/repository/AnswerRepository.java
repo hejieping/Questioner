@@ -43,6 +43,8 @@ public interface AnswerRepository extends CrudRepository<Answer,Long>{
     @Query("select a from Answer a where a.account.id = ?1")
     Page<Answer> getUserAnswers(Long userId, Pageable pageable);
 
+    Long countByAccountId(Long accountId);
+
     /*
     @Query(" select a.id, a.answerDateTime, a.thumbsUpCount, a.thumbsDownCount, a.accepted, a.question.id, a.question.questionTitle " +
             " from Answer  a where a.account.id = ?1")

@@ -5,7 +5,7 @@
       <el-button @click="$router.push({ path: `/questionDetail/${questionId}` })" style="float: right" size="mini"  type="success">查看该问题的所有答案</el-button>
     </div>
     <div id="answers-panel" v-loading.lock="loadingAnswer">
-      <answer :isCurrentUser="isCurrentUser" :answer="answer" ></answer>
+      <answer v-if="answer" :isCurrentUser="isCurrentUser" :answer="answer" ></answer>
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@
     computed: {
       ...mapGetters(['user']),
       isCurrentUser: function () {
-        return this.publisherId === this.user.id
+        return this.user !== null && this.publisherId === this.user.id
       }
     },
     mounted: function () {

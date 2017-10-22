@@ -81,11 +81,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                         "/**/*.js").permitAll()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/questionType", "/questionType/getFollow/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/question","/getQuestionByType/*",
-                        "/question/*","/question/getFollow/*").permitAll()
+                .antMatchers(HttpMethod.GET,"/question","/question/getQuestionByType/*",
+                        "/question/*","/question/getFollow/*","/question/getUserQuestionByViews/*",
+                        "/question/getUserQuestionByDateTime/*","/question/getUserQuestionCount/*").permitAll()
                 .antMatchers(HttpMethod.GET,"/answer/getAnswerNum/*",
                         "/answer/*/*","/answer/getLimitAnswers","/getUserAnswersByDateTime/*",
-                        "/answer/getUserAnswersByThumbsUpCount/*").permitAll()
+                        "/answer/getUserAnswersByThumbsUpCount/*","/answer/getUserAnswerCount/*").permitAll()
                 .antMatchers(HttpMethod.GET,"/answerComment/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/*", "/user/followersInfo/*",
                         "/user/getFollowers/*", "/user/getFollowed/*").permitAll()
