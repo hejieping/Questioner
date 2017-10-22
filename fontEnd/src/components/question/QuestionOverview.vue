@@ -1,8 +1,10 @@
 <template>
   <div>
-  <div class="publisherInfo" @click="$router.push({ path: `/user/${questionOverview.publisherId}` })">
-    <img class="avatar" :src="questionOverview.publisherImgSrc">
-    <span class=".publisher"> {{ questionOverview.publisherName }} </span>
+  <div class="publisherInfo">
+    <router-link :to="{ path: `/user/${questionOverview.publisherId}` }">
+      <img class="avatar" :src="questionOverview.publisherImgSrc">
+      <span class=".publisher"> {{ questionOverview.publisherName }} </span>
+    </router-link>
   </div>
   <div class="summary">
     <h3>

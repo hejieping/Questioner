@@ -1,8 +1,10 @@
 <template>
   <div class="answer">
-    <div class="user-info" @click="$router.push({ path: `/user/${answer.account.id}/` })">
-      <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
-      <span>{{ answer.account.username }}</span>
+    <div>
+      <router-link class="user-info" :to="{ path: `/user/${answer.account.id}/` }">
+        <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
+        <span>{{ answer.account.username }}</span>
+      </router-link>
       发布于 <span>{{ answer.answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
     </div>
     <div class="answer-info" v-html="answer.answerContent">

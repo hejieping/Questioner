@@ -15,11 +15,11 @@
           <el-col :span="20">
             <el-tag type="success"><i class="fa fa-thumbs-o-up"></i> {{ answer.thumbsUpCount }}</el-tag>
             <el-tag> <i class="fa fa-thumbs-o-down"></i> {{ answer.thumbsDownCount }}</el-tag>
-            <span @click="$router.push({ path: `/questionDetail/${answer.questionId}/${answer.id}` })" style="margin-left: 10px">
-              <a href="javascript:void 0" class="questionTitle">
+            <router-link :to="{ path: `/questionDetail/${answer.questionId}/${answer.id}` }">
+              <span class="questionTitle" style="margin-left: 10px">
                 {{ answer.questionTitle }}
-              </a>
             </span>
+            </router-link>
           </el-col>
           <el-col :span="4" style="text-align: right; padding-right: 10px">
             {{ answer.answerDateTime | moment('YYYY-MM-DD') }}

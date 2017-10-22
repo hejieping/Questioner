@@ -2,7 +2,7 @@
   <el-row class="follow">
     <el-col :span="18">
       <div class="question-info">
-        <a @click="$router.push({ path: `/questionDetail/${question.id}/` })" href="javascript:0">{{ question.questionTitle }} </a>
+        <router-link :to="{ path: `/questionDetail/${question.id}/` }">{{ question.questionTitle }}</router-link>
         <div class="questionType-info">
           <el-tag type="gray"> {{ question.questionType.subject }}</el-tag>
           <el-tag> {{ question.questionType.course }} </el-tag>

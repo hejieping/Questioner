@@ -3,7 +3,7 @@
     <el-col :span="20">
       <img class="follower-img" :src="follower.avatarURL"/>
       <div class="followers-info">
-        <a @click="$router.push({ path: `/user/${follower.id}/` })" href="javascript:0">{{ follower.username }} </a>
+        <router-link :to="{ path: `/user/${follower.id}/` }">{{ follower.username }}</router-link>
         <div class="follower-reputation">
           <span> {{ follower.creditPoint }} </span>
           <span>声望</span>

@@ -16,9 +16,11 @@
             <el-tag>
               {{ question.views }} 浏览
             </el-tag>
-            <span @click="$router.push({ path: `/questionDetail/${question.id}/` })" style="margin-left: 10px" class="question-title">
-              <a href="javascript:void 0">{{ question.questionTitle }}</a>
-            </span>
+            <router-link :to="{ path: `/questionDetail/${question.id}/` }">
+              <span style="margin-left: 10px" class="question-title">
+                {{ question.questionTitle }}
+              </span>
+            </router-link>
           </el-col>
           <el-col :span="4">
             {{ question.publishDateTime | moment('YYYY年MM月DD日') }}

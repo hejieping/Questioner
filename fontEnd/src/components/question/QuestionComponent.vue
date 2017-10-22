@@ -34,7 +34,8 @@
   #question-detail{
     clear: both;
     margin-top: 70px;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .question-title{

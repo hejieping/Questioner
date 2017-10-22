@@ -86,11 +86,13 @@
     <i class="triangle"></i>
     <ul>
       <li v-for="comment in commentsList" class="commentLi">
-        <div class="commentThumbnail" @click="$router.push({ path: `/user/${comment.commenter.id}/` })">
-          <img :src="comment.commenter.avatarURL"/>
+        <div class="commentThumbnail">
+          <router-link :to="{ path: `/user/${comment.commenter.id}/` }">
+            <img :src="comment.commenter.avatarURL"/>
+          </router-link>
         </div>
         <div class="commentMain">
-          <a>{{ comment.commenter.username }}</a>
+          <router-link :to="{ path: `/user/${comment.commenter.id}/` }">{{ comment.commenter.username }}</router-link>
           <p class="paragraph"> {{ comment.commentContent }}</p>
           <div class="commentInfo">
             <div class="option">

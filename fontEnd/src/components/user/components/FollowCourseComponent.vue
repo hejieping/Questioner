@@ -2,7 +2,9 @@
   <div class="follow-courses">
     <el-row class="follow course">
       <el-col :span="20">
-        <el-tag> {{ course.subject }} -> {{ course.course }} </el-tag>
+        <router-link :to="{ path: `/questions/questionType/${course.id}/`}">
+          <el-tag> {{ course.subject }} -> {{ course.course }} </el-tag>
+        </router-link>
       </el-col>
       <el-col :span="4">
         <el-button :disabled="isSendingFollow" v-loading.lock="isSendingFollow" v-if="showunFollowButton" @click="unFollow()" style="float: right" size="small" type="primary" icon="star-off">取消关注</el-button>
