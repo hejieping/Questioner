@@ -22,7 +22,7 @@ import java.util.List;
  * Created by jieping on 2017-07-08.
  */
 @Service
-public class AccountSercviceImpl implements AccountService {
+public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
 
@@ -40,7 +40,7 @@ public class AccountSercviceImpl implements AccountService {
     @Override
     public Account register(Account account) {
         final String username = account.getUsername();
-        if (accountRepository.findByUsername(username) != null) {
+        if (accountRepository.findByLoginUsername(username) != null) {
             return null;
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

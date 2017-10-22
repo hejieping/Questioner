@@ -18,10 +18,10 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
      */
     Account save(Account account);
     /**
-     * @param username
-     * @return 返回符合username的account对象
+     * @param loginUsername
+     * @return 返回符合loginUsername的account对象
      */
-    Account findByUsername(String username);
+    Account findByLoginUsername(String loginUsername);
 
     @Query("select count(f.id) from Account a join a.followers f where a.id = ?1")
     Long getUserFollowersCount(Long userId);

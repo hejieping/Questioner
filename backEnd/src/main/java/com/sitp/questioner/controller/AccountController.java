@@ -14,9 +14,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Created by jieping on 2017-07-08.
@@ -30,6 +30,9 @@ public class AccountController {
 
     @Value("${deployment.url}")
     private String deploymentURL ;
+
+    @Value("${default.avatarUrl}")
+    private String defaultAvatarUrl;
 
     @RequestMapping(value = "/index")
     @ResponseBody
@@ -53,7 +56,7 @@ public class AccountController {
         final String token = authService.login(authenticationRequest.getUsername(),
                 authenticationRequest.getPassword());
         JwtAuthenticationResponse authenticationResponse = new JwtAuthenticationResponse(token);
-        return new ResJsonTemplate<>("400", authenticationResponse);
+        return new ResJsonTemplate<>("200", authenticationResponse);
     }
 
 
@@ -67,7 +70,8 @@ public class AccountController {
             Account account = accountService.getUser(userId);
             if (account != null) {
                 String oldAvatarPath = account.getAvatarURL();
-                AvatarUtil.deleteAvatar(oldAvatarPath, deploymentURL);
+                if (!oldAvatarPath.equals(defaultAvatarUrl))  // if the old avatar path isn't equal to the default path, just delete it
+                    AvatarUtil.deleteAvatar(oldAvatarPath, deploymentURL);
                 String imgAbsoluteUrl = deploymentURL + relativeUrl;
                 account.setAvatarURL(imgAbsoluteUrl);
                 accountService.save(account);

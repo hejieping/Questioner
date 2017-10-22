@@ -15,8 +15,11 @@ public class Account {
     @Id
     @GeneratedValue
     private Long id;
+
+    @Column(unique = true)
+    private String loginUsername; // the username that user input just for login
     @Column(nullable = false,unique = true)
-    private String username;
+    private String username; // the username that showed to other users which means it's more friendly and readable
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
@@ -110,6 +113,14 @@ public class Account {
 
     public void setAvatarURL(String avatarURL) {
         this.avatarURL = avatarURL;
+    }
+
+    public String getLoginUsername() {
+        return loginUsername;
+    }
+
+    public void setLoginUsername(String loginUsername) {
+        this.loginUsername = loginUsername;
     }
 
     public Long getCreditPoint() {

@@ -22,7 +22,7 @@ public final class JwtUserFactory {
     {
         return new JwtUser(
                 account.getId(),
-                account.getUsername(),
+                account.getLoginUsername(),
                 account.getPassword(),
                 mapToGrantedAuthorities(account.getRoles()));
     }
