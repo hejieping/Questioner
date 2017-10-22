@@ -2,7 +2,7 @@
   <el-dialog size="large" :visible.sync="dialogVisible">
     <div id="userinfo" style="position: fixed; top: 10px; margin-bottom: 20px">
       <h3>感谢您的回答</h3>
-      <img class="useravatar" :src="userInfo.useravatar"/>
+      <img class="useravatar" :src="userInfo.avatarURL"/>
       <span>{{ userInfo.username }}</span>
     </div>
     <div style="margin-top: 20px">
@@ -44,7 +44,7 @@
         type: Object,
         default: function () {
           return {
-            username: '罗宇侠',
+            username: '',
             useravatar: ''
           }
         }

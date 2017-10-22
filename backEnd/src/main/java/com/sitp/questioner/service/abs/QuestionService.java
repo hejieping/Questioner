@@ -27,4 +27,14 @@ public interface QuestionService {
     boolean userUnFollowQuestion(Long questionId, Long userId);
 
     boolean hasFollowQuestion(Long questionId, Long userId);
+
+    Page<Question> getUserFollowQuestions(Long userId, int currentPage, int pageSize);
+
+    Page<Question> getUserQuestionByViews(Long userId, int currentPage, int pageSize);
+
+    Page<Question> getUserQuestionByDateTime(Long userId, int currentPage, int pageSize);
+
+    Question getQuestionByAnswerId(Long answerId);
+
+    Long getUserQuestionCount(Long userId);
 }

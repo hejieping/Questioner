@@ -4,8 +4,9 @@
 const getters = {
   token: state => state.user.token,
   hasLogin: state => {
-    return true
+    return state.user.token !== null
   },
+  user: state => state.user.userInfo,
   isQuestionListPage: state => state.common.inQuestionListPage
 }
 

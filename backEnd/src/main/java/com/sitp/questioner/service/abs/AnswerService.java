@@ -1,6 +1,8 @@
 package com.sitp.questioner.service.abs;
 
 import com.sitp.questioner.entity.Answer;
+import com.sitp.questioner.viewmodel.AnswerOverview;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -22,4 +24,12 @@ public interface AnswerService {
     Long getQuestionPublisherByAnswer(Long answerId);
 
     boolean acceptAnswer(Long answerId);
+
+    Page<Answer> getUserAnswersByDateTime(Long userId, int currentPage, int pageSize);
+
+    Page<Answer> getUserAnswerByThumbsUpCount(Long userId, int currentPage, int pageSize);
+
+    Answer getAnswer(Long answerId);
+
+    Long getUserAnswerCount(Long userId);
 }

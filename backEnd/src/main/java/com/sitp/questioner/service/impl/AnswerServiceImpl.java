@@ -9,7 +9,9 @@ import com.sitp.questioner.repository.QuestionRepository;
 import com.sitp.questioner.service.abs.AnswerService;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.PageableBuilder;
+import com.sitp.questioner.viewmodel.AnswerOverview;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -84,7 +86,7 @@ public class AnswerServiceImpl implements AnswerService{
             Long questionId = answer.getQuestion().getId();
             Question question = questionRepository.findOne(questionId);
             if(question != null) {
-                if(!question.getSolved()) {
+                if(question.getSolved() == null || !question.getSolved()) {
                     question.setSolved(true);
                     questionRepository.save(question);
                 }
@@ -94,5 +96,32 @@ public class AnswerServiceImpl implements AnswerService{
             }
         }
         return false;
+    }
+
+    @Override
+    public Page<Answer>getUserAnswersByDateTime(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).setDirection(Sort.Direction.DESC)
+                .setSortParam("id").buildPage();
+        return answerRepository.getUserAnswers(userId, pageable);
+    }
+
+    @Override
+    public Page<Answer> getUserAnswerByThumbsUpCount(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setCurrentPage(currentPage)
+                .setPageSize(pageSize).addSortParam(Sort.Direction.DESC,"thumbsUpCount")
+                .addSortParam(Sort.Direction.ASC, "thumbsDownCount")
+                .buildPage();
+        return answerRepository.getUserAnswers(userId, pageable);
+    }
+
+    @Override
+    public Answer getAnswer(Long answerId) {
+        return answerRepository.findOne(answerId);
+    }
+
+    @Override
+    public Long getUserAnswerCount(Long userId) {
+        return answerRepository.countByAccountId(userId);
     }
 }

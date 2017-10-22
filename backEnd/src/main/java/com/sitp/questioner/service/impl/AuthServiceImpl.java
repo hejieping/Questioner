@@ -44,11 +44,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private AccountRepository accountRepository;
+
     @Autowired
     AccountService accountService;
 
     @Value("${jwt.tokenHead}")
     private String tokenHead;
+
     private Map<String, String> cookies4m3 = new HashMap<>();
     private Map<String, String> postData = new HashMap<>();
     private Map<String, String> cookiesIds = new HashMap<>();
@@ -58,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
     private final String step3 = "http://4m3.tongji.edu.cn/eams/samlCheck";
 
     @Override
-    public boolean verify(String username, String password, JSONObject result) {
+    public boolean verify(String loginUsername, String password, JSONObject result) {
 
         try {
             Connection connection = Jsoup.connect(step1);
@@ -115,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
             String step4 = doc.select("form").attr("action");
 
             postData.put("option", "credential");
-            postData.put("Ecom_User_ID", username);
+            postData.put("Ecom_User_ID", loginUsername);
             postData.put("Ecom_Password", password);
             postData.put("submit", "登录");
 
@@ -184,34 +186,35 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(String username, String password) {
+    public String login(String loginUsername, String password) {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new
-                    UsernamePasswordAuthenticationToken(username,password);
+                    UsernamePasswordAuthenticationToken(loginUsername,password);
             // Perform the security
             final Authentication authentication =  authenticationManager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // Reload password post-security so we can generate token
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(loginUsername);
             return jwtTokenUtil.generateToken(userDetails);
         } catch (AuthenticationException e) {
 
             //authenticate in 4m3
             JSONObject jsonRet = new JSONObject();
-            Boolean virifyResult = verify(username, password, jsonRet);
-            if(virifyResult == true){
+            Boolean verifyResult = verify(loginUsername, password, jsonRet);
+            if(verifyResult){
                 Account account = new Account();
-                account.setUsername(username);
+                account.setLoginUsername(loginUsername);
+                account.setUsername(jsonRet.getString("name"));
                 account.setPassword(password);
                 accountService.register(account);
                 UsernamePasswordAuthenticationToken authenticationToken = new
-                    UsernamePasswordAuthenticationToken(username,password);
+                    UsernamePasswordAuthenticationToken(loginUsername,password);
                 final Authentication authentication =  authenticationManager.authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // Reload password post-security so we can generate token
-                final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                final UserDetails userDetails = userDetailsService.loadUserByUsername(loginUsername);
                 return jwtTokenUtil.generateToken(userDetails);
             }
             throw e;

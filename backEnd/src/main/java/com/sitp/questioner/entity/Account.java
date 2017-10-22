@@ -15,12 +15,20 @@ public class Account {
     @Id
     @GeneratedValue
     private Long id;
+
+    @Column(unique = true)
+    private String loginUsername; // the username that user input just for login
     @Column(nullable = false,unique = true)
-    private String username;
+    private String username; // the username that showed to other users which means it's more friendly and readable
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
     private String avatarURL;
+    @Column(columnDefinition = "TEXT")
+    private String profile;
+
+    @Column
+    private Long creditPoint = 0L;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name="account_role",joinColumns = {
@@ -65,6 +73,18 @@ public class Account {
     @JsonIgnore
     private List<Answer> feedbackAnswers = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "follower_followed", joinColumns = @JoinColumn(name = "followed_id"),
+    inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    @JsonIgnore
+    private List <Account> followers = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "follower_followed",joinColumns = @JoinColumn(name = "follower_id"),
+    inverseJoinColumns = @JoinColumn(name = "followed_id"))
+    @JsonIgnore
+    private List<Account> followed = new ArrayList<>();
+
 
     public void setId(Long id) {
         this.id = id;
@@ -95,6 +115,30 @@ public class Account {
 
     public void setAvatarURL(String avatarURL) {
         this.avatarURL = avatarURL;
+    }
+
+    public String getLoginUsername() {
+        return loginUsername;
+    }
+
+    public void setLoginUsername(String loginUsername) {
+        this.loginUsername = loginUsername;
+    }
+
+    public Long getCreditPoint() {
+        return creditPoint;
+    }
+
+    public void setCreditPoint(Long creditPoint) {
+        this.creditPoint = creditPoint;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     public List<Role> getRoles() {
@@ -152,6 +196,23 @@ public class Account {
 
     public void setFollowQuestionType(List<QuestionType> followQuestionType) {
         this.followQuestionType = followQuestionType;
+    }
+
+
+    public List<Account> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Account> followers) {
+        this.followers = followers;
+    }
+
+    public List<Account> getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(List<Account> followed) {
+        this.followed = followed;
     }
 
     @Override

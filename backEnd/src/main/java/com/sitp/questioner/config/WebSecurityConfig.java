@@ -80,13 +80,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                         "/**/*.css",
                         "/**/*.js").permitAll()
                 .antMatchers("/auth/**").permitAll()
-                .antMatchers("/questionType/**").permitAll()
-                .antMatchers("/question/**").permitAll()
+                .antMatchers("/questionType", "/questionType/getFollow/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/question","/question/getQuestionByType/*",
+                        "/question/*","/question/getFollow/*","/question/getUserQuestionByViews/*",
+                        "/question/getUserQuestionByDateTime/*","/question/getUserQuestionCount/*").permitAll()
+                .antMatchers(HttpMethod.GET,"/answer/getAnswerNum/*",
+                        "/answer/*/*","/answer/getLimitAnswers","/getUserAnswersByDateTime/*",
+                        "/answer/getUserAnswersByThumbsUpCount/*","/answer/getUserAnswerCount/*").permitAll()
+                .antMatchers(HttpMethod.GET,"/answerComment/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/user/*", "/user/followersInfo/*",
+                        "/user/getFollowers/*", "/user/getFollowed/*").permitAll()
                 .antMatchers("/ueditor/**").permitAll()
-                .antMatchers("/uploadAvatar/**").permitAll()
-                .antMatchers("/answer/**").permitAll()
-                .antMatchers("/answerComment/**").permitAll()
                 .antMatchers("/index","/register").permitAll()
+                .antMatchers("/user/**").permitAll()
                 .anyRequest().authenticated();
         // add JWT filter
         httpSecurity

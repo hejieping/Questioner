@@ -1,8 +1,10 @@
-<template xmlns="http://www.w3.org/1999/html">
-  <div>
-    <div class="user-info">
-      <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
-      <span>{{ answer.account.username }}</span>
+<template>
+  <div class="answer">
+    <div>
+      <router-link class="user-info" :to="{ path: `/user/${answer.account.id}/` }">
+        <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
+        <span>{{ answer.account.username }}</span>
+      </router-link>
       发布于 <span>{{ answer.answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
     </div>
     <div class="answer-info" v-html="answer.answerContent">
@@ -15,7 +17,7 @@
         <span @click="giveFeedback(false)" ><i class="fa fa-thumbs-o-down fa-lg"></i> {{ answer.thumbsDownCount }} </span>
       </el-tooltip>
       <span @click="toggleComment()"  class="comment"><i class="fa  fa-comments-o fa-lg"></i>
-            <span v-show="!showComment">{{ answer.commentCount }}条评论</span>
+            <span v-show="!showComment">{{ answer.commentCount || 0 }}条评论</span>
             <span v-show="showComment"> 收起评论 </span>
       </span>
       <span v-if="answer.accepted">
@@ -28,6 +30,11 @@
           <i class="el-icon-circle-check"></i>
         </el-tooltip>
       </span>
+      <span v-if="showAccept">
+        <el-tooltip effect="dark" content="该回答解决了我的问题，采纳该回答" placement="top">
+          <i @click="acceptAnswer()"  style="color: green" class="fa fa-check"></i>
+        </el-tooltip>
+      </span>
     </div>
     <div class="commentDetail" v-show="showComment">
       <comment :answerId="answer.id"></comment>
@@ -35,6 +42,10 @@
   </div>
 </template>
 <style scoped>
+  .answer{
+    border-bottom: 1px solid grey;
+    margin-bottom: 10px;
+  }
   .answer .user-avatar{
     width: 38px;
     height: 38px;
@@ -53,23 +64,39 @@
   .feedback>span:hover{
     color: #017E66;
   }
+  .user-info {
+    cursor: pointer;
+  }
 </style>
 <script>
   import Comment from '../comment/Comment.vue'
   import bus from '../../assets/eventBus'
-  import { giveAnswerFeedback } from '@/api/answer'
+  import { giveAnswerFeedback, acceptAnswer } from '@/api/answer'
+  import '../../../static/UE/ueditor.parse'
   import { Message } from 'element-ui'
   export default {
     components: { 'comment': Comment },
     data () {
       return {
         isFeedback: false,
-        userId: 1,
         showComment: false
       }
     },
     props: {
-      answer: Object
+      answer: Object,
+      isCurrentUser: Boolean
+    },
+    computed: {
+      showAccept: function () {
+        return this.isCurrentUser && !this.answer.accepted
+      }
+    },
+    mounted: function () {
+      this.$nextTick(function () {
+        window.uParse('.answer', {
+          rootPath: '../../static/UE/'
+        })
+      })
     },
     methods: {
       toggleComment () {
@@ -83,7 +110,7 @@
         if (this.isFeedback) {
           return
         }
-        giveAnswerFeedback(this.answer.id, this.userId, isGood).then((response) => {
+        giveAnswerFeedback(this.answer.id, isGood).then((response) => {
           if (response.status === '412') {
             Message({
               message: '您已经对该回答做出反馈了！',
@@ -110,6 +137,29 @@
             duration: 1000
           })
           this.isFeedback = false
+        })
+      },
+      acceptAnswer () {
+        acceptAnswer(this.answer.id).then((response) => {
+          if (response.status === '200') {
+            Message({
+              message: '采纳该回答成功！',
+              type: 'success',
+              duration: 1000
+            })
+            this.answer.accepted = true
+          } else {
+            this.handlerError()
+          }
+        }).catch((e) => {
+          this.handlerError()
+        })
+      },
+      handlerError () {
+        Message({
+          message: '采纳该回答失败，请稍后重试！',
+          type: 'error',
+          duration: 1000
         })
       }
     }

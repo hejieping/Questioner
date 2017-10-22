@@ -1,6 +1,7 @@
 package com.sitp.questioner.repository;
 
 import com.sitp.questioner.entity.Answer;
+import com.sitp.questioner.viewmodel.AnswerOverview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,7 @@ public interface AnswerRepository extends CrudRepository<Answer,Long>{
 
     @Query("select count(a.id) from Answer a where a.question.id = :questionId")
     int getAnswerNumOfQuestion(@Param("questionId") Long questionId);
+
 
 
     @Query(value = "select answer.*  from answer WHERE answer.question_id = :questionId ORDER BY id DESC limit :start,:limit",
@@ -37,5 +39,16 @@ public interface AnswerRepository extends CrudRepository<Answer,Long>{
     @Query(value = "SELECT question.account_id FROM answer, question WHERE answer.question_id = question.id AND answer.id = ?1",
             nativeQuery = true)
     Long getQuestionPublisherByAnswer(Long answerId);
+
+    @Query("select a from Answer a where a.account.id = ?1")
+    Page<Answer> getUserAnswers(Long userId, Pageable pageable);
+
+    Long countByAccountId(Long accountId);
+
+    /*
+    @Query(" select a.id, a.answerDateTime, a.thumbsUpCount, a.thumbsDownCount, a.accepted, a.question.id, a.question.questionTitle " +
+            " from Answer  a where a.account.id = ?1")
+    Page<AnswerOverview> getUserAnswersOverview(Long userId, Pageable pageable);
+    */
 
 }

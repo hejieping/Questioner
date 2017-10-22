@@ -1,8 +1,10 @@
 <template>
   <div>
   <div class="publisherInfo">
-    <img class="avatar" :src="questionOverview.publisherImgSrc">
-    <span class=".publisher"> {{ questionOverview.publisherName }} </span>
+    <router-link :to="{ path: `/user/${questionOverview.publisherId}` }">
+      <img class="avatar" :src="questionOverview.publisherImgSrc">
+      <span class=".publisher"> {{ questionOverview.publisherName }} </span>
+    </router-link>
   </div>
   <div class="summary">
     <h3>
@@ -39,6 +41,7 @@
     text-align: center;
     height: 100%;
     min-width: 50px;
+    cursor: pointer;
   }
   .publisherInfo .avatar{
     width: 50px;

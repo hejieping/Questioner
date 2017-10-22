@@ -27,6 +27,7 @@
   .commentThumbnail {
     flex: 1px;
     text-align: center;
+    cursor: pointer;
   }
   .commentThumbnail img {
     width: 38px;
@@ -86,10 +87,12 @@
     <ul>
       <li v-for="comment in commentsList" class="commentLi">
         <div class="commentThumbnail">
-          <img :src="comment.commenter.avatarURL"/>
+          <router-link :to="{ path: `/user/${comment.commenter.id}/` }">
+            <img :src="comment.commenter.avatarURL"/>
+          </router-link>
         </div>
         <div class="commentMain">
-          <a>{{ comment.commenter.username }}</a>
+          <router-link :to="{ path: `/user/${comment.commenter.id}/` }">{{ comment.commenter.username }}</router-link>
           <p class="paragraph"> {{ comment.commentContent }}</p>
           <div class="commentInfo">
             <div class="option">
@@ -118,6 +121,7 @@
   import { postAnswerComment, getAnswerCommentsOfAnswer } from '@/api/answerComment'
   import { Message } from 'element-ui'
   import bus from '../../assets/eventBus'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
@@ -133,6 +137,9 @@
         type: Number
       }
     },
+    computed: {
+      ...mapGetters(['hasLogin'])
+    },
     mounted: function () {
       const eventName = 'comment_' + this.answerId
       bus.$off(eventName)
@@ -140,8 +147,12 @@
     },
     methods: {
       addNewComment () {
-        var _this = this
-        postAnswerComment(this.answerId, this.userId, this.newComment).then((response) => {
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
+        let _this = this
+        postAnswerComment(this.answerId, this.newComment).then((response) => {
           if (response.status === '201') {
             Message({
               message: '发表评论成功！',

@@ -26,7 +26,7 @@
           </div>
         </el-form-item>
       </el-form>
-      <el-button style="float: right; margin-bottom: 10px"  size="small" type="success"  @click="submitQuestion('questionForm')">发布问题</el-button>
+      <el-button :disabled="isSendingRequest" style="float: right; margin-bottom: 10px"  size="small" type="success"  @click="submitQuestion('questionForm')">发布问题</el-button>
     </div>
   </div>
 </template>
@@ -53,7 +53,6 @@
     data () {
       return {
         defaultMsg: '',
-        userId: 1,
         questionTypeArray: [],
         config: {
           initialFrameWidth: null,
@@ -70,7 +69,8 @@
           questionType: [
             { required: true, message: '请选择问题类型', trigger: 'blur' }
           ]
-        }
+        },
+        isSendingRequest: false
       }
     },
     computed: {
@@ -107,28 +107,39 @@
           if (valid) {
             let editor = this.$refs.ue.getUEditor()
             var _this = this
+            this.isSendingRequest = true
             editor.getKfContent(function (content) {
-              raiseQuestion(_this.userId, _this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
+              raiseQuestion(_this.questionForm.questionTitle, _this.questionForm.questionType, content, editor.getContentTxt())
                 .then((response) => {
                   if (response.status === '201') {
                     Message({
-                      message: '问题发布成功！',
+                      message: '问题发布成功, 可在个人中心看到此问题！',
                       type: 'success',
                       duration: 5 * 1000
                     })
+                    _this.resetFields()
+                    _this.isSendingRequest = false
                   }
-                }).catch(() => {
+                }).catch((e) => {
                   Message({
                     message: '对不起，问题发布失败！',
                     type: 'error',
                     duration: 5 * 1000
                   })
+                  _this.isSendingRequest = false
+                  _this.resetFields()
                 })
             })
           } else {
             return false
           }
         })
+      },
+      resetFields () {
+        let editor = this.$refs.ue
+        editor.clearContent()
+        this.questionForm.questionTitle = ''
+        this.questionForm.questionType = ''
       }
     }
   }

@@ -1,15 +1,21 @@
 <template>
-  <div id="container">
+  <div>
     <div id="question-list" v-loading.lock='isLoadingQuestion' element-loading-text="玩命加载中">
       <div v-if="isNoData">
-        <el-alert :closable="false" title="对不起，找不到任何问题！" type="info" show-icon>
+        <span v-if="canFollow">
+          <el-button @click="unFollowQuestionType()"  :disabled="isSendingFollow" size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
+          <el-button @click="followQuestionType()" :disabled="isSendingFollow" v-else size="small" type="success" icon="star-on">关注</el-button>
+        </span>
+        <el-alert style="margin-top: 10px" :closable="false" title="对不起，找不到任何问题！" type="info" show-icon>
         </el-alert>
         <el-button @click.prevent="$router.push('/editQuestion')" style="margin-top: 20px; float: right" size="small" type="success" icon="edit">去提问</el-button>
       </div>
       <div v-else>
-        <el-button size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
-        <el-button v-else size="small" type="success" icon="star-on">关注</el-button>
-      <span id="choose-params-panel">
+        <span v-if="canFollow">
+        <el-button @click="unFollowQuestionType()"  :disabled="isSendingFollow" size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
+        <el-button @click="followQuestionType()" :disabled="isSendingFollow" v-else size="small" type="success" icon="star-on">关注</el-button>
+        </span>
+        <span id="choose-params-panel">
         <el-radio-group v-model="sortParamRadio" @change="radioChange()">
           <el-radio-button label="最新问题"></el-radio-button>
           <el-radio-button label="最热问题"></el-radio-button>
@@ -41,7 +47,6 @@
     margin-left: 5%;
     margin-right: 5%;
     width: 90%;
-    position: relative;
   }
   #question-list div.question-overview{
     border-bottom: 2px solid #c0ccda;
@@ -69,8 +74,10 @@
 <script>
   import { getAllQuestion, getQuestionByType } from '@/api/question'
   import { Message } from 'element-ui'
+  import { getFollowStatus, followQuestionType, unFollowQuestionType } from '@/api/questionType'
   import bus from '../../assets/eventBus.js'
   import store from '@/store'
+  import { mapGetters } from 'vuex'
   import QuestionOverview from '../../components/question/QuestionOverview.vue'
   export default {
     components: { 'question-overview': QuestionOverview },
@@ -87,14 +94,22 @@
         questionOverviewList: [],
         pageSizes: [5, 10],
         searchKeyWord: '',
+        userId: 1,
         sortPrams: '',
-        sortParamRadio: '最新问题'
+        sortParamRadio: '最新问题',
+        hasFollow: false,
+        isSendingFollow: true
       }
     },
     mounted () {
       bus.$off('searchQuestion')
       bus.$on('searchQuestion', (keyWord) => {
         this.searchQuestion(keyWord)
+      })
+      let _this = this
+      bus.$off('loginSuccess')
+      bus.$on('loginSuccess', function () {
+        _this.getFollowStatus()
       })
     },
     created () {
@@ -107,6 +122,7 @@
       updateQuestion () {
         this.fetchQuestion()
         this.resetData()
+        this.getFollowStatus()
       },
       radioChange () {
         this.sortPrams = this.sortParamRadio === '最新问题' ? 'id' : 'views'
@@ -165,16 +181,101 @@
         this.total = 0
         this.isLoadingQuestion = true
         this.questionOverviewList = []
+        this.hasFollow = false
+        this.isSendingFollow = true
       },
       searchQuestion (keyWord) {
         this.searchKeyWord = keyWord
         this.updateQuestion()
+      },
+      getFollowStatus () {
+        const questionType = this.$route.params.questionType
+        if (!(questionType > 0)) {
+          return
+        }
+        if (this.hasLogin === false) {
+          this.isSendingFollow = false
+          this.hasFollow = false
+          return
+        }
+        getFollowStatus(questionType).then((response) => {
+          this.isSendingFollow = false
+          this.hasFollow = response.result
+        }).catch((e) => {
+          Message({
+            message: '获取关注信息失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+        })
+      },
+      followQuestionType () {
+        const questionType = this.$route.params.questionType
+        if (!(questionType > 0)) {
+          return
+        }
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
+          return
+        }
+        this.isSendingFollow = true
+        followQuestionType(questionType).then((response) => {
+          if (response.status === '200') {
+            if (response.result === true) {
+              this.hasFollow = true
+              Message({
+                message: '关注成功！',
+                type: 'success',
+                duration: 1000
+              })
+            }
+          }
+          this.isSendingFollow = false
+        }).catch((e) => {
+          Message({
+            message: '关注失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+          this.isSendingFollow = false
+        })
+      },
+      unFollowQuestionType () {
+        const questionType = this.$route.params.questionType
+        if (!(questionType > 0)) {
+          return
+        }
+        this.isSendingFollow = true
+        unFollowQuestionType(questionType).then((response) => {
+          if (response.status === '200') {
+            if (response.result === true) {
+              this.hasFollow = false
+              Message({
+                message: '取消关注成功！',
+                type: 'success',
+                duration: 1000
+              })
+            }
+          }
+          this.isSendingFollow = false
+        }).catch((e) => {
+          Message({
+            message: '取消关注失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+          this.isSendingFollow = false
+        })
       }
     },
     computed: {
       isNoData: function () {
         return !this.isLoadingQuestion && this.questionOverviewList.length === 0
-      }
+      },
+      canFollow () {
+        return this.$route.params.questionType >= 0
+      },
+      ...mapGetters(['hasLogin'])
     },
     watch: {
       '$route' (to, from) {

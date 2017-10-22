@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * Created by qi on 2017/10/13.
  */
-public class FIleSaveUtil {
+public class AvatarUtil {
     private static String ROOT_PATH ;
     private static String AVATAR_PATH ;
     private static String ACCESS_PREFIX; // access prefix by network
@@ -57,7 +57,7 @@ public class FIleSaveUtil {
 
     public static void deleteAvatar(String avatarAccessPath, String serverUrl){
         String avatarPrefix = serverUrl + ACCESS_PREFIX ;
-        String realAvatarName = avatarAccessPath.substring(avatarAccessPath.lastIndexOf(avatarPrefix)+1);
+        String realAvatarName = avatarAccessPath.substring(avatarPrefix.length());
         String realAvatarPath = AVATAR_PATH + File.separator + realAvatarName ;
         File avatar = new File(realAvatarPath);
         if(avatar.exists()){

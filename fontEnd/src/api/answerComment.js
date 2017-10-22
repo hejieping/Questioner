@@ -3,12 +3,9 @@
  */
 import fetch from '@/utils/fetch'
 
-export function postAnswerComment (answerId, accountId, commentContent) {
+export function postAnswerComment (answerId, commentContent) {
   const data = {
-    commentContent: commentContent,
-    commenter: {
-      id: accountId
-    }
+    commentContent: commentContent
   }
   return fetch({
     url: '/answerComment/' + answerId,

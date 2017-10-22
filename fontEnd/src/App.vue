@@ -8,6 +8,7 @@
 </template>
 <style>
   html,body{background: #f1efe2;}
+  img {vertical-align: middle}
 </style>
 <script>
 export default {
