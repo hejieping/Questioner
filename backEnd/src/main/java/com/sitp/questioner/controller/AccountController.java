@@ -95,6 +95,16 @@ public class AccountController {
         return new ResJsonTemplate<>("200",account);
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/user/profile/saveProfile", method = RequestMethod.POST)
+    public ResJsonTemplate saveProfile(@RequestBody String profile) {
+        JwtUser jwtUser =(JwtUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Account account = accountService.getUser(jwtUser.getId());
+        account.setProfile(profile);
+        accountService.save(account);
+        return new ResJsonTemplate<>("200", account);
+    }
+
 
     @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
     public ResJsonTemplate getUser(@PathVariable("userId") Long userId) {

@@ -24,6 +24,8 @@ public class Account {
     private String password;
     @Column(nullable = false)
     private String avatarURL;
+    @Column(columnDefinition = "TEXT")
+    private String profile;
 
     @Column
     private Long creditPoint = 0L;
@@ -129,6 +131,14 @@ public class Account {
 
     public void setCreditPoint(Long creditPoint) {
         this.creditPoint = creditPoint;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     public List<Role> getRoles() {

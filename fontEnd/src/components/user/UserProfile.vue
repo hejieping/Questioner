@@ -57,11 +57,30 @@
                 <span class="profile__heading-dot profile__heading-dot--yellow"></span>
                 <span class="profile__heading-dot profile__heading-dot--green"></span>
               </span>
+              <span @click="showEditProfilePanel=!showEditProfilePanel" class="editProfile" v-if="isCurrentUser" style="float: right"><i class="fa fa-edit"></i>编辑</span>
             </div>
             <div class="profile__heading--desc-body">
               <div class="profile__desc">
-                <div style="white-space: pre">
-                  该用户太懒什么也没留下.....
+                <div v-if="isCurrentUser">
+                  <div v-if="!showEditProfilePanel" style="white-space: pre">
+                    <div v-if="user.profile === null || user.profile === ''">
+                      暂时没有个人简历<span style="margin-left: 5px"> <a @click="showEditProfilePanel=true" href="javascript:void 0">去添加?</a></span>
+                    </div>
+                    <div v-else v-html="user.profile">
+                    </div>
+                  </div>
+                  <div id="editor-profile-panel" v-if="showEditProfilePanel">
+                    <el-input  :rows=4 type="textarea" v-model="profile">
+                    </el-input>
+                    <div class="button-panel" style="padding-top: 5px;float: right">
+                      <el-button @click="showEditProfilePanel=false" size="mini">取消</el-button>
+                      <el-button :disabled="isSavingProfile" @click="saveProfile()" size="mini" type="success">保存</el-button>
+                    </div>
+                  </div>
+                </div>
+                <div v-else style="white-space: pre">
+                  <div  v-html="user.profile || '该用户很懒，什么都没有留下.....'">
+                  </div>
                 </div>
               </div>
             </div>
@@ -207,7 +226,7 @@
     font-size: 13px;
     color: #666666;
     overflow: auto;
-    height: 150px;
+    height: 170px;
     padding: 20px;
     font-family: "Source Code Pro", Consolas, Menlo, Monaco, "Courier New", monospace;
   }
@@ -219,6 +238,17 @@
   }
   .follower-panel a:hover {
     color: grey;
+  }
+
+
+  .profile__heading--desc-heading .editProfile {
+    color: #999;
+    font-size: 15px;
+    font-weight: normal;
+  }
+  .profile__heading--desc-heading .editProfile:hover {
+    cursor: pointer;
+    color: #8A6D3B;
   }
 
   .container .operation-option .el-menu-item i {
@@ -235,7 +265,7 @@
   }
 </style>
 <script>
-  import { getUser, getFollowInfo, hasFollowUser, followUser, unFollowUser } from '@/api/user'
+  import { getUser, getFollowInfo, hasFollowUser, followUser, unFollowUser, saveProfile } from '@/api/user'
   import { getUserQuestionCount } from '@/api/question'
   import { getUserAnswerCount } from '@/api/answer'
   import { Message } from 'element-ui'
@@ -262,7 +292,10 @@
         isGettingAnswerCount: false,
         isGettingQuestionCount: false,
         answerCount: null,
-        questionCount: null
+        questionCount: null,
+        showEditProfilePanel: false,
+        profile: null,
+        isSavingProfile: false
       }
     },
     mounted () {
@@ -432,6 +465,23 @@
         let aimPath = '/user/' + this.userId + '/followers'
         this.$router.push({ path: aimPath })
         this.getFollowInfo()
+      },
+      saveProfile () {
+        this.isSavingProfile = true
+        saveProfile(this.profile).then((response) => {
+          if (response.status === '200') {
+            this.user.profile = response.result.profile
+            this.isSavingProfile = false
+            this.showEditProfilePanel = false
+          }
+        }).catch((e) => {
+          Message({
+            message: '保存个人简介失败，请稍后重试！',
+            type: 'error',
+            duration: 1000
+          })
+          this.showEditProfilePanel = false
+        })
       }
     },
     beforeRouteUpdate (to, from, next) {
@@ -442,6 +492,11 @@
       '$route' (to, from) {
         if (from.params.userId !== to.params.userId) {
           this.updateUserInfo()
+        }
+      },
+      showEditProfilePanel () {
+        if (this.showEditProfilePanel && this.user !== null) {
+          this.profile = this.user.profile
         }
       }
     }
