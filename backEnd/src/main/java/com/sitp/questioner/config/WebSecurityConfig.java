@@ -90,6 +90,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers(HttpMethod.GET,"/answerComment/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/*", "/user/followersInfo/*",
                         "/user/getFollowers/*", "/user/getFollowed/*").permitAll()
+                .antMatchers("/socket.io/**").permitAll()
+                .antMatchers("/socket/**").permitAll()
                 .antMatchers("/ueditor/**").permitAll()
                 .antMatchers("/index","/register").permitAll()
                 .antMatchers("/user/**").permitAll()

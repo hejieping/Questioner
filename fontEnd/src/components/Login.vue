@@ -76,6 +76,9 @@
           }
         })
       }
+    },
+    mounted: function () {
+      this.$socket.emit('notice', 'sdsd')
     }
   }
 </script>
