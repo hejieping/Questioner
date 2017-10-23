@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
-
 /**
  * Created by jieping on 2017-07-08.
  */
@@ -22,7 +20,6 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
      * @return 返回符合loginUsername的account对象
      */
     Account findByLoginUsername(String loginUsername);
-
     @Query("select count(f.id) from Account a join a.followers f where a.id = ?1")
     Long getUserFollowersCount(Long userId);
 
