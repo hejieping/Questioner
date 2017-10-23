@@ -1,5 +1,9 @@
 package com.sitp.questioner.service.impl;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Answer;
 import com.sitp.questioner.entity.Question;
@@ -7,17 +11,12 @@ import com.sitp.questioner.repository.AccountRepository;
 import com.sitp.questioner.repository.AnswerRepository;
 import com.sitp.questioner.repository.QuestionRepository;
 import com.sitp.questioner.service.abs.AnswerService;
-import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.PageableBuilder;
-import com.sitp.questioner.viewmodel.AnswerOverview;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.List;
 
 /**
  * Created by qi on 2017/10/14.
@@ -123,5 +122,10 @@ public class AnswerServiceImpl implements AnswerService{
     @Override
     public Long getUserAnswerCount(Long userId) {
         return answerRepository.countByAccountId(userId);
+    }
+
+    @Override
+    public Answer save(Answer answer) {
+        return answerRepository.save(answer);
     }
 }

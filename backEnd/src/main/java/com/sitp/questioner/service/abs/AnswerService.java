@@ -1,10 +1,9 @@
 package com.sitp.questioner.service.abs;
 
-import com.sitp.questioner.entity.Answer;
-import com.sitp.questioner.viewmodel.AnswerOverview;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+
+import com.sitp.questioner.entity.Answer;
+import org.springframework.data.domain.Page;
 
 /**
  * Created by qi on 2017/10/14.
@@ -32,4 +31,6 @@ public interface AnswerService {
     Answer getAnswer(Long answerId);
 
     Long getUserAnswerCount(Long userId);
+
+    Answer save(Answer answer);
 }

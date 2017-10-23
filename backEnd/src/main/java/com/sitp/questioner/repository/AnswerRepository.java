@@ -1,14 +1,13 @@
 package com.sitp.questioner.repository;
 
+import java.util.List;
+
 import com.sitp.questioner.entity.Answer;
-import com.sitp.questioner.viewmodel.AnswerOverview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 /**
  * Created by qi on 2017/10/14.
@@ -44,6 +43,8 @@ public interface AnswerRepository extends CrudRepository<Answer,Long>{
     Page<Answer> getUserAnswers(Long userId, Pageable pageable);
 
     Long countByAccountId(Long accountId);
+
+    Answer save(Answer answer);
 
     /*
     @Query(" select a.id, a.answerDateTime, a.thumbsUpCount, a.thumbsDownCount, a.accepted, a.question.id, a.question.questionTitle " +
