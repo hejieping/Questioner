@@ -12,5 +12,6 @@ libs/
 .settings/
 
 .DS_Store
-
+*.iml
 webapp/
+backEnd/src/main/resources/application.properties
