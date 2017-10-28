@@ -40,6 +40,12 @@ public class Account {
     @JsonIgnore
     private List<Answer> answers = new ArrayList<>();
 
+    /*
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<QuestionNotice> questionNotices = new ArrayList<>();
+*/
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(joinColumns = {
           @JoinColumn(name = "account_id",referencedColumnName = "id")
@@ -215,6 +221,15 @@ public class Account {
         this.followed = followed;
     }
 
+/*
+    public List<QuestionNotice> getQuestionNotices() {
+        return questionNotices;
+    }
+
+    public void setQuestionNotices(List<QuestionNotice> questionNotices) {
+        this.questionNotices = questionNotices;
+    }
+*/
     @Override
     public String toString() {
         return "Account{" +

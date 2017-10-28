@@ -1,5 +1,7 @@
 package com.sitp.questioner.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sitp.questioner.security.JwtAuthenticationTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -51,6 +53,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+    }
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -90,8 +98,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers(HttpMethod.GET,"/answerComment/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/*", "/user/followersInfo/*",
                         "/user/getFollowers/*", "/user/getFollowed/*").permitAll()
-                .antMatchers("/socket.io/**").permitAll()
-                .antMatchers("/socket/**").permitAll()
+                .antMatchers("/websocket/**").permitAll()
                 .antMatchers("/ueditor/**").permitAll()
                 .antMatchers("/index","/register").permitAll()
                 .antMatchers("/user/**").permitAll()

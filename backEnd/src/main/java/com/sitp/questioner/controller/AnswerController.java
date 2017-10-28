@@ -7,6 +7,7 @@ import com.sitp.questioner.entity.Question;
 import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AnswerCommentService;
 import com.sitp.questioner.service.abs.AnswerService;
+import com.sitp.questioner.service.abs.QuestionNoticeService;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.AnswerOverview;
@@ -33,6 +34,9 @@ public class AnswerController {
     @Autowired
     private AnswerCommentService answerCommentService;
 
+    @Autowired
+    private QuestionNoticeService questionNoticeService;
+
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/{questionId}", method = RequestMethod.POST)
     public ResJsonTemplate postAnswer(@RequestBody Answer answer,
@@ -45,6 +49,7 @@ public class AnswerController {
         account.setId(userId);
         answer.setAccount(account);
         if(answerService.saveAnswer(answer)){
+            new Thread(() -> { questionNoticeService.createNoticeAfterAnswerQuestion(answer); }).start();
             return new ResJsonTemplate<>("201", "书写答案成功！");
         }
         else {

@@ -7,14 +7,15 @@ import Element from 'element-ui'
 import store from './store'
 import 'element-ui/lib/theme-default/index.css'
 import VueParticles from 'vue-particles'
-import VueWebsocket from 'vue-websocket'
 import 'font-awesome/css/font-awesome.css'
 
+const moment = require('moment')
+require('moment/locale/zh-cn')
 Vue.use(Element)
-Vue.use(require('vue-moment'))
+Vue.use(require('vue-moment'), {
+  moment
+})
 Vue.use(VueParticles)
-Vue.use(VueWebsocket, 'ws://localhost:8080/socket')
-
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {

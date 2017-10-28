@@ -52,7 +52,13 @@ public class Answer {
 
     @OneToMany
     @JsonIgnore
-    private List<AnswerComment> answerComments ;
+    private List<AnswerComment> answerComments = new ArrayList<>();
+
+    /*
+    @OneToMany
+    @JsonIgnore
+    private List<QuestionNotice> questionNotices = new ArrayList<>();
+*/
 
     @Transient
     private Long commentCount;
@@ -146,6 +152,14 @@ public class Answer {
         this.feedbackAccounts = feedbackAccounts;
     }
 
+/*    public List<QuestionNotice> getQuestionNotices() {
+        return questionNotices;
+    }
+
+    public void setQuestionNotices(List<QuestionNotice> questionNotices) {
+        this.questionNotices = questionNotices;
+    }
+*/
     @Override
     public String toString() {
         return "Answer{" +
