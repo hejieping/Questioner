@@ -1,7 +1,5 @@
 package com.sitp.questioner.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 /**

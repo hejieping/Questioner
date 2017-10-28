@@ -1,13 +1,24 @@
 package com.sitp.questioner.controller;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import com.sitp.questioner.constants.CreditEnum;
 import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Answer;
-import com.sitp.questioner.entity.AnswerComment;
+import com.sitp.questioner.entity.CreditRecord;
 import com.sitp.questioner.entity.Question;
 import com.sitp.questioner.jwt.JwtUser;
+import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AnswerCommentService;
 import com.sitp.questioner.service.abs.AnswerService;
 import com.sitp.questioner.service.abs.QuestionNoticeService;
+import com.sitp.questioner.service.abs.CreditRecordService;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.AnswerOverview;
@@ -15,9 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by qi on 2017/10/14.
@@ -25,6 +39,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/answer")
 public class AnswerController {
+    /**
+     * 线程池服务
+     */
+    private static ExecutorService executorService = Executors.newFixedThreadPool(20);
     @Autowired
     private AnswerService answerService;
 
@@ -33,6 +51,10 @@ public class AnswerController {
 
     @Autowired
     private AnswerCommentService answerCommentService;
+    @Autowired
+    private CreditRecordService creditRecordService;
+    @Autowired
+    private AccountService accountService;
 
     @Autowired
     private QuestionNoticeService questionNoticeService;
@@ -45,11 +67,18 @@ public class AnswerController {
         Question question = new Question();
         question.setId(questionId);
         answer.setQuestion(question);
-        Account account = new Account();
-        account.setId(userId);
+        Account account = accountService.getUser(userId);
+        account.setCreditPoint(account.getCreditPoint() + CreditEnum.ANSWER_QUESTION.getCreditValue());
         answer.setAccount(account);
         if(answerService.saveAnswer(answer)){
-            new Thread(() -> { questionNoticeService.createNoticeAfterAnswerQuestion(answer); }).start();
+            executorService.submit(() -> questionNoticeService.createNoticeAfterAnswerQuestion(answer));
+            //保存声望记录
+            CreditRecord creditRecord = new CreditRecord();
+            creditRecord.setType(CreditEnum.ANSWER_QUESTION.getType());
+            creditRecord.setAnswer(answer);
+            creditRecord.setDatetime(new Date());
+            executorService.submit(() -> accountService.save(account));
+            executorService.submit(()-> creditRecordService.save(creditRecord));
             return new ResJsonTemplate<>("201", "书写答案成功！");
         }
         else {
@@ -67,6 +96,23 @@ public class AnswerController {
         }
         else {
             answerService.giveAnswerFeedBack(answerId, userId, isGood);
+            Answer answer = answerService.getAnswer(answerId);
+            CreditRecord creditRecord = new CreditRecord();
+            creditRecord.setAnswer(answer);
+            creditRecord.setDatetime(new Date());
+            //声望值加减
+            if(isGood){
+                answer.getAccount().setCreditPoint(answer.getAccount().getCreditPoint()+ CreditEnum.FEED_BACK_GOOD.getCreditValue());
+                creditRecord.setType(CreditEnum.FEED_BACK_GOOD.getType());
+            }
+            else {
+                answer.getAccount().setCreditPoint(answer.getAccount().getCreditPoint()+ CreditEnum.FEED_BACK_BAD.getCreditValue());
+                creditRecord.setType(CreditEnum.FEED_BACK_BAD.getType());
+            }
+            //保存声望记录
+            executorService.submit(()->creditRecordService.save(creditRecord));
+            //保存账户信息
+            executorService.submit(()-> accountService.save(answer.getAccount()));
             return new ResJsonTemplate<>("200", "对答案反馈成功！");
         }
     }
@@ -79,6 +125,16 @@ public class AnswerController {
         if(publisher_id == null || !publisher_id.equals(userId)) {
             return new ResJsonTemplate<>("401", "你无权采纳该回答！");
         }
+        Answer answer = answerService.getAnswer(answerId);
+        //声望值记录
+        Account account = answer.getAccount();
+        CreditRecord creditRecord = new CreditRecord();
+        account.setCreditPoint(account.getCreditPoint() + CreditEnum.ACCEPT_ANSWER.getCreditValue());
+        creditRecord.setAnswer(answer);
+        creditRecord.setType(CreditEnum.ACCEPT_ANSWER.getType());
+        creditRecord.setDatetime(new Date());
+        executorService.submit(() -> accountService.save(account));
+        executorService.submit(() -> creditRecordService.save(creditRecord));
         return new ResJsonTemplate<>("200",answerService.acceptAnswer(answerId));
     }
 
