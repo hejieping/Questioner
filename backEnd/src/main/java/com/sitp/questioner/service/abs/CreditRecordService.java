@@ -1,8 +1,8 @@
 package com.sitp.questioner.service.abs;
 
-import java.util.List;
 
 import com.sitp.questioner.entity.CreditRecord;
+import org.springframework.data.domain.Page;
 
 /**
  * @author <a href="mailto:jieping.hjp@cainiao.com">jieping.hjp</a>
@@ -10,5 +10,6 @@ import com.sitp.questioner.entity.CreditRecord;
  */
 public interface CreditRecordService {
     CreditRecord save(CreditRecord creditRecord);
-    List<CreditRecord> getCreditRecords(Long answerId);
+
+    Page<CreditRecord> getUserCreditRecordPageable(Long userId, int currentPage, int pageSize);
 }

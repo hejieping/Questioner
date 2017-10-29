@@ -49,6 +49,11 @@ public class AccountController {
         }
     }
 
+    @RequestMapping(value = "/validateLoginUsername/{username}", method = RequestMethod.GET)
+    public ResJsonTemplate validateLoginUsername(@PathVariable("username") String loginUsername) {
+        return new ResJsonTemplate<>("200", accountService.validateLoginUsername(loginUsername));
+    }
+
     @RequestMapping(value = "/auth",method = RequestMethod.POST)
     public ResJsonTemplate auth(@RequestBody JwtAuthenticationRequest authenticationRequest)
         throws Exception

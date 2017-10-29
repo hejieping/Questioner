@@ -1,11 +1,14 @@
 package com.sitp.questioner.repository;
 
+import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * Created by qi on 2017/10/11.
@@ -40,8 +43,11 @@ public interface QuestionRepository extends CrudRepository<Question,Long>{
     @Query("select q from Question q where q.publisher.id = ?1")
     Page<Question> getUserQuestions(Long userId, Pageable pageable);
 
-    @Query("select q from Question q join q.answers a where a.id = ?1")
+    @Query("select q from Answer a join a.question q where a.id = ?1")
     Question getQuestionByAnswerId(Long answerId);
+
+    @Query("select u from Question q join q.followers u  where q.id = ?1")
+    List<Account> getQuestionFollowers(Long questionId);
 
     Long countByPublisherId(Long publisherId);
 

@@ -29,4 +29,6 @@ public interface AccountService {
     boolean unFollowUser(Long userId, Long followedUserId);
 
     boolean hasFollowUser(Long userId, Long followedUserId);
+
+    boolean validateLoginUsername(String loginUsername);
 }

@@ -45,7 +45,7 @@
         default: function () {
           return {
             username: '',
-            useravatar: ''
+            avatarURL: ''
           }
         }
       }

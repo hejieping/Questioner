@@ -9,10 +9,13 @@ import 'element-ui/lib/theme-default/index.css'
 import VueParticles from 'vue-particles'
 import 'font-awesome/css/font-awesome.css'
 
+const moment = require('moment')
+require('moment/locale/zh-cn')
 Vue.use(Element)
-Vue.use(require('vue-moment'))
+Vue.use(require('vue-moment'), {
+  moment
+})
 Vue.use(VueParticles)
-
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {

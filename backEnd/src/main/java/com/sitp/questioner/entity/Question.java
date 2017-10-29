@@ -45,6 +45,11 @@ public class Question {
     @JsonIgnore
     private List<Account> followers = new ArrayList<>();
 
+    /*
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<QuestionNotice> questionNotices = new ArrayList<>();
+    */
     @JoinColumn(name = "account_id")
     @ManyToOne
     private Account publisher;
@@ -137,6 +142,15 @@ public class Question {
     public void setPublisher(Account publisher) {
         this.publisher = publisher;
     }
+
+    /*
+    public List<QuestionNotice> getQuestionNotices() {
+        return questionNotices;
+    }
+
+    public void setQuestionNotices(List<QuestionNotice> questionNotices) {
+        this.questionNotices = questionNotices;
+    }*/
 
     @Override
     public String toString() {

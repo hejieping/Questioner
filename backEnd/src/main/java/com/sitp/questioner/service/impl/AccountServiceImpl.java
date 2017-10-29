@@ -122,4 +122,9 @@ public class AccountServiceImpl implements AccountService {
     public boolean hasFollowUser(Long userId, Long followedUserId) {
         return accountRepository.hasFollow(userId, followedUserId) > 0;
     }
+
+    @Override
+    public boolean validateLoginUsername(String loginUsername) {
+        return accountRepository.findByLoginUsername(loginUsername) == null;
+    }
 }

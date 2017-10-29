@@ -7,9 +7,9 @@ package com.sitp.questioner.constants;
  */
 public enum CreditEnum {
     ACCEPT_ANSWER("acceptAnswer",15),
-    FEED_BACK_GOOD("feedBack",1),
+    FEED_BACK_GOOD("goodFeedBack",2),
     ANSWER_QUESTION("answerQuestion",1),
-    FEED_BACK_BAD("feedBack",-1),
+    FEED_BACK_BAD("badFeedBack",-1),
     ;
     private String type;
     private int creditValue;

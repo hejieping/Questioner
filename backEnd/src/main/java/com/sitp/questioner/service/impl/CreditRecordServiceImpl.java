@@ -5,7 +5,11 @@ import java.util.List;
 import com.sitp.questioner.entity.CreditRecord;
 import com.sitp.questioner.repository.CreditRecordRepository;
 import com.sitp.questioner.service.abs.CreditRecordService;
+import com.sitp.questioner.util.PageableBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,7 +26,11 @@ public class CreditRecordServiceImpl implements CreditRecordService {
     }
 
     @Override
-    public List<CreditRecord> getCreditRecords(Long answerId) {
-        return creditRecordRepository.findByAnswerid(answerId);
+    public Page<CreditRecord> getUserCreditRecordPageable(Long userId, int currentPage, int pageSize) {
+        Pageable pageable = new PageableBuilder().setPageSize(pageSize)
+                .setCurrentPage(currentPage).setSortParam("id")
+                .setDirection(Sort.Direction.DESC).buildPage();
+        return creditRecordRepository.getUserCreditRecordsPageable(userId, pageable);
     }
+
 }

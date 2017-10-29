@@ -5,6 +5,7 @@
                 mode="out-in">
       <router-view></router-view>
     </transition>
+    <back-to-top></back-to-top>
   </div>
 </template>
 <style scoped>
@@ -18,6 +19,7 @@
 <script>
   import TopHeader from './top-header/Top-Header.vue'
   import Content from './main-content/Content.vue'
+  import BackToTop from './common/BackToTop.vue'
   export default {
     data () {
       return {
@@ -26,7 +28,8 @@
     },
     components: {
       'top-header': TopHeader,
-      'question-content': Content
+      'question-content': Content,
+      'back-to-top': BackToTop
     }
   }
 </script>

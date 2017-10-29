@@ -2,10 +2,7 @@ package com.sitp.questioner.entity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import com.alibaba.fastjson.JSON;
 
@@ -26,13 +23,18 @@ public class CreditRecord {
     /**
      * 答案id
      */
-    @Column(nullable = false)
-    private Long answerid;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "answer_id")
+    private Answer answer;
+
     /**
      * 日期
      */
     @Column(nullable = false)
     private Date datetime;
+
+
+
     public Long getId() {
         return id;
     }
@@ -49,14 +51,13 @@ public class CreditRecord {
         this.type = type;
     }
 
-    public Long getAnswerid() {
-        return answerid;
+    public Answer getAnswer() {
+        return answer;
     }
 
-    public void setAnswerid(Long answerid) {
-        this.answerid = answerid;
+    public void setAnswer(Answer answer) {
+        this.answer = answer;
     }
-
 
     public Date getDatetime() {
         return datetime;

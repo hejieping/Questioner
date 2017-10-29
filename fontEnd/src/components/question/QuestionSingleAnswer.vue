@@ -72,6 +72,13 @@
       initQuestionPublisherId (userId) {
         this.publisherId = userId
       }
+    },
+    watch: {
+      '$route' (to, from) {
+        this.questionId = to.params.questionId
+        this.answerId = to.params.answerId
+        this.getAnswer()
+      }
     }
   }
 </script>

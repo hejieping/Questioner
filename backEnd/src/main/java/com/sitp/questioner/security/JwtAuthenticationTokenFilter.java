@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 /**
  * Created by qi on 2017/7/23.
@@ -62,7 +63,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter{
                     logger.info("authenticated user " + username + ", setting security context");
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
-
             }
         }
         filterChain.doFilter(httpServletRequest,httpServletResponse);

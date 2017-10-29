@@ -17,6 +17,7 @@ import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AnswerCommentService;
 import com.sitp.questioner.service.abs.AnswerService;
+import com.sitp.questioner.service.abs.QuestionNoticeService;
 import com.sitp.questioner.service.abs.CreditRecordService;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
@@ -41,7 +42,7 @@ public class AnswerController {
     /**
      * 线程池服务
      */
-    private ExecutorService executorService = Executors.newFixedThreadPool(20);
+    private static ExecutorService executorService = Executors.newFixedThreadPool(20);
     @Autowired
     private AnswerService answerService;
 
@@ -55,6 +56,9 @@ public class AnswerController {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private QuestionNoticeService questionNoticeService;
+
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/{questionId}", method = RequestMethod.POST)
     public ResJsonTemplate postAnswer(@RequestBody Answer answer,
@@ -66,12 +70,12 @@ public class AnswerController {
         Account account = accountService.getUser(userId);
         account.setCreditPoint(account.getCreditPoint() + CreditEnum.ANSWER_QUESTION.getCreditValue());
         answer.setAccount(account);
-        answer = answerService.save(answer);
-        if(answer != null){
+        if(answerService.saveAnswer(answer)){
+            executorService.submit(() -> questionNoticeService.createNoticeAfterAnswerQuestion(answer));
             //保存声望记录
             CreditRecord creditRecord = new CreditRecord();
             creditRecord.setType(CreditEnum.ANSWER_QUESTION.getType());
-            creditRecord.setAnswerid(answer.getId());
+            creditRecord.setAnswer(answer);
             creditRecord.setDatetime(new Date());
             executorService.submit(() -> accountService.save(account));
             executorService.submit(()-> creditRecordService.save(creditRecord));
@@ -94,7 +98,7 @@ public class AnswerController {
             answerService.giveAnswerFeedBack(answerId, userId, isGood);
             Answer answer = answerService.getAnswer(answerId);
             CreditRecord creditRecord = new CreditRecord();
-            creditRecord.setAnswerid(answerId);
+            creditRecord.setAnswer(answer);
             creditRecord.setDatetime(new Date());
             //声望值加减
             if(isGood){
@@ -106,9 +110,9 @@ public class AnswerController {
                 creditRecord.setType(CreditEnum.FEED_BACK_BAD.getType());
             }
             //保存声望记录
-            executorService.submit(() -> creditRecordService.save(creditRecord));
+            executorService.submit(()->creditRecordService.save(creditRecord));
             //保存账户信息
-            executorService.submit(() -> answerService.saveAnswer(answer));
+            executorService.submit(()-> accountService.save(answer.getAccount()));
             return new ResJsonTemplate<>("200", "对答案反馈成功！");
         }
     }
@@ -121,11 +125,12 @@ public class AnswerController {
         if(publisher_id == null || !publisher_id.equals(userId)) {
             return new ResJsonTemplate<>("401", "你无权采纳该回答！");
         }
+        Answer answer = answerService.getAnswer(answerId);
         //声望值记录
-        Account account = answerService.getAnswer(answerId).getAccount();
+        Account account = answer.getAccount();
         CreditRecord creditRecord = new CreditRecord();
         account.setCreditPoint(account.getCreditPoint() + CreditEnum.ACCEPT_ANSWER.getCreditValue());
-        creditRecord.setAnswerid(answerId);
+        creditRecord.setAnswer(answer);
         creditRecord.setType(CreditEnum.ACCEPT_ANSWER.getType());
         creditRecord.setDatetime(new Date());
         executorService.submit(() -> accountService.save(account));
