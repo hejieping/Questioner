@@ -108,6 +108,7 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login,
+      props: (route) => ({ query: route.query.register }),
       meta: {needAuth: false}
     }
   ]

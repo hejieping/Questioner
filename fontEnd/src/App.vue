@@ -15,7 +15,19 @@ export default {
   name: 'app'
 }
 </script>
+<style lang="less">
+  [class^="el-icon-fa"], [class*=" el-icon-fa"] {
+    display: inline-block;
+    font: normal normal normal 20px/1 FontAwesome!important;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  };
 
+  @import url("../node_modules/font-awesome/less/font-awesome");
+  @fa-css-prefix: el-icon-fa;
+</style>
 <style>
   * {
     margin: 0;

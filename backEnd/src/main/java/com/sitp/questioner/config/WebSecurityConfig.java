@@ -97,7 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                         "/answer/getUserAnswersByThumbsUpCount/*","/answer/getUserAnswerCount/*").permitAll()
                 .antMatchers(HttpMethod.GET,"/answerComment/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/*", "/user/followersInfo/*",
-                        "/user/getFollowers/*", "/user/getFollowed/*").permitAll()
+                        "/user/getFollowers/*", "/user/getFollowed/*","/validateLoginUsername/*").permitAll()
                 .antMatchers("/creditRecord/**").permitAll()
                 .antMatchers("/websocket/**").permitAll()
                 .antMatchers("/ueditor/**").permitAll()

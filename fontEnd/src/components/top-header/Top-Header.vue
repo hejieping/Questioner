@@ -127,10 +127,15 @@
       bus.$on('requestLogin', function () {
         _this.$refs.loginDialog.showDialog()
       })
-      this.getUnreadNotice()
-      this.connectToSocket()
+      this.initAfterLogin()
     },
     methods: {
+      initAfterLogin () {
+        if (this.hasLogin) {
+          this.getUnreadNotice()
+          this.connectToSocket()
+        }
+      },
       search () {
         if (store.getters.isQuestionListPage) {
           bus.$emit('searchQuestion', this.question)
@@ -160,12 +165,11 @@
       },
       loginSuccess () {
         bus.$emit('loginSuccess')
-        this.getUnreadNotice()
+        this.initAfterLogin()
       },
       getUnreadNotice () {
         getUnreadNotice().then((response) => {
           this.notices = response.result
-          console.log(this.notices)
         }).catch((e) => {
           Message({
             message: '不能读取提醒信息，请稍后重试！',
@@ -196,7 +200,6 @@
       },
       socketReceiveMessage (event) {
         this.notices.push(JSON.parse(event.data))
-        console.log(event.data)
       }
     }
   }

@@ -15,6 +15,25 @@ export function login (username, password) {
   })
 }
 
+export function validateLoginUsername (loginUsername) {
+  return fetch({
+    url: '/validateLoginUsername/' + loginUsername,
+    method: 'get'
+  })
+}
+
+export function register (loginUsername, username, password) {
+  return fetch({
+    url: '/register',
+    method: 'post',
+    data: {
+      loginUsername: loginUsername,
+      username: username,
+      password: password
+    }
+  })
+}
+
 export function getUserOwnInfo () {
   return fetch({
     url: '/userOwnInfo',
