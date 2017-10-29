@@ -22,9 +22,6 @@
       <el-menu-item @click="$router.push({ path: `/user/${user.id}` })" index="3-1">
           我的主页
        </el-menu-item>
-      <el-menu-item @click="$router.push('/showContent')" index="3-2">
-          问题中心
-      </el-menu-item>
       <el-menu-item @click="logout" index="3-3">退出登录</el-menu-item>
     </el-submenu>
     <el-submenu  v-if="hasLogin" id="notification" index="4">
