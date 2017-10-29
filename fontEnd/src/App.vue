@@ -35,9 +35,7 @@ export default {
     border: 0;
     vertical-align: baseline;
     word-wrap: break-word;
-    box-sizing:border-box;
     font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
-    line-height: 1.7;
   }
   ol, ul {
     list-style: none;

@@ -25,6 +25,8 @@
         <common-codec.version>1.10</common-codec.version>
         <json.version>20160810</json.version>
         <web-socket.version>4.3.10.RELEASE</web-socket.version>
+        <aliyun-sdk-core.version>2.1.4</aliyun-sdk-core.version>
+        <aliyun-sdk-jaq.version>2.0.5</aliyun-sdk-jaq.version>
     </properties>
     <dependencies>
         <dependency>
@@ -131,6 +133,20 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>${aliyun-sdk-core.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-jaq -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-jaq</artifactId>
+            <version>${aliyun-sdk-jaq.version}</version>
         </dependency>
 
 
