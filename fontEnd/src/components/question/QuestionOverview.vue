@@ -16,7 +16,7 @@
       {{ questionOverview.subject }} -> {{ questionOverview.course }}
           </div>
     <div class="publish-date">
-      发布于 <span>{{ questionOverview.publishDateTime | moment("ddd, MMM Do YYYY") }} </span>
+      发布于 <span style="padding-right: 5px">{{ questionOverview.publishDateTime | moment("YYYY-MM-DD ") }} </span>
     </div>
   </div>
   <div class="info">

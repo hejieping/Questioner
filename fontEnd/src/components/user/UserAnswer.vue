@@ -22,7 +22,7 @@
             </router-link>
           </el-col>
           <el-col :span="4" style="text-align: right; padding-right: 10px">
-            {{ answer.answerDateTime | moment('YYYY-MM-DD') }}
+            {{ answer.answerDateTime | moment('YYYY年MM月DD日') }}
           </el-col>
         </el-row>
       </div>

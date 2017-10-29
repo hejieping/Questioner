@@ -5,7 +5,7 @@
         <span><img :src="answer.account.avatarURL"   class="user-avatar"/></span>
         <span>{{ answer.account.username }}</span>
       </router-link>
-      发布于 <span>{{ answer.answerDateTime | moment("ddd, MMM Do YYYY") }}</span>
+      发布于 <span>{{ $moment(answer.answerDateTime).fromNow() }}</span>
     </div>
     <div class="answer-info" v-html="answer.answerContent">
     </div>

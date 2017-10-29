@@ -46,7 +46,7 @@
                        placeholder="请再一次输入密码" ></el-input>
           </el-form-item>
           <el-form-item class="verification">
-            <div id="dom_id" style="width: 400px"></div>
+            <div id="verification_code_id" style="width: 400px"></div>
           </el-form-item>
           <el-form-item class="register-button">
             <el-button style="width: 100%" type="success" :loading="registering" @click.native.prevent="userRegister" >注册</el-button>
@@ -227,7 +227,7 @@
         const nc_scene = 'register'  // 场景,不可更改
         const nc_token = [nc_appkey, (new Date()).getTime(), Math.random()].join(':')
         const nc_option = {
-          renderTo: '#dom_id', // 渲染到该DOM ID指定的Div位置
+          renderTo: '#verification_code_id', // 渲染到该DOM ID指定的Div位置
           appkey: nc_appkey,
           scene: nc_scene,
           token: nc_token,
@@ -307,4 +307,5 @@
     width: 100%;
     height: 100%;
   }
+
 </style>

@@ -35,7 +35,12 @@ export default {
     border: 0;
     vertical-align: baseline;
     word-wrap: break-word;
+    box-sizing:border-box;
     font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+    line-height: 1.7;
+  }
+  #verification_code_id div,span{
+    box-sizing: content-box;
   }
   ol, ul {
     list-style: none;
