@@ -1,9 +1,13 @@
 package com.sitp.questioner.controller;
 
+import java.util.List;
+
+import com.sitp.questioner.constants.QuestionerConstants;
 import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Question;
 import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.QuestionService;
+import com.sitp.questioner.service.abs.RecommendService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.QuestionOverview;
 import com.sitp.questioner.viewmodel.QuestionOverviewList;
@@ -11,7 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by qi on 2017/10/11.
@@ -21,7 +30,8 @@ import org.springframework.web.bind.annotation.*;
 public class QuestionController {
     @Autowired
     private QuestionService questionService;
-
+    @Autowired
+    private RecommendService recommendService;
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = RequestMethod.POST)
     public ResJsonTemplate raiseQuestion(@RequestBody Question question){
@@ -62,7 +72,24 @@ public class QuestionController {
         questionOverviewList.setTotalNumber(questions.getTotalElements());
         return questionOverviewList;
     }
-
+    private void replaceQuestionOverviewList(QuestionOverviewList questionOverviewList, List<Question> questionList){
+        for(int i = 0; i < questionList.size(); i++){
+            Question question = questionList.get(i);
+            QuestionOverview questionOverview = questionOverviewList.getQuestionOverviewList().get(i);
+            questionOverview.setAnswers(questionService.getAnswerNumber(question.getId()));
+            questionOverview.setId(question.getId());
+            questionOverview.setCourse(question.getQuestionType().getCourse());
+            questionOverview.setSubject(question.getQuestionType().getSubject());
+            questionOverview.setPublisherId(question.getPublisher().getId());
+            questionOverview.setPublishDateTime(question.getPublishDateTime());
+            questionOverview.setPublisherId(question.getPublisher().getId());
+            questionOverview.setTitle(question.getQuestionTitle());
+            questionOverview.setSolved(question.getSolved());
+            questionOverview.setPublisherName(question.getPublisher().getUsername());
+            questionOverview.setPublisherImgSrc(question.getPublisher().getAvatarURL());
+            questionOverview.setViews(question.getViews());
+        }
+    }
     @RequestMapping(method = RequestMethod.GET)
     public ResJsonTemplate getAllQuestions(@RequestParam("pageSize") int pageSize,
                                            @RequestParam("currentPage") int currentPage,
@@ -76,7 +103,18 @@ public class QuestionController {
             questions = questionService.getQuestionTitleLike(questionTitle,pageSize,currentPage, sortParam);
         }
         QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
-        return new ResJsonTemplate<>("200", questionOverviewList);
+        try {
+            //浏览记录
+            Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+            if(currentPage == QuestionerConstants.FIRST_PAGE){
+                replaceQuestionOverviewList(questionOverviewList,recommendService.recommend(userId));
+            }
+        }catch (Exception e){
+            //获取用户信息失败，表明是匿名登录
+        }finally {
+            return new ResJsonTemplate<>("200", questionOverviewList);
+        }
+
     }
 
     @RequestMapping(value = "/getQuestionByType/{questionTypeId}", method = RequestMethod.GET)
@@ -98,12 +136,20 @@ public class QuestionController {
 
     @RequestMapping(value = "/{questionId}", method = RequestMethod.GET)
     public ResJsonTemplate getQuestion(@PathVariable Long questionId){
-        Question question = questionService.getQuestion(questionId);
-        if(question == null)
-            return new ResJsonTemplate<>("404","不存在的问题！");
-        question.setViews(question.getViews() + 1);
-        new Thread(() -> questionService.saveQuestion(question)).start();
-        return new ResJsonTemplate<>("200", question);
+        try {
+            //浏览记录
+            Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+            recommendService.broweRecord(userId,questionId);
+        }catch (Exception e){
+            //获取用户信息失败，表明是匿名登录
+        }finally {
+            Question question = questionService.getQuestion(questionId);
+            if(question == null)
+                return new ResJsonTemplate<>("404","不存在的问题！");
+            question.setViews(question.getViews() + 1);
+            new Thread(() -> questionService.saveQuestion(question)).start();
+            return new ResJsonTemplate<>("200", question);
+        }
     }
 
     @PreAuthorize("hasRole('USER')")

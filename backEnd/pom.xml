@@ -27,6 +27,8 @@
         <web-socket.version>4.3.10.RELEASE</web-socket.version>
         <aliyun-sdk-core.version>2.1.4</aliyun-sdk-core.version>
         <aliyun-sdk-jaq.version>2.0.5</aliyun-sdk-jaq.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mahout.version>0.9</mahout.version>
     </properties>
     <dependencies>
         <dependency>
@@ -149,7 +151,30 @@
             <version>${aliyun-sdk-jaq.version}</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.apache.mahout</groupId>
+            <artifactId>mahout-core</artifactId>
+            <version>${mahout.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mahout</groupId>
+            <artifactId>mahout-integration</artifactId>
+            <version>${mahout.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cassandra</groupId>
+                    <artifactId>cassandra-all</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>me.prettyprint</groupId>
+                    <artifactId>hector-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
