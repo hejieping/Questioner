@@ -17,8 +17,8 @@ import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AnswerCommentService;
 import com.sitp.questioner.service.abs.AnswerService;
-import com.sitp.questioner.service.abs.QuestionNoticeService;
 import com.sitp.questioner.service.abs.CreditRecordService;
+import com.sitp.questioner.service.abs.QuestionNoticeService;
 import com.sitp.questioner.service.abs.QuestionService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.AnswerOverview;
@@ -59,11 +59,14 @@ public class AnswerController {
     @Autowired
     private QuestionNoticeService questionNoticeService;
 
+
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/{questionId}", method = RequestMethod.POST)
     public ResJsonTemplate postAnswer(@RequestBody Answer answer,
                                       @PathVariable("questionId") Long questionId){
+
         Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+
         Question question = new Question();
         question.setId(questionId);
         answer.setQuestion(question);
