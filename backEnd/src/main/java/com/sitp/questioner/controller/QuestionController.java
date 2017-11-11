@@ -1,8 +1,10 @@
 package com.sitp.questioner.controller;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import com.sitp.questioner.constants.QuestionerConstants;
+import com.google.common.collect.Lists;
 import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.entity.Question;
 import com.sitp.questioner.jwt.JwtUser;
@@ -32,6 +34,7 @@ public class QuestionController {
     private QuestionService questionService;
     @Autowired
     private RecommendService recommendService;
+    private static ExecutorService executorService = Executors.newFixedThreadPool(20);
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = RequestMethod.POST)
     public ResJsonTemplate raiseQuestion(@RequestBody Question question){
@@ -103,20 +106,25 @@ public class QuestionController {
             questions = questionService.getQuestionTitleLike(questionTitle,pageSize,currentPage, sortParam);
         }
         QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
+        return new ResJsonTemplate<>("200", questionOverviewList);
+
+
+
+    }
+    @RequestMapping(value = "/recommend",method = RequestMethod.GET)
+    public ResJsonTemplate getRecommendQuestion(@RequestParam("questionSize") int questionSize){
+        List<Question> recommendQuestions = Lists.newArrayList();
         try {
             //浏览记录
             Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-            if(currentPage == QuestionerConstants.FIRST_PAGE){
-                replaceQuestionOverviewList(questionOverviewList,recommendService.recommend(userId));
-            }
+           recommendQuestions = recommendService.recommend(userId,questionSize);
+           executorService.submit(() -> recommendService.refreshRecommendSystem());
         }catch (Exception e){
             //获取用户信息失败，表明是匿名登录
         }finally {
-            return new ResJsonTemplate<>("200", questionOverviewList);
+            return new ResJsonTemplate<>("200", recommendQuestions);
         }
-
     }
-
     @RequestMapping(value = "/getQuestionByType/{questionTypeId}", method = RequestMethod.GET)
     public ResJsonTemplate getQuestionsByType(@RequestParam("pageSize") int pageSize,
                                               @RequestParam("currentPage") int currentPage,
@@ -140,6 +148,7 @@ public class QuestionController {
             //浏览记录
             Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
             recommendService.broweRecord(userId,questionId);
+
         }catch (Exception e){
             //获取用户信息失败，表明是匿名登录
         }finally {

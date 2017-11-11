@@ -3,17 +3,22 @@ package com.sitp.questioner.service.impl;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.sitp.questioner.constants.QuestionerConstants;
 import com.sitp.questioner.entity.BrowseHistory;
 import com.sitp.questioner.entity.Question;
+import com.sitp.questioner.entity.QuestionType;
 import com.sitp.questioner.repository.BrowseHistoryRepository;
 import com.sitp.questioner.repository.QuestionRepository;
+import com.sitp.questioner.repository.QuestionTypeRepository;
 import com.sitp.questioner.service.abs.RecommendService;
 import com.sitp.questioner.util.PageableBuilder;
+import com.sitp.questioner.viewmodel.Preference;
 import org.apache.mahout.cf.taste.common.NoSuchUserException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
@@ -36,11 +41,21 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RecommendServiceImpl implements RecommendService {
+    private static DataModel dataModel;
+    private static UserSimilarity similarity;
+    private static UserNeighborhood neighborhood;
+    private static UserBasedRecommender recommender;
+    private static MysqlDataSource mysqlDataSource;
+    static {
+        refresh();
+    }
     @Autowired
     private BrowseHistoryRepository browseHistoryRepository;
     @Autowired
     private QuestionRepository questionRepository;
-    private MysqlDataSource mysqlDataSource;
+    @Autowired
+    private QuestionTypeRepository questionTypeRepository;
+
     public static Random random = new Random();
     @Override
     public void broweRecord(Long accountid, Long questionId) {
@@ -61,30 +76,69 @@ public class RecommendServiceImpl implements RecommendService {
     }
 
     @Override
-    public List<Question> recommend(Long accountid) throws TasteException {
-        if(mysqlDataSource == null){
-            mysqlDataSource = new MysqlDataSource();
-            mysqlDataSource.setUrl(QuestionerConstants.URL);
-            mysqlDataSource.setUser(QuestionerConstants.ACCOUNT);
-            mysqlDataSource.setPassword(QuestionerConstants.PWD);
+    public List<Question> recommend(Long accountId,int questionSize) throws TasteException {
+
+        List<BrowseHistory> browseHistoryList = getBrowseHistory(accountId);
+        List<Question> questionList = Lists.newArrayList();
+        for(int i = 0; i < browseHistoryList.size()&&i < questionSize; i++){
+            questionList.add(getRandomQuestionByType(browseHistoryList.get(i).getItemid()));
         }
-        //执行推荐算法
-        DataModel dataModel = new MySQLJDBCDataModel(mysqlDataSource,QuestionerConstants.RECOMMEND_TABLE_NAME,QuestionerConstants.USER_ID,QuestionerConstants.ITEM_ID,QuestionerConstants.PREFERENCE,QuestionerConstants.TIMESTAMP);
-        UserSimilarity similarity = new PearsonCorrelationSimilarity(dataModel);
-        UserNeighborhood neighborhood = new ThresholdUserNeighborhood(QuestionerConstants.THRESHOLD, similarity, dataModel);
-        UserBasedRecommender recommender = new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
+        return questionList;
+    }
+
+    @Override
+    public List<Preference> getPreferences(Long accountId, int preferenceSize) throws TasteException {
+        List<BrowseHistory> browseHistoryList = getBrowseHistory(accountId);
+        List<Long> typeIdList = Lists.newArrayList();
+        List<Preference> preferenceList = Lists.newArrayList();
+        int index = 0;
+        for(BrowseHistory browseHistory : browseHistoryList){
+            if(index < preferenceSize){
+                typeIdList.add(browseHistory.getItemid());
+                index++;
+            }
+            else {
+                index = 0;
+                break;
+            }
+        }
+        List<QuestionType> questionTypeList = questionTypeRepository.findByIdIn(typeIdList);
+        Map<Long,QuestionType> questionTypeMap = Maps.newHashMap();
+        for(QuestionType questionType : questionTypeList){
+            questionTypeMap.put(questionType.getId(),questionType);
+        }
+        for(BrowseHistory browseHistory : browseHistoryList){
+            if(index < preferenceSize){
+                Preference preference = new Preference();
+                preference.setPreferenceValue(browseHistory.getPreference());
+                preference.setSubject(questionTypeMap.get(browseHistory.getItemid()).getSubject());
+                preference.setCourse(questionTypeMap.get(browseHistory.getItemid()).getCourse());
+                preferenceList.add(preference);
+                index++;
+            }
+        }
+        return preferenceList;
+    }
+
+    @Override
+    public void refreshRecommendSystem() {
+        refresh();
+    }
+
+    private List<BrowseHistory> getBrowseHistory(Long accountId) throws TasteException {
+
         List<RecommendedItem> recommendations = null;
         try {
             //算法只给出用户从未浏览过的问题类型的预估喜欢程度
-            recommendations = recommender.recommend(accountid, QuestionerConstants.RECOMMEND_MAX_NUMBER);
+            recommendations = recommender.recommend(accountId, QuestionerConstants.RECOMMEND_MAX_NUMBER);
         }catch (NoSuchUserException e){
             recommendations = Lists.newArrayList();
         }
         //将预估喜欢程度和已有的喜欢程度和在一起，排序，取出喜欢程度高的作为问题推荐
-        List<BrowseHistory> browseHistoryList = browseHistoryRepository.findByUserid(accountid);
+        List<BrowseHistory> browseHistoryList = browseHistoryRepository.findByUserid(accountId);
         for(RecommendedItem recommendedItem : recommendations){
             BrowseHistory browseHistory = new BrowseHistory();
-            browseHistory.setUserid(accountid);
+            browseHistory.setUserid(accountId);
             browseHistory.setItemid(recommendedItem.getItemID());
             browseHistory.setPreference(new Double(recommendedItem.getValue()));
             browseHistoryList.add(browseHistory);
@@ -95,12 +149,7 @@ public class RecommendServiceImpl implements RecommendService {
                 return o1.getPreference().compareTo(o2.getPreference());
             }
         });
-
-        List<Question> questionList = Lists.newArrayList();
-        for(int i = 0; i < browseHistoryList.size()&&i < QuestionerConstants.RECOMMEND_SIZE; i++){
-            questionList.add(getRandomQuestionByType(browseHistoryList.get(i).getItemid()));
-        }
-        return questionList;
+        return browseHistoryList;
     }
 
     /**
@@ -114,6 +163,24 @@ public class RecommendServiceImpl implements RecommendService {
             .setDirection(Sort.Direction.DESC).buildPage();
         List<Question> questionList = questionRepository.getQuestionByPageAndType(typeid,pageable).getContent();
         return questionList.get(random.nextInt(questionList.size()));
+    }
+    public static void refresh(){
+        mysqlDataSource = new MysqlDataSource();
+        mysqlDataSource = new MysqlDataSource();
+        mysqlDataSource.setUrl(QuestionerConstants.URL);
+        mysqlDataSource.setUser(QuestionerConstants.ACCOUNT);
+        mysqlDataSource.setPassword(QuestionerConstants.PWD);
+        //执行推荐算法
+        dataModel = new MySQLJDBCDataModel(mysqlDataSource,QuestionerConstants.RECOMMEND_TABLE_NAME,QuestionerConstants.USER_ID,QuestionerConstants.ITEM_ID,QuestionerConstants.PREFERENCE,QuestionerConstants.TIMESTAMP);
+
+        similarity = null;
+        try {
+            similarity = new PearsonCorrelationSimilarity(dataModel);
+        } catch (TasteException e) {
+            e.printStackTrace();
+        }
+        neighborhood = new ThresholdUserNeighborhood(QuestionerConstants.THRESHOLD, similarity, dataModel);
+        recommender = new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
     }
 
 }

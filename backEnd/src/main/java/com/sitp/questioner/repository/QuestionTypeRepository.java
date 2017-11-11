@@ -1,5 +1,7 @@
 package com.sitp.questioner.repository;
 
+import java.util.List;
+
 import com.sitp.questioner.entity.QuestionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +19,5 @@ public interface QuestionTypeRepository extends CrudRepository<QuestionType,Long
 
     @Query("select q from QuestionType q join q.followers f where f.id = ?1")
     Page<QuestionType> getUserFollowQuestionType(Long userId, Pageable pageable);
+    List<QuestionType> findByIdIn(List<Long> idList);
 }

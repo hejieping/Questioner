@@ -1,21 +1,30 @@
 package com.sitp.questioner.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sitp.questioner.entity.Account;
 import com.sitp.questioner.jwt.JwtAuthenticationRequest;
 import com.sitp.questioner.jwt.JwtAuthenticationResponse;
 import com.sitp.questioner.jwt.JwtUser;
 import com.sitp.questioner.service.abs.AccountService;
 import com.sitp.questioner.service.abs.AuthService;
+import com.sitp.questioner.service.abs.RecommendService;
 import com.sitp.questioner.util.AvatarUtil;
 import com.sitp.questioner.util.ResJsonTemplate;
+import org.apache.mahout.cf.taste.common.TasteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -27,7 +36,8 @@ public class AccountController {
     AuthService authService;
     @Autowired
     AccountService accountService;
-
+    @Autowired
+    private RecommendService recommendService;
     @Value("${deployment.url}")
     private String deploymentURL ;
 
@@ -167,6 +177,15 @@ public class AccountController {
                                        @RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
                                        @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         return new ResJsonTemplate<>("200", accountService.getUserFollowed(userId, currentPage,pageSize));
+    }
+    @PreAuthorize("hasRole('USER')")
+    @RequestMapping(value = "/user/getPreference/{userId}", method = RequestMethod.GET)
+    public ResJsonTemplate getPreference(@PathVariable("userId") Long userId,@RequestParam(value = "preferenceSize") int preferenceSize ){
+        try {
+            return new ResJsonTemplate<>("200",recommendService.getPreferences(userId,preferenceSize));
+        } catch (TasteException e) {
+            return new ResJsonTemplate<>("500",e.getMessage());
+        }
     }
 
 }
