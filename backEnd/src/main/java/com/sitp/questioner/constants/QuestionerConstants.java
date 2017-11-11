@@ -16,5 +16,4 @@ public class QuestionerConstants {
     public static String ACCOUNT = "remote";
     public static String PWD = "Qq123456!";
     public static Double THRESHOLD = 0.1D;
-    public static int FIRST_PAGE = 0;
 }

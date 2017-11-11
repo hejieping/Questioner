@@ -117,7 +117,6 @@
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/` })" index="1"><i class="fa fa-home fa-lg"></i>{{ infoPrefix }}主页</el-menu-item>
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/userQuestion` })"  index="2"><span v-loading.lock="isGettingQuestionCount"><i class="fa fa-question-circle fa-lg"></i>{{ infoPrefix }}提问 {{ questionCount }}</span> </el-menu-item>
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/userAnswer` })" index="3"><span v-loading.lock="isGettingAnswerCount"><i class="fa fa-key fa-lg"></i>{{ infoPrefix }}回答 {{ answerCount }}</span></el-menu-item>
-                <el-menu-item @click="$router.push({ path: `/user/${userId}/userActivity` })" index="4"><i class="fa fa-line-chart fa-lg"></i>{{ infoPrefix }}动态 </el-menu-item>
                 <el-menu-item @click="$router.push({ path: `/user/${userId}/reputation` })" index="5"><i class="fa fa-star fa-lg"></i>声望记录</el-menu-item>
               </el-menu>
             </div>

@@ -2,7 +2,7 @@ package com.sitp.questioner.controller;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.sitp.questioner.entity.Account;
@@ -13,6 +13,8 @@ import com.sitp.questioner.service.abs.RecommendService;
 import com.sitp.questioner.util.ResJsonTemplate;
 import com.sitp.questioner.viewmodel.QuestionOverview;
 import com.sitp.questioner.viewmodel.QuestionOverviewList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,11 +32,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/question")
 public class QuestionController {
+    private static Logger logger = LoggerFactory.getLogger(QuestionController.class);
+
     @Autowired
     private QuestionService questionService;
     @Autowired
     private RecommendService recommendService;
-    private static ExecutorService executorService = Executors.newFixedThreadPool(20);
+
+    @Autowired
+    private ExecutorService executorService;
+
     @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = RequestMethod.POST)
     public ResJsonTemplate raiseQuestion(@RequestBody Question question){
@@ -53,20 +60,7 @@ public class QuestionController {
         Iterable<Question> questionContent = questions.getContent();
         QuestionOverviewList questionOverviewList = new QuestionOverviewList();
         for (Question question : questionContent) {
-            QuestionOverview questionOverview = new QuestionOverview();
-            questionOverview.setAnswers(questionService.getAnswerNumber(question.getId()));
-            questionOverview.setId(question.getId());
-            questionOverview.setCourse(question.getQuestionType().getCourse());
-            questionOverview.setSubject(question.getQuestionType().getSubject());
-            questionOverview.setPublisherId(question.getPublisher().getId());
-            questionOverview.setPublishDateTime(question.getPublishDateTime());
-            questionOverview.setPublisherId(question.getPublisher().getId());
-            questionOverview.setTitle(question.getQuestionTitle());
-            questionOverview.setSolved(question.getSolved());
-            questionOverview.setPublisherName(question.getPublisher().getUsername());
-            questionOverview.setPublisherImgSrc(question.getPublisher().getAvatarURL());
-            questionOverview.setViews(question.getViews());
-            questionOverviewList.addQuestionOverview(questionOverview);
+            questionOverviewList.addQuestionOverview(generateQuestionOverviewFromQuestion(questionService, question));
         }
         questionOverviewList.setCurrentPage(questions.getNumber());
         questionOverviewList.setHasNext(questions.hasNext());
@@ -75,24 +69,24 @@ public class QuestionController {
         questionOverviewList.setTotalNumber(questions.getTotalElements());
         return questionOverviewList;
     }
-    private void replaceQuestionOverviewList(QuestionOverviewList questionOverviewList, List<Question> questionList){
-        for(int i = 0; i < questionList.size(); i++){
-            Question question = questionList.get(i);
-            QuestionOverview questionOverview = questionOverviewList.getQuestionOverviewList().get(i);
-            questionOverview.setAnswers(questionService.getAnswerNumber(question.getId()));
-            questionOverview.setId(question.getId());
-            questionOverview.setCourse(question.getQuestionType().getCourse());
-            questionOverview.setSubject(question.getQuestionType().getSubject());
-            questionOverview.setPublisherId(question.getPublisher().getId());
-            questionOverview.setPublishDateTime(question.getPublishDateTime());
-            questionOverview.setPublisherId(question.getPublisher().getId());
-            questionOverview.setTitle(question.getQuestionTitle());
-            questionOverview.setSolved(question.getSolved());
-            questionOverview.setPublisherName(question.getPublisher().getUsername());
-            questionOverview.setPublisherImgSrc(question.getPublisher().getAvatarURL());
-            questionOverview.setViews(question.getViews());
-        }
+
+    private static QuestionOverview generateQuestionOverviewFromQuestion(QuestionService questionService,Question question) {
+        QuestionOverview questionOverview = new QuestionOverview();
+        questionOverview.setAnswers(questionService.getAnswerNumber(question.getId()));
+        questionOverview.setId(question.getId());
+        questionOverview.setCourse(question.getQuestionType().getCourse());
+        questionOverview.setSubject(question.getQuestionType().getSubject());
+        questionOverview.setPublisherId(question.getPublisher().getId());
+        questionOverview.setPublishDateTime(question.getPublishDateTime());
+        questionOverview.setPublisherId(question.getPublisher().getId());
+        questionOverview.setTitle(question.getQuestionTitle());
+        questionOverview.setSolved(question.getSolved());
+        questionOverview.setPublisherName(question.getPublisher().getUsername());
+        questionOverview.setPublisherImgSrc(question.getPublisher().getAvatarURL());
+        questionOverview.setViews(question.getViews());
+        return questionOverview;
     }
+
     @RequestMapping(method = RequestMethod.GET)
     public ResJsonTemplate getAllQuestions(@RequestParam("pageSize") int pageSize,
                                            @RequestParam("currentPage") int currentPage,
@@ -107,24 +101,27 @@ public class QuestionController {
         }
         QuestionOverviewList questionOverviewList = buildQuestionOverviewList(questionService, questions);
         return new ResJsonTemplate<>("200", questionOverviewList);
-
-
-
     }
+
+    @PreAuthorize("hasRole('USER')")
     @RequestMapping(value = "/recommend",method = RequestMethod.GET)
-    public ResJsonTemplate getRecommendQuestion(@RequestParam("questionSize") int questionSize){
-        List<Question> recommendQuestions = Lists.newArrayList();
+    public ResJsonTemplate getRecommendQuestion(@RequestParam(value = "questionSize",defaultValue = "3") int questionSize){
+        List<QuestionOverview> recommendQuestions = Lists.newArrayList();
+        //浏览记录
+        Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         try {
-            //浏览记录
-            Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-           recommendQuestions = recommendService.recommend(userId,questionSize);
-           executorService.submit(() -> recommendService.refreshRecommendSystem());
-        }catch (Exception e){
-            //获取用户信息失败，表明是匿名登录
-        }finally {
-            return new ResJsonTemplate<>("200", recommendQuestions);
+            List<Question> questions = recommendService.recommend(userId,questionSize);
+            recommendQuestions = questions.stream().map((question -> generateQuestionOverviewFromQuestion(questionService, question)))
+                    .collect(Collectors.toList());
         }
+        catch (Exception e){
+            logger.error("Recommend Question Fail");
+            logger.error(e.toString());
+        }
+        executorService.submit(() -> recommendService.refreshRecommendSystem());
+        return new ResJsonTemplate<>("200", recommendQuestions);
     }
+
     @RequestMapping(value = "/getQuestionByType/{questionTypeId}", method = RequestMethod.GET)
     public ResJsonTemplate getQuestionsByType(@RequestParam("pageSize") int pageSize,
                                               @RequestParam("currentPage") int currentPage,
@@ -146,19 +143,17 @@ public class QuestionController {
     public ResJsonTemplate getQuestion(@PathVariable Long questionId){
         try {
             //浏览记录
-            Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-            recommendService.broweRecord(userId,questionId);
-
+           Long userId = ((JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+           executorService.submit(()->recommendService.browseRecord(userId,questionId));
         }catch (Exception e){
             //获取用户信息失败，表明是匿名登录
-        }finally {
-            Question question = questionService.getQuestion(questionId);
-            if(question == null)
-                return new ResJsonTemplate<>("404","不存在的问题！");
-            question.setViews(question.getViews() + 1);
-            new Thread(() -> questionService.saveQuestion(question)).start();
-            return new ResJsonTemplate<>("200", question);
         }
+        Question question = questionService.getQuestion(questionId);
+        if(question == null)
+            return new ResJsonTemplate<>("404","不存在的问题！");
+        question.setViews(question.getViews() + 1);
+        executorService.submit(()->questionService.saveQuestion(question));
+        return new ResJsonTemplate<>("200", question);
     }
 
     @PreAuthorize("hasRole('USER')")

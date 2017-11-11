@@ -51,4 +51,7 @@ public interface QuestionRepository extends CrudRepository<Question,Long>{
 
     Long countByPublisherId(Long publisherId);
 
+    @Query("select q.id from Question q where q.questionType.id = ?1")
+    List<Long> getAllQuestionIdByQuestionTypeId(Long typeId);
+
 }

@@ -44,12 +44,6 @@ public class AccountController {
     @Value("${default.avatarUrl}")
     private String defaultAvatarUrl;
 
-    @RequestMapping(value = "/index")
-    @ResponseBody
-    public ResJsonTemplate hello() {
-        return new ResJsonTemplate("200","welcome");
-    }
-
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResJsonTemplate register(@RequestBody Account addedUser)  {
         if (accountService.register(addedUser) != null) {
@@ -178,9 +172,9 @@ public class AccountController {
                                        @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         return new ResJsonTemplate<>("200", accountService.getUserFollowed(userId, currentPage,pageSize));
     }
-    @PreAuthorize("hasRole('USER')")
+
     @RequestMapping(value = "/user/getPreference/{userId}", method = RequestMethod.GET)
-    public ResJsonTemplate getPreference(@PathVariable("userId") Long userId,@RequestParam(value = "preferenceSize") int preferenceSize ){
+    public ResJsonTemplate getPreference(@PathVariable("userId") Long userId,@RequestParam(value = "preferenceSize", defaultValue = "5") int preferenceSize ){
         try {
             return new ResJsonTemplate<>("200",recommendService.getPreferences(userId,preferenceSize));
         } catch (TasteException e) {

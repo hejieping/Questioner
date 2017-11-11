@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div id="question-list" v-loading.lock='isLoadingQuestion' element-loading-text="玩命加载中">
+    <div id="question-list">
+      <div  v-loading='isLoadingQuestion' element-loading-text="玩命加载中">
       <div v-if="isNoData">
         <span v-if="canFollow">
           <el-button @click="unFollowQuestionType()"  :disabled="isSendingFollow" size="small" type="info" v-if="hasFollow" icon="star-off">取消关注</el-button>
@@ -9,6 +10,7 @@
         <el-alert style="margin-top: 10px" :closable="false" title="对不起，找不到任何问题！" type="info" show-icon>
         </el-alert>
         <el-button @click.prevent="$router.push('/editQuestion')" style="margin-top: 20px; float: right" size="small" type="success" icon="edit">去提问</el-button>
+        <div style="clear: both"></div>
       </div>
       <div v-else>
         <span v-if="canFollow">
@@ -38,6 +40,20 @@
       </div>
       <div style="clear: both; margin-bottom: 20px"></div>
       </div>
+      </div>
+      <div v-if="showRecommendQuestion">
+        <el-card  class="box-card">
+          <div slot="header" class="clearfix">
+            <span style="line-height: 20px;">你可能感兴趣</span>
+            <el-button @click.prevent="loadingRecommendQuestion()" size="mini" icon="fa fa-refresh" style="float: right" type="primary">换一换</el-button>
+          </div>
+          <div class="recommend-question" v-loading="isLoadingRecommend" element-loading-text="玩命加载中">
+            <div  class="question-overview" v-for="questionOverview in recommendQuestionOverviewList">
+              <question-overview :questionOverview="questionOverview"></question-overview>
+            </div>
+          </div>
+        </el-card>
+      </div>
     </div>
   </div>
 
@@ -48,7 +64,8 @@
     margin-right: 5%;
     width: 90%;
   }
-  #question-list div.question-overview{
+
+  div.question-overview{
     border-bottom: 2px solid #c0ccda;
     padding: 12px 0 10px 0;
     background: #f9fafd;
@@ -72,7 +89,7 @@
 
 </style>
 <script>
-  import { getAllQuestion, getQuestionByType } from '@/api/question'
+  import { getAllQuestion, getQuestionByType, getRecommendQuestion } from '@/api/question'
   import { Message } from 'element-ui'
   import { getFollowStatus, followQuestionType, unFollowQuestionType } from '@/api/questionType'
   import bus from '../../assets/eventBus.js'
@@ -98,7 +115,9 @@
         sortPrams: '',
         sortParamRadio: '最新问题',
         hasFollow: false,
-        isSendingFollow: true
+        isSendingFollow: true,
+        isLoadingRecommend: false,
+        recommendQuestionOverviewList: []
       }
     },
     mounted () {
@@ -110,6 +129,7 @@
       bus.$off('loginSuccess')
       bus.$on('loginSuccess', function () {
         _this.getFollowStatus()
+        _this.loadingRecommendQuestion()
       })
     },
     created () {
@@ -123,6 +143,7 @@
         this.fetchQuestion()
         this.resetData()
         this.getFollowStatus()
+        this.loadingRecommendQuestion()
       },
       radioChange () {
         this.sortPrams = this.sortParamRadio === '最新问题' ? 'id' : 'views'
@@ -266,6 +287,25 @@
           })
           this.isSendingFollow = false
         })
+      },
+      loadingRecommendQuestion () {
+        if (!this.hasLogin) {
+          return
+        }
+        this.isLoadingRecommend = true
+        getRecommendQuestion().then((response) => {
+          if (response.status === '200') {
+            this.recommendQuestionOverviewList = response.result
+          }
+          this.isLoadingRecommend = false
+        }).catch((e) => {
+          Message({
+            message: '加载推荐问题失败，请稍后重试！',
+            type: 'error',
+            duration: 2000
+          })
+          this.isLoadingRecommend = false
+        })
       }
     },
     computed: {
@@ -274,6 +314,9 @@
       },
       canFollow () {
         return this.$route.params.questionType >= 0
+      },
+      showRecommendQuestion () {
+        return !(this.$route.params.questionType >= 0) && this.hasLogin
       },
       ...mapGetters(['hasLogin'])
     },

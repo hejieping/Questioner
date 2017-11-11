@@ -42,7 +42,9 @@ public class AnswerController {
     /**
      * 线程池服务
      */
-    private static ExecutorService executorService = Executors.newFixedThreadPool(20);
+    @Autowired
+    private  ExecutorService executorService ;
+
     @Autowired
     private AnswerService answerService;
 

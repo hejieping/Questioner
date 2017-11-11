@@ -10,6 +10,16 @@ export function getUser (userId) {
   })
 }
 
+export function getUserPreference (userId, size = 5) {
+  return fetch({
+    url: '/user/getPreference/' + userId,
+    methods: 'get',
+    params: {
+      preferenceSize: size
+    }
+  })
+}
+
 export function getFollowInfo (userId) {
   return fetch({
     url: '/user/followersInfo/' + userId,

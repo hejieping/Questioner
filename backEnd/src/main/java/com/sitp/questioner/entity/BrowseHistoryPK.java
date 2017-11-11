@@ -25,4 +25,30 @@ public class BrowseHistoryPK implements Serializable {
     public void setItemid(Long itemid) {
         this.itemid = itemid;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BrowseHistoryPK)) return false;
+
+        BrowseHistoryPK that = (BrowseHistoryPK) o;
+
+        if (!getUserid().equals(that.getUserid())) return false;
+        return getItemid().equals(that.getItemid());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getUserid().hashCode();
+        result = 31 * result + getItemid().hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "BrowseHistoryPK{" +
+                "userid=" + userid +
+                ", itemid=" + itemid +
+                '}';
+    }
 }
