@@ -14,9 +14,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class QuestionNoticeServiceImpl implements QuestionNoticeService{
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private QuestionNoticeRepository questionNoticeRepository;
@@ -46,7 +50,7 @@ public class QuestionNoticeServiceImpl implements QuestionNoticeService{
         tempQuestion.setQuestionTitle(question.getQuestionTitle());
         tempQuestion.setId(questionId);
 
-        accounts.forEach((account) -> new Thread(()->{
+        accounts.forEach((account) -> executorService.submit(()->{
             QuestionNotice questionNotice = new QuestionNotice();
             questionNotice.setAnswer(answer);
             questionNotice.setAccount(account);
@@ -56,7 +60,7 @@ public class QuestionNoticeServiceImpl implements QuestionNoticeService{
             questionNotice.setAccount(null);
             questionNotice.getAnswer().setAccount(tempAccount);
             NoticeWebSocket.pushMessageToOneUser(account.getId().toString(), questionNotice);
-        }).start());
+        }));
     }
 
 

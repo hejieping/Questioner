@@ -1,10 +1,10 @@
 package com.sitp.questioner.service.impl;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -58,7 +58,7 @@ public class RecommendServiceImpl implements RecommendService {
 
     public static Random random = new Random();
     @Override
-    public void broweRecord(Long accountid, Long questionId) {
+    public void browseRecord(Long accountid, Long questionId) {
         //查询问题的类型id
         Long questionTypeId = questionRepository.findOne(questionId).getQuestionType().getId();
         //记录浏览
@@ -89,10 +89,10 @@ public class RecommendServiceImpl implements RecommendService {
     @Override
     public List<Preference> getPreferences(Long accountId, int preferenceSize) throws TasteException {
         List<BrowseHistory> browseHistoryList = getBrowseHistory(accountId);
-        List<Long> typeIdList = Lists.newArrayList();
-        List<Preference> preferenceList = Lists.newArrayList();
-        int index = 0;
-        for(BrowseHistory browseHistory : browseHistoryList){
+        List<Long> typeIdList ;//= Lists.newArrayList();
+        List<Preference> preferenceList;// = Lists.newArrayList();
+    /*     int index = 0;
+       for(BrowseHistory browseHistory : browseHistoryList){
             if(index < preferenceSize){
                 typeIdList.add(browseHistory.getItemid());
                 index++;
@@ -101,13 +101,14 @@ public class RecommendServiceImpl implements RecommendService {
                 index = 0;
                 break;
             }
-        }
+        }*/
+        typeIdList = browseHistoryList.stream().limit(preferenceSize).map(BrowseHistory::getItemid).collect(Collectors.toList());
         List<QuestionType> questionTypeList = questionTypeRepository.findByIdIn(typeIdList);
         Map<Long,QuestionType> questionTypeMap = Maps.newHashMap();
         for(QuestionType questionType : questionTypeList){
             questionTypeMap.put(questionType.getId(),questionType);
         }
-        for(BrowseHistory browseHistory : browseHistoryList){
+    /*    for(BrowseHistory browseHistory : browseHistoryList){
             if(index < preferenceSize){
                 Preference preference = new Preference();
                 preference.setPreferenceValue(browseHistory.getPreference());
@@ -116,7 +117,14 @@ public class RecommendServiceImpl implements RecommendService {
                 preferenceList.add(preference);
                 index++;
             }
-        }
+        }*/
+        preferenceList = browseHistoryList.stream().limit(preferenceSize).map((browseHistory) -> {
+            Preference preference = new Preference();
+            preference.setPreferenceValue(browseHistory.getPreference());
+            preference.setSubject(questionTypeMap.get(browseHistory.getItemid()).getSubject());
+            preference.setCourse(questionTypeMap.get(browseHistory.getItemid()).getCourse());
+            return preference;
+        }).collect(Collectors.toList());
         return preferenceList;
     }
 
@@ -140,15 +148,10 @@ public class RecommendServiceImpl implements RecommendService {
             BrowseHistory browseHistory = new BrowseHistory();
             browseHistory.setUserid(accountId);
             browseHistory.setItemid(recommendedItem.getItemID());
-            browseHistory.setPreference(new Double(recommendedItem.getValue()));
+            browseHistory.setPreference((double) recommendedItem.getValue());
             browseHistoryList.add(browseHistory);
         }
-        Collections.sort(browseHistoryList, new Comparator<BrowseHistory>() {
-            @Override
-            public int compare(BrowseHistory o1, BrowseHistory o2) {
-                return o1.getPreference().compareTo(o2.getPreference());
-            }
-        });
+        browseHistoryList.sort(Comparator.comparing(BrowseHistory::getPreference));
         return browseHistoryList;
     }
 
@@ -158,11 +161,9 @@ public class RecommendServiceImpl implements RecommendService {
      * @return
      */
     private Question getRandomQuestionByType(Long typeid){
-        Pageable pageable = new PageableBuilder().setCurrentPage(0)
-            .setPageSize(10000).setSortParam("id")
-            .setDirection(Sort.Direction.DESC).buildPage();
-        List<Question> questionList = questionRepository.getQuestionByPageAndType(typeid,pageable).getContent();
-        return questionList.get(random.nextInt(questionList.size()));
+        List<Long> questionIdList = questionRepository.getAllQuestionIdByQuestionTypeId(typeid);
+        Long questionId = questionIdList.get(random.nextInt(questionIdList.size()));
+        return questionRepository.findOne(questionId);
     }
     public static void refresh(){
         mysqlDataSource = new MysqlDataSource();

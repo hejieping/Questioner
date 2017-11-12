@@ -1,6 +1,7 @@
 package com.sitp.questioner.entity;
 
 import java.sql.Time;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,7 +19,7 @@ public class BrowseHistory {
     @Id
     Long itemid;
     Double preference;
-    Time timestamp = null;
+    Date timestamp = null;
     public Long getUserid() {
         return userid;
     }
@@ -43,7 +44,7 @@ public class BrowseHistory {
         this.preference = preference;
     }
 
-    public Time getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 

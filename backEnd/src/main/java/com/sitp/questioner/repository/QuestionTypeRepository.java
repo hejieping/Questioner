@@ -17,6 +17,7 @@ public interface QuestionTypeRepository extends CrudRepository<QuestionType,Long
             ,nativeQuery = true)
     int hasFollowQuestionType(Long userId, Long questionTypeId);
 
+
     @Query("select q from QuestionType q join q.followers f where f.id = ?1")
     Page<QuestionType> getUserFollowQuestionType(Long userId, Pageable pageable);
     List<QuestionType> findByIdIn(List<Long> idList);

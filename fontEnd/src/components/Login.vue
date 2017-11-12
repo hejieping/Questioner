@@ -265,7 +265,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin: 100px auto;
+    margin: 145px auto;
     width: 350px;
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;

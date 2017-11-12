@@ -32,6 +32,16 @@ export function getAllQuestion (questionTitle, currentPage, pageSize, sortParam)
   })
 }
 
+export function getRecommendQuestion (recommendSize = 3) {
+  return fetch({
+    url: '/question/recommend/',
+    method: 'get',
+    params: {
+      questionSize: recommendSize
+    }
+  })
+}
+
 export function getQuestionByType (questionTitle, questionTypeId, currentPage, pageSize, sortParam) {
   return fetch({
     url: '/question/getQuestionByType/' + questionTypeId,
