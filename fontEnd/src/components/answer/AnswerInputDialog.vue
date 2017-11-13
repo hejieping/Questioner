@@ -1,6 +1,6 @@
 <template>
   <el-dialog size="large" :visible.sync="dialogVisible">
-    <div id="userinfo" style="position: fixed; top: 10px; margin-bottom: 20px">
+    <div v-if="userInfo" id="userinfo" style="position: fixed; top: 10px; margin-bottom: 20px">
       <h3>感谢您的回答</h3>
       <img class="useravatar" :src="userInfo.avatarURL"/>
       <span>{{ userInfo.username }}</span>
@@ -33,7 +33,7 @@
       return {
         dialogVisible: false,
         config: {
-          initialFrameWidth: 900,
+          initialFrameWidth: 1100,
           initialFrameHeight: 250
         },
         editorReady: false

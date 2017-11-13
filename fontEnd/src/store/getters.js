@@ -7,7 +7,8 @@ const getters = {
     return state.user.token !== null
   },
   user: state => state.user.userInfo,
-  isQuestionListPage: state => state.common.inQuestionListPage
+  isQuestionListPage: state => state.common.inQuestionListPage,
+  questionType: state => state.common.questionType
 }
 
 export default getters

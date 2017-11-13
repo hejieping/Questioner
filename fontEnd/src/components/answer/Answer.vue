@@ -35,6 +35,15 @@
           <i @click="acceptAnswer()"  style="color: green" class="fa fa-check"></i>
         </el-tooltip>
       </span>
+      <!-- JiaThis Button BEGIN -->
+      <div @mouseover="setShareUrl()" class="jiathis_style" style="float: right; margin-right: 65px">
+        <span class="jiathis_txt">分享到：</span>
+        <a class="jiathis_button_cqq"></a>
+        <a class="jiathis_button_weixin"></a>
+        <a class="jiathis_button_qzone"></a>
+        <a class="jiathis_button_tsina"></a>
+        <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+      </div><!-- JiaThis Button END -->
     </div>
     <div class="commentDetail" v-show="showComment">
       <comment :answerId="answer.id"></comment>
@@ -74,12 +83,15 @@
   import { giveAnswerFeedback, acceptAnswer } from '@/api/answer'
   import '../../../static/UE/ueditor.parse'
   import { Message } from 'element-ui'
+  import { mapGetters } from 'vuex'
+  import { initShare } from '@/utils/util'
   export default {
     components: { 'comment': Comment },
     data () {
       return {
         isFeedback: false,
-        showComment: false
+        showComment: false,
+        questionId: null
       }
     },
     props: {
@@ -89,7 +101,8 @@
     computed: {
       showAccept: function () {
         return this.isCurrentUser && !this.answer.accepted
-      }
+      },
+      ...mapGetters(['hasLogin'])
     },
     mounted: function () {
       this.$nextTick(function () {
@@ -97,6 +110,8 @@
           rootPath: '../../static/UE/'
         })
       })
+      this.questionId = this.$route.params.questionId
+      initShare()
     },
     methods: {
       toggleComment () {
@@ -108,6 +123,10 @@
       },
       giveFeedback (isGood) {
         if (this.isFeedback) {
+          return
+        }
+        if (!this.hasLogin) {
+          bus.$emit('requestLogin')
           return
         }
         giveAnswerFeedback(this.answer.id, isGood).then((response) => {
@@ -161,6 +180,9 @@
           type: 'error',
           duration: 1000
         })
+      },
+      setShareUrl () {
+        window.jiathis_config.url = window.location.host + '/questionDetail/' + this.questionId + '/' + this.answer.id
       }
     }
   }

@@ -30,6 +30,8 @@ import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RecommendServiceImpl implements RecommendService {
+    private static Logger logger = LoggerFactory.getLogger(RecommendServiceImpl.class);
     private static DataModel dataModel;
     private static UserSimilarity similarity;
     private static UserNeighborhood neighborhood;
@@ -88,36 +91,19 @@ public class RecommendServiceImpl implements RecommendService {
 
     @Override
     public List<Preference> getPreferences(Long accountId, int preferenceSize) throws TasteException {
-        List<BrowseHistory> browseHistoryList = getBrowseHistory(accountId);
-        List<Long> typeIdList ;//= Lists.newArrayList();
-        List<Preference> preferenceList;// = Lists.newArrayList();
-    /*     int index = 0;
-       for(BrowseHistory browseHistory : browseHistoryList){
-            if(index < preferenceSize){
-                typeIdList.add(browseHistory.getItemid());
-                index++;
-            }
-            else {
-                index = 0;
-                break;
-            }
-        }*/
+        // here it will use machine learning Algorithm to predict the user preference, so it'll cost much time,
+        // in the future the machine learning Algorithm can be skipped here for it's to slow
+     //   List<BrowseHistory> browseHistoryList = getBrowseHistory(accountId);
+        // now we don't want to use recommend data just to get user preference
+        List<BrowseHistory> browseHistoryList = getBrowseHistory(accountId, false);
+        List<Long> typeIdList ;
+        List<Preference> preferenceList;
         typeIdList = browseHistoryList.stream().limit(preferenceSize).map(BrowseHistory::getItemid).collect(Collectors.toList());
         List<QuestionType> questionTypeList = questionTypeRepository.findByIdIn(typeIdList);
         Map<Long,QuestionType> questionTypeMap = Maps.newHashMap();
         for(QuestionType questionType : questionTypeList){
             questionTypeMap.put(questionType.getId(),questionType);
         }
-    /*    for(BrowseHistory browseHistory : browseHistoryList){
-            if(index < preferenceSize){
-                Preference preference = new Preference();
-                preference.setPreferenceValue(browseHistory.getPreference());
-                preference.setSubject(questionTypeMap.get(browseHistory.getItemid()).getSubject());
-                preference.setCourse(questionTypeMap.get(browseHistory.getItemid()).getCourse());
-                preferenceList.add(preference);
-                index++;
-            }
-        }*/
         preferenceList = browseHistoryList.stream().limit(preferenceSize).map((browseHistory) -> {
             Preference preference = new Preference();
             preference.setPreferenceValue(browseHistory.getPreference());
@@ -134,13 +120,20 @@ public class RecommendServiceImpl implements RecommendService {
     }
 
     private List<BrowseHistory> getBrowseHistory(Long accountId) throws TasteException {
+        return getBrowseHistory(accountId, true);
+    }
 
-        List<RecommendedItem> recommendations = null;
-        try {
-            //算法只给出用户从未浏览过的问题类型的预估喜欢程度
-            recommendations = recommender.recommend(accountId, QuestionerConstants.RECOMMEND_MAX_NUMBER);
-        }catch (NoSuchUserException e){
-            recommendations = Lists.newArrayList();
+
+    private List<BrowseHistory> getBrowseHistory(Long accountId, boolean withRecommend) throws TasteException {
+
+        List<RecommendedItem> recommendations = Lists.newArrayList();
+        if (withRecommend) {
+            try {
+                //算法只给出用户从未浏览过的问题类型的预估喜欢程度
+                recommendations = recommender.recommend(accountId, QuestionerConstants.RECOMMEND_MAX_NUMBER);
+            }catch (NoSuchUserException e){
+                logger.error("Can't recommend question");
+            }
         }
         //将预估喜欢程度和已有的喜欢程度和在一起，排序，取出喜欢程度高的作为问题推荐
         List<BrowseHistory> browseHistoryList = browseHistoryRepository.findByUserid(accountId);
@@ -151,7 +144,7 @@ public class RecommendServiceImpl implements RecommendService {
             browseHistory.setPreference((double) recommendedItem.getValue());
             browseHistoryList.add(browseHistory);
         }
-        browseHistoryList.sort(Comparator.comparing(BrowseHistory::getPreference));
+        browseHistoryList.sort(Comparator.comparing(BrowseHistory::getPreference).reversed());
         return browseHistoryList;
     }
 

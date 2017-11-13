@@ -15,6 +15,9 @@
             <el-input type="password" v-model="loginform.password" autoComplete="false"
                       icon="fa-lock" placeholder="请输入密码"></el-input>
           </el-form-item>
+          <el-form-item class="verification">
+            <div id="login_verification_code_id" style="width: 400px"></div>
+          </el-form-item>
           <el-form-item class="login-button">
             <el-button style="width: 100%" type="success" :loading="logining" @click.native.prevent="login" >登录</el-button>
           </el-form-item>
@@ -145,11 +148,20 @@
           ]
         },
         registering: false,
-        registerVerification: false
+        registerVerification: false,
+        loginVerification: false
       }
     },
     methods: {
       login (ev) {
+        if (!this.loginVerification) {
+          Message({
+            message: '请滑动滑块进行验证！',
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
         let _this = this
         this.$refs.loginform.validate((valid) => {
           if (valid) {
@@ -210,7 +222,9 @@
           _this.$refs.registerform.resetFields()
           _this.registerform.password = ''
           _this.registerform.passwordAgain = ''
-          _this.initVerificationCode()
+          _this.initVerificationCode('verification_code_id', function (data) {
+            _this.registerVerification = true
+          })
           this.registerVerification = false
         })
       },
@@ -218,23 +232,23 @@
         const _this = this
         this.$nextTick(function () {
           _this.$refs.loginform.resetFields()
+          _this.initVerificationCode('login_verification_code_id', function (data) {
+            _this.loginVerification = true
+          })
         })
       },
-      initVerificationCode () {
-        const _this = this
+      initVerificationCode (id, callback) {
         const nc = new noCaptcha()
         const nc_appkey = 'FFFF0000000001787D7C'  // 应用标识,不可更改
         const nc_scene = 'register'  // 场景,不可更改
         const nc_token = [nc_appkey, (new Date()).getTime(), Math.random()].join(':')
         const nc_option = {
-          renderTo: '#verification_code_id', // 渲染到该DOM ID指定的Div位置
+          renderTo: '#' + id, // 渲染到该DOM ID指定的Div位置
           appkey: nc_appkey,
           scene: nc_scene,
           token: nc_token,
           trans: '{"name1":"code100"}', // 测试用，特殊nc_appkey时才生效，正式上线时请务必要删除；code0:通过;code100:点击验证码;code200:图形验证码;code300:恶意请求拦截处理
-          callback: function (data) { // 校验成功回调
-            _this.registerVerification = true
-          }
+          callback: callback
         }
         nc.init(nc_option)
       }
@@ -265,7 +279,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin: 145px auto;
+    margin: 123px auto;
     width: 350px;
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;

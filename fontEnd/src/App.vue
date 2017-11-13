@@ -9,6 +9,9 @@
 <style>
   html,body{background: #f1efe2;}
   img {vertical-align: middle}
+  .code {
+    overflow-x: scroll;
+  }
 </style>
 <script>
 export default {

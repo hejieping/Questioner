@@ -17,6 +17,14 @@
           <el-button @click.prevent="writeAnswer()" size="small" icon="edit" type="info">写回答</el-button>
         </el-tooltip>
       </div>
+      <div @mouseover="setShareUrl()" class="jiathis_style" style="clear: both; float: right; margin-right: 80px; margin-top: 10px">
+        <span class="jiathis_txt">分享到：</span>
+        <a class="jiathis_button_cqq"></a>
+        <a class="jiathis_button_weixin"></a>
+        <a class="jiathis_button_qzone"></a>
+        <a class="jiathis_button_tsina"></a>
+        <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+      </div>
     </div>
     <div id="question-detail" v-html="question.questionContent">
     </div>
@@ -58,6 +66,7 @@
   import AnswerInputDialog from '@/components/answer/AnswerInputDialog'
   import bus from '../../assets/eventBus.js'
   import { mapGetters } from 'vuex'
+  import { initShare } from '@/utils/util'
   export default {
     components: { 'answer-dialog': AnswerInputDialog },
     props: {
@@ -88,6 +97,7 @@
       bus.$on('loginSuccess', function () {
         _this.getFollowStatus()
       })
+      initShare()
     },
     computed: {
       ...mapGetters(['hasLogin', 'user'])
@@ -206,6 +216,9 @@
           return
         }
         this.$refs.dialog.open()
+      },
+      setShareUrl () {
+        window.jiathis_config = window.location.host + '/questionDetail/' + this.questionId
       }
     }
   }

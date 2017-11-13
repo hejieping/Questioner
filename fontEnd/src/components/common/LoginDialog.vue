@@ -66,7 +66,9 @@
                   type: 'error',
                   duration: 1000
                 })
-                _this.resetForm()
+                _this.$nextTick(() => {
+                  _this.resetForm()
+                })
               })
           }
         })

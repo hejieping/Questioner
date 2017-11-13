@@ -188,38 +188,25 @@
   import { getQuestionType } from '@/api/question'
   import { Message } from 'element-ui'
   import { transformQuestionType2Map } from '@/utils/util'
+  import { mapGetters } from 'vuex'
 
   export default {
     data () {
       return {
         questionTypeArray: [],
-        loading: true
+        loading: false
       }
     },
     computed: {
       questionTypeMap () {
         return transformQuestionType2Map(this.questionTypeArray)
-      }
+      },
+      ...mapGetters(['questionType'])
     },
     mounted: function () {
-      var _this = this
       this.initToggleEvent()
       this.openNav()
-      getQuestionType().then((response) => {
-        if (response.status === '200') {
-          _this.questionTypeArray = response.result
-          _this.loading = false
-          _this.$nextTick(function () {
-            _this.initEvent()
-          })
-        }
-      }).catch((e) => {
-        Message({
-          message: '获取问题类别信息失败',
-          type: 'error',
-          duration: 5 * 1000
-        })
-      })
+      this.initQuestionType()
     },
     methods: {
       initEvent () {
@@ -260,7 +247,6 @@
         $('#canvas').css('width', '70%')
         $('#question-list').css('margin-right', '0')
       },
-
       toggleNavigation () {
         if ($('#container').hasClass('display-nav')) {
           this.closeNav()
@@ -268,6 +254,32 @@
           // Open Nav
           this.openNav()
         }
+      },
+      initQuestionType () {
+        if (this.questionType !== null) {
+          this.questionTypeArray = this.questionType
+          this.$nextTick(function () {
+            this.initEvent()
+          })
+          return
+        }
+        this.loading = true
+        getQuestionType().then((response) => {
+          if (response.status === '200') {
+            this.questionTypeArray = response.result
+            this.loading = false
+            this.$store.dispatch('init_question_type', this.questionTypeArray)
+            this.$nextTick(function () {
+              this.initEvent()
+            })
+          }
+        }).catch((e) => {
+          Message({
+            message: '获取问题类别信息失败',
+            type: 'error',
+            duration: 5 * 1000
+          })
+        })
       }
     }
   }
