@@ -10,14 +10,12 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by qi on 2017/10/26.
  */
 @ServerEndpoint(value = "/websocket/notice")
-@Component
 public class NoticeWebSocket {
 
     private static Logger logger = LoggerFactory.getLogger(NoticeWebSocket.class);
