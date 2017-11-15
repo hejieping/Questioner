@@ -16,7 +16,7 @@
     </el-menu-item>
 
     <el-submenu v-if="hasLogin" id="personInfo" index="3">
-      <template slot="title"><span><img :src="avatar" class="top-header-img">
+      <template slot="title"><span><img :src="user.avatarURL" class="top-header-img">
         个人中心</span>
       </template>
       <el-menu-item @click="$router.push({ path: `/user/${user.id}` })" index="3-1">
