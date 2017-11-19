@@ -191,7 +191,7 @@
         this.$router.push({ path: `/questionDetail/${notice.question.id}/${notice.answer.id}` })
       },
       connectToSocket () {
-        this.socket = new WebSocket('ws://localhost:8080/websocket/notice?id=' + this.user.id)
+        this.socket = new WebSocket('ws://119.23.77.132:8080/websocket/notice?id=' + this.user.id)
         this.socket.onopen = this.socketOpen
         this.socket.onmessage = this.socketReceiveMessage
       },

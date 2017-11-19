@@ -14,7 +14,7 @@
                        v-model="avatarUploadShow"
                        :width="100"
                        :height="100"
-                       url="http://localhost:8080/uploadAvatar"
+                       url="http://119.23.77.132:8080/uploadAvatar"
                        :headers="headers"
                        img-format="png"></my-upload>
           </div>

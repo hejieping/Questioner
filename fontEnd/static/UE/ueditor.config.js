@@ -21,7 +21,7 @@
    */
   window.UEDITOR_HOME_URL = '/static/UE/';
   var URL = window.UEDITOR_HOME_URL || getUEBasePath();
-  var serverURL = "http://localhost:8080/";
+  var serverURL = "http://119.23.77.132:8080/";
 
   /**
    * 配置项主体。注意，此处所有涉及到路径的配置别遗漏URL变量。

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionNoticeServiceImpl implements QuestionNoticeService{
@@ -39,6 +40,8 @@ public class QuestionNoticeServiceImpl implements QuestionNoticeService{
 
         Account questionPublisher = accountRepository.findOne(question.getPublisher().getId());
         List<Account> accounts = questionRepository.getQuestionFollowers(questionId);
+        // first remove the question publisher to avoid send the notification for two times
+        accounts = accounts.stream().filter(account -> !account.getId().equals(questionPublisher.getId())).collect(Collectors.toList());
         accounts.add(questionPublisher);
 
         Account answerUser = accountRepository.findOne(answer.getAccount().getId());
