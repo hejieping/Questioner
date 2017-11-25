@@ -138,7 +138,7 @@
       }
     },
     computed: {
-      ...mapGetters(['hasLogin'])
+      ...mapGetters(['hasLogin', 'user'])
     },
     mounted: function () {
       const eventName = 'comment_' + this.answerId
@@ -151,7 +151,6 @@
           bus.$emit('requestLogin')
           return
         }
-        let _this = this
         postAnswerComment(this.answerId, this.newComment).then((response) => {
           if (response.status === '201') {
             Message({
@@ -164,11 +163,12 @@
               thumbsUpCount: 0,
               commentDateTime: new Date(),
               commenter: {
-                username: _this.username,
-                avatarURL: 'http://localhost:8080/img/avatar/default.png'
+                username: this.user.username,
+                avatarURL: this.user.avatarURL,
+                id: this.user.id
               }
             })
-            _this.newComment = ''
+            this.newComment = ''
           }
         }).catch((e) => {
           Message({
