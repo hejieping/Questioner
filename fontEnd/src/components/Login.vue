@@ -257,6 +257,8 @@
       this.register = this.$route.query.register === 'true'
       if (this.register) {
         this.resetRegisterForm()
+      } else {
+        this.resetLoginForm()
       }
     },
     watch: {

@@ -41,7 +41,9 @@
       },
       showDialog () {
         this.dialogVisible = true
-        this.resetForm()
+        this.$nextTick(() => {
+          this.resetForm()
+        })
       },
       login () {
         let _this = this
