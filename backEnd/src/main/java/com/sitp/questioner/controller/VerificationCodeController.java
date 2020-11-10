@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class VerificationCodeController {
     private static IAcsClient client = null;
     static {
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAIcBJZtnRFweBE", "ve5XQLVVXL67dbKhbBRjjfnkz5hRuI");
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAIcBJZtnRFweBE...", "ve5XQLVVXL67dbKhbBRjjfnkz5hRuI...");
         client = new DefaultAcsClient(profile);
         try {
             DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", "Jaq", "jaq.aliyuncs.com");
